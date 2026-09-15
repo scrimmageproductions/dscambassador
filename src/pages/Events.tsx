@@ -6,6 +6,7 @@ import { SWCHeatMap } from '../components/interactive/SWCHeatMap'
 import { EventMaterialsRequest } from '../components/interactive/EventMaterialsRequest'
 import { CardTapDemo } from '../components/interactive/CardTapDemo'
 import { CultureMedia } from '../components/ui/CultureMedia'
+import { EventFeed } from '../components/interactive/EventFeed'
 import { Link } from 'react-router-dom'
 
 export function Events() {
@@ -20,12 +21,12 @@ export function Events() {
       <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
         <div className="grid gap-5 sm:grid-cols-3">
           <HairlineCard>
-            <p className="label-mono text-[0.68rem] text-gold">Grassroots</p>
-            <h3 className="mt-4 font-display text-xl text-cream">Stand With Crypto circuit</h3>
+            <p className="label-mono text-[0.68rem] text-gold">Circuit</p>
+            <h3 className="mt-4 font-display text-xl text-cream">Ecosystem events</h3>
             <p className="mt-2 text-sm leading-relaxed text-cream-3">
-              Priority coverage of SWC events across the United States. Ambassadors join local
-              gatherings, represent the brand, and network with legislators, founders, and
-              newcomers.
+              Priority coverage of major conferences, side-events, and grassroots meetups.
+              Ambassadors represent the brand, onboard members, and network with founders,
+              builders, and newcomers across the globe.
             </p>
           </HairlineCard>
           <HairlineCard>
@@ -47,6 +48,18 @@ export function Events() {
               page for how chapters work.
             </p>
           </HairlineCard>
+        </div>
+      </section>
+
+      <section className="hairline-t bg-surface/20">
+        <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
+          <SectionLabel>The circuit feed</SectionLabel>
+          <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
+            What&rsquo;s next, by category.
+          </h2>
+          <div className="mt-10">
+            <EventFeed />
+          </div>
         </div>
       </section>
 
