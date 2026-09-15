@@ -4,7 +4,6 @@ import { SectionLabel } from '../components/ui/SectionLabel'
 import { HairlineCard } from '../components/ui/HairlineCard'
 import { CommitmentStrip } from '../components/interactive/CommitmentStrip'
 import { EligibilityChecker } from '../components/interactive/EligibilityChecker'
-import { ExternalImage } from '../components/ui/ExternalImage'
 import { CultureMedia } from '../components/ui/CultureMedia'
 import { Link } from 'react-router-dom'
 
@@ -112,12 +111,14 @@ export function Home() {
               </LinkButton>
             </div>
           </div>
-          <ExternalImage
-            src="https://www.spenders.club/cdn/shop/files/Bag_1x1_f42b5c50-65b3-424f-ba87-ce6788295c892.png"
-            alt="Digital Spenders Club Abundance Bundle"
-            fallbackLabel="Abundance Bundle"
-            className="hairline aspect-square w-full bg-surface/40 object-cover"
-          />
+          <div className="hairline aspect-square w-full overflow-hidden bg-surface/40">
+            <img
+              src="/apparelgif.gif"
+              alt="Digital Spenders Club apparel"
+              loading="lazy"
+              className="h-full w-full object-contain"
+            />
+          </div>
         </div>
       </section>
 
