@@ -11,7 +11,11 @@ export function Layout() {
   }, [pathname])
 
   return (
-    <div className="flex min-h-screen flex-col bg-bg">
+    <div className="relative flex min-h-screen flex-col bg-bg">
+      <div
+        className="bg-grain pointer-events-none fixed inset-0 z-30 opacity-[0.05]"
+        aria-hidden="true"
+      />
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-cream focus:px-4 focus:py-2 focus:text-ink"
