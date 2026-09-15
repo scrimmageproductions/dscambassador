@@ -3,6 +3,7 @@ import { SectionLabel } from '../components/ui/SectionLabel'
 import { HairlineCard } from '../components/ui/HairlineCard'
 import { LinkButton } from '../components/ui/Button'
 import { KitConfigurator } from '../components/interactive/KitConfigurator'
+import { CardTapDemo } from '../components/interactive/CardTapDemo'
 import { MembershipCardIllustration } from '../components/illustrations/Garments'
 
 const columns = [
@@ -50,18 +51,29 @@ export function Kit() {
           <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
             The DSC Membership Card.
           </h2>
-          <div className="mt-10 grid items-center gap-10 md:grid-cols-2">
-            <MembershipCardIllustration className="w-full" />
-            <div>
-              <h3 className="font-display text-2xl text-cream">A card that means something.</h3>
-              <p className="mt-3 text-sm leading-relaxed text-cream-3">
-                Every ambassador holds an allotment of DSC Membership Cards to give out at their
-                own discretion — only to people who will actually push the movement forward. This
-                is the IRL onboarding tool: hand one to someone at a conference, meetup, or club
-                night, and they&rsquo;re in. Black and cream, numbered, unmistakably not a loyalty
-                punch card.
-              </p>
-            </div>
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-cream-3">
+            Every member — ambassador or not — taps their card to their phone to get into Burner,
+            the club&rsquo;s app. There&rsquo;s no separate login. The card is the key.
+          </p>
+          <div className="mt-10">
+            <CardTapDemo />
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
+        <SectionLabel>Membership object</SectionLabel>
+        <div className="mt-8 grid items-center gap-10 md:grid-cols-2">
+          <MembershipCardIllustration className="w-full" />
+          <div>
+            <h3 className="font-display text-2xl text-cream">A card that means something.</h3>
+            <p className="mt-3 text-sm leading-relaxed text-cream-3">
+              Every ambassador holds an allotment of DSC Membership Cards to give out at their own
+              discretion — only to people who will actually push the movement forward. Hand one to
+              someone at a conference, meetup, or club night, and their first tap is the one that
+              opens Burner for them. Black and cream, numbered, unmistakably not a loyalty punch
+              card.
+            </p>
           </div>
         </div>
       </section>

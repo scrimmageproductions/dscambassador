@@ -30,9 +30,9 @@ npm run lint       # oxlint
 | --- | --- |
 | `/` | Home — hero, three program tiles, commitment cadence strip, eligibility checker |
 | `/program` | The Program — who we want, the commitment table, content rules, success metrics |
-| `/kit` | The Kit — wearables/tools/comms, membership card, kit configurator |
+| `/kit` | The Kit — wearables/tools/comms, membership card tap demo, kit configurator |
 | `/campus` | Campus — chapter cards, merch kickback, chapter flow, chapter interest form |
-| `/events` | Events — SWC/conference circuit map, card onboarding, materials request preview |
+| `/events` | Events — SWC/conference circuit map, card tap onboarding, materials request preview |
 | `/apply` | Apply — 4-step ambassador application wizard |
 | `/guidelines` | Guidelines — printable official rules |
 | `/hq` | HQ — preview of the private ambassador HQ (Telegram, SYNC calls, Discord), gated as "after approval" |
@@ -51,6 +51,8 @@ All under `src/components/interactive/` and `src/components/apply/`:
   daily engagement, and the quarterly IRL slot on a single month grid.
 - **Kit configurator** (`KitConfigurator.tsx`) — garment, colorway, size, and region, with a
   live SVG preview of the complimentary piece.
+- **Card tap demo** (`CardTapDemo.tsx`) — simulated tap-to-phone animation showing a DSC
+  Membership Card unlocking the Burner app; every member (not just new ones) taps in this way.
 - **Campus interest form** (`CampusInterestForm.tsx`) — school/club/city/headcount, separate
   from the main ambassador application.
 - **Event materials request** (`EventMaterialsRequest.tsx`) — intentionally disabled preview;
