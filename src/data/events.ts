@@ -1,4 +1,4 @@
-export type EventSource = 'Ecosystem' | 'Plan.wtf' | 'Stand With Crypto' | 'Campus'
+export type EventSource = 'Lu.ma Crypto' | 'Team1' | 'Plan.wtf' | 'Stand With Crypto' | 'Campus'
 export type DscStatus = 'Ambassadors Attending' | 'Priority Circuit' | 'Open Call'
 
 export type CircuitEvent = {
@@ -12,57 +12,90 @@ export type CircuitEvent = {
   dscStatus: DscStatus
 }
 
+/** Short monospace tag shown on each event card, e.g. "LUMA // CRYPTO". */
+export const sourceBadge: Record<EventSource, string> = {
+  'Lu.ma Crypto': 'LUMA // CRYPTO',
+  Team1: 'TEAM1',
+  'Plan.wtf': 'PLAN.WTF',
+  'Stand With Crypto': 'SWC',
+  Campus: 'CAMPUS',
+}
+
 /**
  * Illustrative circuit sample — not a live feed. Live scraping of
- * standwithcrypto.org/events and plan.wtf isn't available from this build
- * environment, so dates below are seasonal placeholders, not confirmed
- * bookings. Links point to the source calendars themselves, not fabricated
- * per-event ticket pages. Swap this file for a real feed when one exists.
+ * standwithcrypto.org/events, plan.wtf, lu.ma/crypto, and lu.ma/Team1 isn't
+ * available from this build environment (all four domains are blocked by
+ * the sandbox's egress policy), so dates below are seasonal placeholders,
+ * not confirmed bookings. Links point to each source's hub page itself,
+ * not fabricated per-event ticket URLs. Swap this file for a real feed
+ * (or a build-time scrape) when one exists.
  */
 export const events: CircuitEvent[] = [
   {
     id: 'eth-denver',
     title: 'ETHDenver',
-    source: 'Ecosystem',
+    source: 'Lu.ma Crypto',
     date: 'February 2026',
     location: 'Denver, CO',
     description:
       'Builder-week anchor for the entire circuit. Hackathon energy, side-events stacked wall to wall, and the highest ambassador density of the year.',
-    link: 'https://sheeets.xyz',
+    link: 'https://lu.ma/crypto',
     dscStatus: 'Priority Circuit',
   },
   {
     id: 'consensus',
     title: 'Consensus',
-    source: 'Ecosystem',
+    source: 'Lu.ma Crypto',
     date: 'Spring 2026',
     location: 'Austin, TX',
     description:
       'Mainstage conference with a heavy founder and institutional presence — a strong booth-adjacent onboarding opportunity.',
-    link: 'https://sheeets.xyz',
+    link: 'https://lu.ma/crypto',
     dscStatus: 'Ambassadors Attending',
   },
   {
     id: 'token2049',
     title: 'Token2049',
-    source: 'Ecosystem',
+    source: 'Lu.ma Crypto',
     date: 'Q3 2026',
     location: 'Singapore',
     description:
       "The region's largest builder and investor gathering. Priority coverage for ambassadors already active in APAC.",
-    link: 'https://sheeets.xyz',
+    link: 'https://lu.ma/crypto',
     dscStatus: 'Priority Circuit',
   },
   {
     id: 'solana-breakpoint',
     title: 'Solana Breakpoint',
-    source: 'Ecosystem',
+    source: 'Lu.ma Crypto',
     date: 'Q4 2026',
     location: 'Location TBD',
     description:
       'Annual flagship for the Solana ecosystem. Open call for ambassadors who want to run point on-site.',
-    link: 'https://sheeets.xyz',
+    link: 'https://lu.ma/crypto',
     dscStatus: 'Open Call',
+  },
+  {
+    id: 'team1-summit',
+    title: 'Team1 Ambassador Summit',
+    source: 'Team1',
+    date: 'Ongoing',
+    location: 'Virtual + regional hubs',
+    description:
+      'Avalanche Team1’s cross-ecosystem ambassador gathering. High overlap audience — builders already fluent in chapter-style ambassador programs.',
+    link: 'https://lu.ma/Team1',
+    dscStatus: 'Open Call',
+  },
+  {
+    id: 'team1-regional',
+    title: 'Team1 Regional Builder Meetup',
+    source: 'Team1',
+    date: 'Ongoing — monthly',
+    location: 'Rotating cities',
+    description:
+      'Regional builder meetups run under the Team1 banner. A natural cross-promotion lane for DSC ambassadors already covering that city.',
+    link: 'https://lu.ma/Team1',
+    dscStatus: 'Ambassadors Attending',
   },
   {
     id: 'denver-side-events',
