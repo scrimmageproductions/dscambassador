@@ -5,6 +5,7 @@ import { LinkButton } from '../components/ui/Button'
 import { SWCHeatMap } from '../components/interactive/SWCHeatMap'
 import { EventMaterialsRequest } from '../components/interactive/EventMaterialsRequest'
 import { CardTapDemo } from '../components/interactive/CardTapDemo'
+import { CultureMedia } from '../components/ui/CultureMedia'
 import { Link } from 'react-router-dom'
 
 export function Events() {
@@ -46,6 +47,22 @@ export function Events() {
               page for how chapters work.
             </p>
           </HairlineCard>
+        </div>
+      </section>
+
+      <section className="hairline-t">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-20 md:grid-cols-2 md:py-24">
+          <div>
+            <SectionLabel>IRL motion</SectionLabel>
+            <h2 className="mt-6 max-w-md font-display text-3xl text-cream md:text-4xl">
+              This is what an activation looks like.
+            </h2>
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-cream-3">
+              A folding table, a rack of kit, and people who showed up. No side-event vendor
+              energy — just the club, in a room, moving.
+            </p>
+          </div>
+          <CultureMedia />
         </div>
       </section>
 

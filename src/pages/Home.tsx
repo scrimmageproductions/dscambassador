@@ -5,6 +5,7 @@ import { HairlineCard } from '../components/ui/HairlineCard'
 import { CommitmentStrip } from '../components/interactive/CommitmentStrip'
 import { EligibilityChecker } from '../components/interactive/EligibilityChecker'
 import { ExternalImage } from '../components/ui/ExternalImage'
+import { CultureMedia } from '../components/ui/CultureMedia'
 import { Link } from 'react-router-dom'
 
 const tiles = [
@@ -58,21 +59,39 @@ export function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-20 md:py-28">
-        <SectionLabel>Three ways in</SectionLabel>
-        <div className="mt-8 grid gap-5 md:grid-cols-3">
-          {tiles.map((t) => (
-            <Link key={t.to} to={t.to} className="block">
-              <HairlineCard className="h-full">
-                <p className="label-mono text-[0.68rem] text-gold">{t.label}</p>
-                <h3 className="mt-4 font-display text-2xl text-cream">{t.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-cream-3">{t.body}</p>
-                <span className="label-mono mt-6 inline-block text-[0.65rem] text-cream-wash underline underline-offset-4">
-                  Read more
-                </span>
-              </HairlineCard>
-            </Link>
-          ))}
+      <section className="mx-auto max-w-7xl px-6 py-20 md:py-24">
+        <div className="grid items-center gap-10 md:grid-cols-2">
+          <CultureMedia className="md:order-2" />
+          <div className="md:order-1">
+            <SectionLabel>IRL motion</SectionLabel>
+            <h2 className="mt-6 max-w-md font-display text-3xl text-cream md:text-4xl">
+              This isn&rsquo;t a mood board. It&rsquo;s Tuesday.
+            </h2>
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-cream-3">
+              Pop-ups, drops, and the members who show up for both. The kit gets worn before it
+              gets photographed.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="hairline-t">
+        <div className="mx-auto max-w-7xl px-6 py-20 md:py-28">
+          <SectionLabel>Three ways in</SectionLabel>
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            {tiles.map((t) => (
+              <Link key={t.to} to={t.to} className="block">
+                <HairlineCard className="h-full">
+                  <p className="label-mono text-[0.68rem] text-gold">{t.label}</p>
+                  <h3 className="mt-4 font-display text-2xl text-cream">{t.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-cream-3">{t.body}</p>
+                  <span className="label-mono mt-6 inline-block text-[0.65rem] text-cream-wash underline underline-offset-4">
+                    Read more
+                  </span>
+                </HairlineCard>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
