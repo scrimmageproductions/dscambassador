@@ -1,13 +1,17 @@
+import { lazy, Suspense } from 'react'
 import { PageHero } from '../components/ui/PageHero'
 import { SectionLabel } from '../components/ui/SectionLabel'
 import { HairlineCard } from '../components/ui/HairlineCard'
 import { LinkButton } from '../components/ui/Button'
-import { SWCHeatMap } from '../components/interactive/SWCHeatMap'
 import { EventMaterialsRequest } from '../components/interactive/EventMaterialsRequest'
 import { CardTapDemo } from '../components/interactive/CardTapDemo'
 import { CultureMedia } from '../components/ui/CultureMedia'
 import { EventFeed } from '../components/interactive/EventFeed'
 import { Link } from 'react-router-dom'
+
+const CircuitMap = lazy(() =>
+  import('../components/interactive/CircuitMap').then((m) => ({ default: m.CircuitMap })),
+)
 
 export function Events() {
   return (
@@ -86,7 +90,15 @@ export function Events() {
             The circuit, mapped.
           </h2>
           <div className="mt-10">
-            <SWCHeatMap />
+            <Suspense
+              fallback={
+                <div className="hairline flex aspect-[2/1] items-center justify-center bg-surface/40">
+                  <p className="label-mono text-[0.65rem] text-cream-wash">Loading map…</p>
+                </div>
+              }
+            >
+              <CircuitMap />
+            </Suspense>
           </div>
           <p className="mt-6 text-sm leading-relaxed text-cream-3">
             For the full, weekly-updated calendar of Web3 events, ambassadors track{' '}
