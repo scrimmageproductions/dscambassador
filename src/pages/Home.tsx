@@ -64,11 +64,11 @@ export function Home() {
           <div className="md:order-1">
             <SectionLabel>IRL motion</SectionLabel>
             <h2 className="mt-6 max-w-md font-display text-3xl text-cream md:text-4xl">
-              This isn&rsquo;t a mood board. It&rsquo;s Tuesday.
+              Real people. Real presence.
             </h2>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-cream-3">
-              Pop-ups, drops, and the members who show up for both. The kit gets worn before it
-              gets photographed.
+              Pop-ups, drops, and ecosystem activations. We don&rsquo;t just talk about the
+              movement—we show up.
             </p>
           </div>
         </div>
