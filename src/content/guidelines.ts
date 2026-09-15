@@ -46,7 +46,7 @@ export const commitments: CommitmentRow[] = [
     task: 'Attend a major conference or local crypto event and promote DSC',
     example: 'Encourage people to join the club.',
     detail:
-      'Use your complimentary DSC NFC keychain to onboard people at events and conferences IRL. Join panels and/or get a sponsor booth or space at events when possible.',
+      'Hand out DSC Membership Cards to onboard people at events and conferences IRL. Join panels and/or get a sponsor booth or space at events when possible.',
   },
 ]
 

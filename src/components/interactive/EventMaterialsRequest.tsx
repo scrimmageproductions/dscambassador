@@ -1,4 +1,4 @@
-const materials = ['Flyers', 'Banners', 'Extra NFC keychains', 'Extra membership cards']
+const materials = ['Flyers', 'Banners', 'Extra membership cards', 'Signage']
 
 export function EventMaterialsRequest() {
   return (

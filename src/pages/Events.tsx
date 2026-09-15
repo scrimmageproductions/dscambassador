@@ -3,8 +3,8 @@ import { SectionLabel } from '../components/ui/SectionLabel'
 import { HairlineCard } from '../components/ui/HairlineCard'
 import { LinkButton } from '../components/ui/Button'
 import { SWCHeatMap } from '../components/interactive/SWCHeatMap'
-import { NFCTapDemo } from '../components/interactive/NFCTapDemo'
 import { EventMaterialsRequest } from '../components/interactive/EventMaterialsRequest'
+import { MembershipCardIllustration } from '../components/illustrations/Garments'
 import { Link } from 'react-router-dom'
 
 export function Events() {
@@ -74,12 +74,28 @@ export function Events() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
-        <SectionLabel>Onboard with the keychain</SectionLabel>
+        <SectionLabel>Onboard with the card</SectionLabel>
         <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
-          Every activation ends in a tap.
+          Every activation ends with a card in someone&rsquo;s hand.
         </h2>
-        <div className="mt-10">
-          <NFCTapDemo />
+        <div className="mt-10 grid items-center gap-10 md:grid-cols-2">
+          <div>
+            <p className="text-sm leading-relaxed text-cream-3">
+              This is the exact moment ambassadors create at events — a conversation, a DSC
+              Membership Card, a new member. Give one to someone who will actually push the
+              movement forward, and point them to{' '}
+              <a
+                href="https://spenders.club"
+                target="_blank"
+                rel="noreferrer"
+                className="text-cream underline decoration-cream/40 underline-offset-4 hover:decoration-cream"
+              >
+                spenders.club
+              </a>{' '}
+              to follow the motion.
+            </p>
+          </div>
+          <MembershipCardIllustration className="w-full" />
         </div>
       </section>
 

@@ -17,7 +17,7 @@ const tiles = [
     to: '/kit',
     label: 'Kit',
     title: 'What you carry',
-    body: 'Wearables, membership cards, and the NFC keychain built for tapping people into the club.',
+    body: 'Wearables and the membership cards ambassadors hand out to bring new people into the club.',
   },
   {
     to: '/campus',

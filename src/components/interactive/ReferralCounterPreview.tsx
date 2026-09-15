@@ -1,5 +1,5 @@
 const stats = [
-  { label: 'Members onboarded', value: '—', hint: 'via your NFC keychain + referral link' },
+  { label: 'Members onboarded', value: '—', hint: 'via your membership cards + referral link' },
   { label: 'Content posted', value: '0 / 2', hint: 'this month' },
   { label: 'Events attended', value: '0 / 1', hint: 'this quarter' },
   { label: 'SYNC attendance', value: '—', hint: 'monthly ambassador call' },

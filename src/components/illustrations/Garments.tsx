@@ -68,29 +68,6 @@ export function HoodieIllustration({ colorway = 'black', className = '' }: Garme
   )
 }
 
-export function NFCKeychainIllustration({ className = '' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 200 200" className={className} role="img" aria-label="DSC NFC keychain">
-      <rect width="200" height="200" fill="#141414" />
-      <rect x="55" y="30" width="90" height="130" rx="14" fill="#0A0A0A" stroke="#F3EDE3" strokeWidth="2.5" />
-      <circle cx="100" cy="46" r="5" fill="none" stroke="#C4A574" strokeWidth="2" />
-      <text x="100" y="105" textAnchor="middle" fontFamily="Georgia, serif" fontSize="15" fill="#F3EDE3">
-        DSC
-      </text>
-      <text x="100" y="122" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="6" letterSpacing="1" fill="#C4B8A4">
-        NFC TAP
-      </text>
-      <path
-        d="M118 88 a12 12 0 0 1 0 17 M124 82 a20 20 0 0 1 0 29"
-        fill="none"
-        stroke="#C4A574"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-    </svg>
-  )
-}
-
 export function MembershipCardIllustration({ className = '' }: { className?: string }) {
   return (
     <svg viewBox="0 0 320 200" className={className} role="img" aria-label="DSC membership card">
