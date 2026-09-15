@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Tagline } from './ui/Tagline'
+import { BrandLogo } from './ui/BrandLogo'
 
 export function Footer() {
   return (
@@ -7,7 +8,10 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-6 py-16">
         <div className="grid gap-12 md:grid-cols-4">
           <div className="md:col-span-2">
-            <span className="font-display text-2xl text-cream">DSC Ambassadors</span>
+            <div className="flex items-center gap-2.5">
+              <BrandLogo className="h-6 w-6 shrink-0" />
+              <span className="font-display text-2xl text-cream">DSC Ambassadors</span>
+            </div>
             <Tagline className="mt-4" />
             <p className="mt-6 max-w-sm text-sm leading-relaxed text-cream-3">
               Questions? DM{' '}

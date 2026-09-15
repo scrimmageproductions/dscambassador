@@ -5,6 +5,25 @@ import { LinkButton } from '../components/ui/Button'
 import { KitConfigurator } from '../components/interactive/KitConfigurator'
 import { CardTapDemo } from '../components/interactive/CardTapDemo'
 import { MembershipCardIllustration } from '../components/illustrations/Garments'
+import { ExternalImage } from '../components/ui/ExternalImage'
+
+const drops = [
+  {
+    src: 'https://www.spenders.club/cdn/shop/files/Digital_Spenders_Club_7-23_bitcoin_jacket_1.png',
+    label: 'BTC Varsity Jacket',
+    note: 'Heavyweight varsity — the kind of piece that reads across a conference floor.',
+  },
+  {
+    src: 'https://www.spenders.club/cdn/shop/files/Digital_Spenders_Club_7-23_Real_Jacket_1_78e08668-3abe-490a-a9fa-04dc3a4854ca.png',
+    label: 'DSC x Barriers "Real" Bomber',
+    note: 'A collaboration drop, limited by nature.',
+  },
+  {
+    src: 'https://www.spenders.club/cdn/shop/files/Bag_1x1_f42b5c50-65b3-424f-ba87-ce6788295c892.png',
+    label: 'Abundance Bundle',
+    note: 'The full kit, for members who want more than the ambassador core piece.',
+  },
+]
 
 const columns = [
   {
@@ -90,18 +109,54 @@ export function Kit() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-4xl px-6 py-20 text-center md:py-28">
-        <HairlineCard className="text-left md:text-center">
-          <p className="label-mono text-[0.68rem] text-cream-wash">Assets, post-approval</p>
-          <p className="mt-3 text-sm leading-relaxed text-cream-3 md:mx-auto md:max-w-md">
-            Extra event assets — flyers, banners, more membership cards — are requested directly
-            in the Telegram Assets channel once you&rsquo;re approved.
-          </p>
-        </HairlineCard>
-        <div className="mt-8">
-          <LinkButton to="/apply" variant="solid">
-            Apply for the kit
+      <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <SectionLabel>From the shop floor</SectionLabel>
+            <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
+              What the club actually wears.
+            </h2>
+            <p className="mt-4 max-w-xl text-sm leading-relaxed text-cream-3">
+              The complimentary piece above is the guaranteed core. The rest of the line — drops
+              like these — lives at the shop.
+            </p>
+          </div>
+          <LinkButton to="https://www.spenders.club/collections/all" variant="ghost">
+            Shop the collection
           </LinkButton>
+        </div>
+        <div className="mt-10 grid gap-5 sm:grid-cols-3">
+          {drops.map((d) => (
+            <div key={d.label} className="hairline overflow-hidden bg-surface/40">
+              <ExternalImage
+                src={d.src}
+                alt={d.label}
+                fallbackLabel={d.label}
+                className="aspect-square w-full bg-ink object-cover"
+              />
+              <div className="p-5">
+                <h3 className="font-display text-lg text-cream">{d.label}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-cream-3">{d.note}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="hairline-t">
+        <div className="mx-auto max-w-4xl px-6 py-20 text-center md:py-28">
+          <HairlineCard className="text-left md:text-center">
+            <p className="label-mono text-[0.68rem] text-cream-wash">Assets, post-approval</p>
+            <p className="mt-3 text-sm leading-relaxed text-cream-3 md:mx-auto md:max-w-md">
+              Extra event assets — flyers, banners, more membership cards — are requested directly
+              in the Telegram Assets channel once you&rsquo;re approved.
+            </p>
+          </HairlineCard>
+          <div className="mt-8">
+            <LinkButton to="/apply" variant="solid">
+              Apply for the kit
+            </LinkButton>
+          </div>
         </div>
       </section>
     </div>

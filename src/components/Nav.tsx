@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { LinkButton } from './ui/Button'
+import { BrandLogo } from './ui/BrandLogo'
 
 const links = [
   { to: '/program', label: 'Program' },
@@ -32,7 +33,8 @@ export function Nav() {
     <>
       <nav className="sticky top-0 z-50 hairline-b bg-ink/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <NavLink to="/" className="flex items-baseline gap-2.5 group">
+          <NavLink to="/" className="group flex items-center gap-2.5">
+            <BrandLogo className="h-6 w-6 shrink-0" />
             <span className="font-display text-2xl tracking-tight text-cream">DSC</span>
             <span className="label-mono hidden text-[0.65rem] text-cream-wash sm:inline">
               Ambassadors

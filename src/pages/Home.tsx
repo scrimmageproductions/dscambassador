@@ -4,6 +4,7 @@ import { SectionLabel } from '../components/ui/SectionLabel'
 import { HairlineCard } from '../components/ui/HairlineCard'
 import { CommitmentStrip } from '../components/interactive/CommitmentStrip'
 import { EligibilityChecker } from '../components/interactive/EligibilityChecker'
+import { ExternalImage } from '../components/ui/ExternalImage'
 import { Link } from 'react-router-dom'
 
 const tiles = [
@@ -72,6 +73,32 @@ export function Home() {
               </HairlineCard>
             </Link>
           ))}
+        </div>
+      </section>
+
+      <section className="hairline-t">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 px-6 py-20 md:grid-cols-2 md:py-24">
+          <div>
+            <SectionLabel>The shop</SectionLabel>
+            <h2 className="mt-6 max-w-md font-display text-3xl text-cream md:text-4xl">
+              The kit is one piece of a much bigger line.
+            </h2>
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-cream-3">
+              Varsity jackets, collab bombers, full bundles — the club&rsquo;s actual shop floor.
+              See what ambassadors are already wearing before you apply.
+            </p>
+            <div className="mt-6">
+              <LinkButton to="https://www.spenders.club/collections/all" variant="ghost">
+                Shop spenders.club
+              </LinkButton>
+            </div>
+          </div>
+          <ExternalImage
+            src="https://www.spenders.club/cdn/shop/files/Bag_1x1_f42b5c50-65b3-424f-ba87-ce6788295c892.png"
+            alt="Digital Spenders Club Abundance Bundle"
+            fallbackLabel="Abundance Bundle"
+            className="hairline aspect-square w-full bg-surface/40 object-cover"
+          />
         </div>
       </section>
 
