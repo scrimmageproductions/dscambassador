@@ -79,7 +79,11 @@ export function Events() {
               energy — just the club, in a room, moving.
             </p>
           </div>
-          <CultureMedia />
+          <CultureMedia
+            src="/dsceventgif.gif"
+            alt="Digital Spenders Club IRL activation"
+            aspectClassName="aspect-[3/2]"
+          />
         </div>
       </section>
 

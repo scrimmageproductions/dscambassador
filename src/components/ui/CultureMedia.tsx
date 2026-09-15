@@ -1,10 +1,20 @@
-export function CultureMedia({ className = '' }: { className?: string }) {
+export function CultureMedia({
+  className = '',
+  src = '/dsc-culture.gif',
+  alt = 'Digital Spenders Club members browsing kit at an IRL pop-up',
+  aspectClassName = 'aspect-[4/5]',
+}: {
+  className?: string
+  src?: string
+  alt?: string
+  aspectClassName?: string
+}) {
   return (
     <figure className={`hairline group relative overflow-hidden bg-surface/40 ${className}`}>
-      <div className="relative aspect-[4/5] w-full overflow-hidden">
+      <div className={`relative ${aspectClassName} w-full overflow-hidden`}>
         <img
-          src="/dsc-culture.gif"
-          alt="Digital Spenders Club members browsing kit at an IRL pop-up"
+          src={src}
+          alt={alt}
           loading="lazy"
           className="h-full w-full object-cover grayscale-[35%] contrast-125 brightness-90 transition-transform duration-700 ease-out group-hover:scale-105"
         />
