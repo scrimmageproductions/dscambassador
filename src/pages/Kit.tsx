@@ -97,13 +97,13 @@ export function Kit() {
             </TiltCard>
           </Reveal>
           <Reveal delay={0.1}>
-            <h3 className="font-display text-2xl text-cream">A card that means something.</h3>
+            <h3 className="font-display text-2xl text-cream">Make the connection count.</h3>
             <p className="mt-3 text-sm leading-relaxed text-cream-3">
-              Every ambassador holds an allotment of DSC Membership Cards to give out at their own
-              discretion — only to people who will actually push the movement forward. Hand one to
-              someone at a conference, meetup, or club night, and their first tap is the one that
-              opens Burner for them. Black and cream, numbered, unmistakably not a loyalty punch
-              card.
+              Every ambassador carries an allotment of physical DSC Membership Cards to distribute
+              at their discretion. As the face of the movement, you hold the key to someone&rsquo;s
+              initiation. A single tap to phone instantly unlocks the full Digital Spenders Club
+              experience for a new member on the spot. Bringing someone into the fold is a
+              privilege.
             </p>
           </Reveal>
         </div>
