@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { MembershipCardIllustration } from '../illustrations/Garments'
 import { LinkButton } from '../ui/Button'
+import { TiltCard } from '../motion/TiltCard'
 
 type Stage = 'idle' | 'tapping' | 'verified' | 'app'
 
@@ -37,7 +38,9 @@ export function CardTapDemo() {
               stage === 'idle' ? '-translate-x-8' : 'translate-x-6'
             } ${stage === 'tapping' ? 'scale-95' : ''}`}
           >
-            <MembershipCardIllustration className="w-full drop-shadow-[0_0_30px_rgba(196,165,116,0.08)]" />
+            <TiltCard maxTilt={10} className="rounded-2xl">
+              <MembershipCardIllustration className="w-full drop-shadow-[0_0_30px_rgba(196,165,116,0.08)]" />
+            </TiltCard>
           </div>
 
           <div

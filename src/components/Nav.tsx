@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { LinkButton } from './ui/Button'
+import { ScrambleText } from './motion/ScrambleText'
 
 const links = [
   { to: '/program', label: 'Program' },
@@ -54,7 +55,7 @@ export function Nav() {
                   }`
                 }
               >
-                {l.label}
+                <ScrambleText>{l.label}</ScrambleText>
               </NavLink>
             ))}
           </div>

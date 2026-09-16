@@ -6,6 +6,8 @@ import { KitConfigurator } from '../components/interactive/KitConfigurator'
 import { CardTapDemo } from '../components/interactive/CardTapDemo'
 import { MembershipCardIllustration } from '../components/illustrations/Garments'
 import { ExternalImage } from '../components/ui/ExternalImage'
+import { Reveal } from '../components/motion/Reveal'
+import { TiltCard } from '../components/motion/TiltCard'
 
 const drops = [
   {
@@ -54,26 +56,30 @@ export function Kit() {
 
       <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
         <div className="grid gap-px overflow-hidden hairline bg-cream/10 md:grid-cols-3">
-          {columns.map((c) => (
-            <div key={c.label} className="bg-ink p-8">
-              <p className="label-mono text-[0.68rem] text-gold">{c.label}</p>
-              <h3 className="mt-4 font-display text-xl text-cream">{c.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-cream-3">{c.body}</p>
-            </div>
+          {columns.map((c, i) => (
+            <Reveal key={c.label} as="div" delay={i * 0.1} amount={0.2}>
+              <div className="bg-ink p-8">
+                <p className="label-mono text-[0.68rem] text-gold">{c.label}</p>
+                <h3 className="mt-4 font-display text-xl text-cream">{c.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-cream-3">{c.body}</p>
+              </div>
+            </Reveal>
           ))}
         </div>
       </section>
 
       <section className="hairline-t hairline-b bg-surface/20">
         <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
-          <SectionLabel>Featured object</SectionLabel>
-          <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
-            The DSC Membership Card.
-          </h2>
-          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-cream-3">
-            Every member — ambassador or not — taps their card to their phone to get into Burner,
-            the club&rsquo;s app. There&rsquo;s no separate login. The card is the key.
-          </p>
+          <Reveal stagger>
+            <SectionLabel>Featured object</SectionLabel>
+            <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
+              The DSC Membership Card.
+            </h2>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-cream-3">
+              Every member — ambassador or not — taps their card to their phone to get into Burner,
+              the club&rsquo;s app. There&rsquo;s no separate login. The card is the key.
+            </p>
+          </Reveal>
           <div className="mt-10">
             <CardTapDemo />
           </div>
@@ -81,10 +87,16 @@ export function Kit() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
-        <SectionLabel>Membership object</SectionLabel>
+        <Reveal>
+          <SectionLabel>Membership object</SectionLabel>
+        </Reveal>
         <div className="mt-8 grid items-center gap-10 md:grid-cols-2">
-          <MembershipCardIllustration className="w-full" />
-          <div>
+          <Reveal>
+            <TiltCard maxTilt={10} className="rounded-2xl">
+              <MembershipCardIllustration className="w-full" />
+            </TiltCard>
+          </Reveal>
+          <Reveal delay={0.1}>
             <h3 className="font-display text-2xl text-cream">A card that means something.</h3>
             <p className="mt-3 text-sm leading-relaxed text-cream-3">
               Every ambassador holds an allotment of DSC Membership Cards to give out at their own
@@ -93,16 +105,18 @@ export function Kit() {
               opens Burner for them. Black and cream, numbered, unmistakably not a loyalty punch
               card.
             </p>
-          </div>
+          </Reveal>
         </div>
       </section>
 
       <section className="hairline-t bg-surface/20">
         <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
-          <SectionLabel>Configure yours</SectionLabel>
-          <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
-            Preview your complimentary piece.
-          </h2>
+          <Reveal stagger>
+            <SectionLabel>Configure yours</SectionLabel>
+            <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
+              Preview your complimentary piece.
+            </h2>
+          </Reveal>
           <div className="mt-10">
             <KitConfigurator />
           </div>
@@ -111,7 +125,7 @@ export function Kit() {
 
       <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
+          <Reveal stagger>
             <SectionLabel>From the shop floor</SectionLabel>
             <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
               What the club actually wears.
@@ -120,25 +134,27 @@ export function Kit() {
               The complimentary piece above is the guaranteed core. The rest of the line — drops
               like these — lives at the shop.
             </p>
-          </div>
+          </Reveal>
           <LinkButton to="https://www.spenders.club/collections/all" variant="ghost">
             Shop the collection
           </LinkButton>
         </div>
         <div className="mt-10 grid gap-5 sm:grid-cols-3">
-          {drops.map((d) => (
-            <div key={d.label} className="hairline overflow-hidden bg-surface/40">
-              <ExternalImage
-                src={d.src}
-                alt={d.label}
-                fallbackLabel={d.label}
-                className="aspect-square w-full bg-ink object-cover"
-              />
-              <div className="p-5">
-                <h3 className="font-display text-lg text-cream">{d.label}</h3>
-                <p className="mt-1 text-sm leading-relaxed text-cream-3">{d.note}</p>
+          {drops.map((d, i) => (
+            <Reveal key={d.label} delay={i * 0.1} amount={0.2}>
+              <div className="hairline overflow-hidden bg-surface/40">
+                <ExternalImage
+                  src={d.src}
+                  alt={d.label}
+                  fallbackLabel={d.label}
+                  className="aspect-square w-full bg-ink object-cover"
+                />
+                <div className="p-5">
+                  <h3 className="font-display text-lg text-cream">{d.label}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-cream-3">{d.note}</p>
+                </div>
               </div>
-            </div>
+            </Reveal>
           ))}
         </div>
       </section>

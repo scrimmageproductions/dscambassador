@@ -5,6 +5,8 @@ import { HairlineCard } from '../components/ui/HairlineCard'
 import { CommitmentStrip } from '../components/interactive/CommitmentStrip'
 import { EligibilityChecker } from '../components/interactive/EligibilityChecker'
 import { CultureMedia } from '../components/ui/CultureMedia'
+import { Reveal } from '../components/motion/Reveal'
+import { ParallaxImage } from '../components/motion/ParallaxImage'
 import { Link } from 'react-router-dom'
 
 const tiles = [
@@ -37,31 +39,33 @@ export function Home() {
           aria-hidden="true"
         />
         <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-6 py-24">
-          <SectionLabel>Digital Spenders Club</SectionLabel>
-          <h1 className="mt-8 max-w-4xl font-display text-5xl font-extrabold leading-[1.02] tracking-tight text-cream sm:text-6xl md:text-8xl">
-            Ambassador Program
-          </h1>
-          <div className="mt-8 animate-tick">
-            <Tagline className="text-sm md:text-base" />
-          </div>
-          <p className="mt-8 max-w-lg text-base leading-relaxed text-cream-3 md:text-lg">
-            The people who wear the kit, post the work, and bring new members into the club.
-          </p>
-          <div className="mt-10 flex flex-wrap gap-4">
-            <LinkButton to="/apply" variant="solid">
-              Apply
-            </LinkButton>
-            <LinkButton to="/guidelines" variant="ghost">
-              Read the guidelines
-            </LinkButton>
-          </div>
+          <Reveal stagger>
+            <SectionLabel>Digital Spenders Club</SectionLabel>
+            <h1 className="mt-8 max-w-4xl font-display text-5xl font-extrabold leading-[1.02] tracking-tight text-cream sm:text-6xl md:text-8xl">
+              Ambassador Program
+            </h1>
+            <div className="mt-8">
+              <Tagline className="text-sm md:text-base" />
+            </div>
+            <p className="mt-8 max-w-lg text-base leading-relaxed text-cream-3 md:text-lg">
+              The people who wear the kit, post the work, and bring new members into the club.
+            </p>
+            <div className="mt-10 flex flex-wrap gap-4">
+              <LinkButton to="/apply" variant="solid">
+                Apply
+              </LinkButton>
+              <LinkButton to="/guidelines" variant="ghost">
+                Read the guidelines
+              </LinkButton>
+            </div>
+          </Reveal>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-20 md:py-24">
         <div className="grid items-center gap-10 md:grid-cols-2">
           <CultureMedia className="md:order-2" />
-          <div className="md:order-1">
+          <Reveal stagger className="md:order-1">
             <SectionLabel>IRL motion</SectionLabel>
             <h2 className="mt-6 max-w-md font-display text-3xl text-cream md:text-4xl">
               Real people. Real presence.
@@ -70,17 +74,19 @@ export function Home() {
               Pop-ups, drops, and ecosystem activations. We don&rsquo;t just talk about the
               movement—we show up.
             </p>
-          </div>
+          </Reveal>
         </div>
       </section>
 
       <section className="hairline-t">
         <div className="mx-auto max-w-7xl px-6 py-20 md:py-28">
-          <SectionLabel>Three ways in</SectionLabel>
+          <Reveal>
+            <SectionLabel>Three ways in</SectionLabel>
+          </Reveal>
           <div className="mt-8 grid gap-5 md:grid-cols-3">
-            {tiles.map((t) => (
+            {tiles.map((t, i) => (
               <Link key={t.to} to={t.to} className="block">
-                <HairlineCard className="h-full">
+                <HairlineCard className="h-full" delay={i * 0.1}>
                   <p className="label-mono text-[0.68rem] text-gold">{t.label}</p>
                   <h3 className="mt-4 font-display text-2xl text-cream">{t.title}</h3>
                   <p className="mt-3 text-sm leading-relaxed text-cream-3">{t.body}</p>
@@ -96,7 +102,7 @@ export function Home() {
 
       <section className="hairline-t">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-6 py-20 md:grid-cols-2 md:py-24">
-          <div>
+          <Reveal stagger>
             <SectionLabel>The shop</SectionLabel>
             <h2 className="mt-6 max-w-md font-display text-3xl text-cream md:text-4xl">
               The kit is one piece of a much bigger line.
@@ -110,9 +116,9 @@ export function Home() {
                 Shop spenders.club
               </LinkButton>
             </div>
-          </div>
+          </Reveal>
           <div className="hairline aspect-square w-full overflow-hidden bg-surface/40">
-            <img
+            <ParallaxImage
               src="/apparelgif.gif"
               alt="Digital Spenders Club apparel"
               loading="lazy"
@@ -124,7 +130,9 @@ export function Home() {
 
       <section className="hairline-t hairline-b bg-surface/30">
         <div className="mx-auto max-w-7xl px-6 py-16">
-          <SectionLabel>The minimum commitment</SectionLabel>
+          <Reveal>
+            <SectionLabel>The minimum commitment</SectionLabel>
+          </Reveal>
           <div className="mt-8">
             <CommitmentStrip />
           </div>
@@ -132,10 +140,12 @@ export function Home() {
       </section>
 
       <section className="mx-auto max-w-3xl px-6 py-20 md:py-28">
-        <SectionLabel>Check yourself</SectionLabel>
-        <h2 className="mt-6 font-display text-3xl text-cream md:text-4xl">
-          See where you stand before you apply.
-        </h2>
+        <Reveal stagger>
+          <SectionLabel>Check yourself</SectionLabel>
+          <h2 className="mt-6 font-display text-3xl text-cream md:text-4xl">
+            See where you stand before you apply.
+          </h2>
+        </Reveal>
         <div className="mt-8">
           <EligibilityChecker />
         </div>
@@ -143,19 +153,21 @@ export function Home() {
 
       <section className="hairline-t bg-ink">
         <div className="mx-auto max-w-4xl px-6 py-20 text-center md:py-28">
-          <p className="font-display text-3xl text-cream md:text-4xl">Questions?</p>
-          <p className="mt-3 text-lg text-cream-3">
-            DM{' '}
-            <a
-              href="https://twitter.com/YoungScrimmage"
-              target="_blank"
-              rel="noreferrer"
-              className="underline decoration-cream/40 underline-offset-4 hover:text-cream"
-            >
-              @YoungScrimmage
-            </a>
-            .
-          </p>
+          <Reveal>
+            <p className="font-display text-3xl text-cream md:text-4xl">Questions?</p>
+            <p className="mt-3 text-lg text-cream-3">
+              DM{' '}
+              <a
+                href="https://twitter.com/YoungScrimmage"
+                target="_blank"
+                rel="noreferrer"
+                className="underline decoration-cream/40 underline-offset-4 hover:text-cream"
+              >
+                @YoungScrimmage
+              </a>
+              .
+            </p>
+          </Reveal>
         </div>
       </section>
     </div>

@@ -1,24 +1,27 @@
 import { Button, LinkButton } from '../components/ui/Button'
 import { Tagline } from '../components/ui/Tagline'
 import { eligibility, commitments, contentRules, successMetrics, AGREEMENT_TEXT } from '../content/guidelines'
+import { Reveal } from '../components/motion/Reveal'
 
 export function Guidelines() {
   return (
     <div>
       <div className="hairline-b bg-noise">
         <div className="mx-auto max-w-3xl px-6 py-16 md:py-20">
-          <p className="label-mono text-[0.7rem] text-cream-wash">Official Guidelines</p>
-          <h1 className="mt-4 font-display text-4xl text-cream md:text-5xl">
-            Digital Spenders Club Ambassador Program
-          </h1>
-          <div className="no-print mt-8 flex flex-wrap gap-3">
-            <Button variant="ghost" onClick={() => window.print()}>
-              Print / save as PDF
-            </Button>
-            <LinkButton to="/apply" variant="solid">
-              Apply
-            </LinkButton>
-          </div>
+          <Reveal stagger>
+            <p className="label-mono text-[0.7rem] text-cream-wash">Official Guidelines</p>
+            <h1 className="mt-4 font-display text-4xl text-cream md:text-5xl">
+              Digital Spenders Club Ambassador Program
+            </h1>
+            <div className="no-print mt-8 flex flex-wrap gap-3">
+              <Button variant="ghost" onClick={() => window.print()}>
+                Print / save as PDF
+              </Button>
+              <LinkButton to="/apply" variant="solid">
+                Apply
+              </LinkButton>
+            </div>
+          </Reveal>
         </div>
       </div>
 

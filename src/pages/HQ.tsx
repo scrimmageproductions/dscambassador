@@ -4,6 +4,7 @@ import { HairlineCard } from '../components/ui/HairlineCard'
 import { LinkButton } from '../components/ui/Button'
 import { SyncAgendaAccordion } from '../components/interactive/SyncAgendaAccordion'
 import { ReferralCounterPreview } from '../components/interactive/ReferralCounterPreview'
+import { Reveal } from '../components/motion/Reveal'
 
 export function HQ() {
   return (
@@ -18,7 +19,7 @@ export function HQ() {
 
       <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
         <div className="grid gap-5 sm:grid-cols-3">
-          <HairlineCard>
+          <HairlineCard delay={0}>
             <p className="label-mono text-[0.68rem] text-gold">Telegram</p>
             <h3 className="mt-4 font-display text-xl text-cream">The Ambassador Program group</h3>
             <p className="mt-2 text-sm leading-relaxed text-cream-3">
@@ -26,7 +27,7 @@ export function HQ() {
               announcements, and day-to-day coordination happen.
             </p>
           </HairlineCard>
-          <HairlineCard>
+          <HairlineCard delay={0.1}>
             <p className="label-mono text-[0.68rem] text-gold">Monthly</p>
             <h3 className="mt-4 font-display text-xl text-cream">The SYNC call</h3>
             <p className="mt-2 text-sm leading-relaxed text-cream-3">
@@ -34,7 +35,7 @@ export function HQ() {
               calls as needed. Attendance is expected.
             </p>
           </HairlineCard>
-          <HairlineCard>
+          <HairlineCard delay={0.2}>
             <p className="label-mono text-[0.68rem] text-gold">Discord</p>
             <h3 className="mt-4 font-display text-xl text-cream">Ambassador voice channel</h3>
             <p className="mt-2 text-sm leading-relaxed text-cream-3">
@@ -47,10 +48,12 @@ export function HQ() {
 
       <section className="hairline-t hairline-b bg-surface/20">
         <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
-          <SectionLabel>Monthly SYNC agenda</SectionLabel>
-          <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
-            What actually gets discussed.
-          </h2>
+          <Reveal stagger>
+            <SectionLabel>Monthly SYNC agenda</SectionLabel>
+            <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
+              What actually gets discussed.
+            </h2>
+          </Reveal>
           <div className="mt-10">
             <SyncAgendaAccordion />
           </div>
@@ -58,10 +61,12 @@ export function HQ() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
-        <SectionLabel>Your dashboard, previewed</SectionLabel>
-        <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
-          Tracking, once you&rsquo;re in.
-        </h2>
+        <Reveal stagger>
+          <SectionLabel>Your dashboard, previewed</SectionLabel>
+          <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
+            Tracking, once you&rsquo;re in.
+          </h2>
+        </Reveal>
         <div className="mt-10">
           <ReferralCounterPreview />
         </div>
@@ -69,13 +74,15 @@ export function HQ() {
 
       <section className="hairline-t bg-ink">
         <div className="mx-auto max-w-4xl px-6 py-20 text-center md:py-28">
-          <p className="font-display text-3xl text-cream md:text-4xl">Not in yet?</p>
-          <p className="mt-3 text-cream-3">The application takes about five minutes.</p>
-          <div className="mt-8 flex justify-center">
-            <LinkButton to="/apply" variant="solid">
-              Apply
-            </LinkButton>
-          </div>
+          <Reveal stagger>
+            <p className="font-display text-3xl text-cream md:text-4xl">Not in yet?</p>
+            <p className="mt-3 text-cream-3">The application takes about five minutes.</p>
+            <div className="mt-8 flex justify-center">
+              <LinkButton to="/apply" variant="solid">
+                Apply
+              </LinkButton>
+            </div>
+          </Reveal>
         </div>
       </section>
     </div>

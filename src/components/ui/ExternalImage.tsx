@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ParallaxImage } from '../motion/ParallaxImage'
 
 export function ExternalImage({
   src,
@@ -24,7 +25,7 @@ export function ExternalImage({
   }
 
   return (
-    <img
+    <ParallaxImage
       src={src}
       alt={alt}
       loading="lazy"
