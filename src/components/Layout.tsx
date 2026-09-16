@@ -15,7 +15,7 @@ export function Layout() {
     <div className="relative flex min-h-screen flex-col">
       <ThermalBackground />
       <div
-        className="bg-grain pointer-events-none fixed inset-0 z-30 opacity-[0.05]"
+        className="bg-grain pointer-events-none fixed inset-0 z-30 opacity-[0.12]"
         aria-hidden="true"
       />
       <div className="relative z-10 flex flex-1 flex-col bg-transparent">
