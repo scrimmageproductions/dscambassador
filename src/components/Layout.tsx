@@ -2,6 +2,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import { Nav } from './Nav'
 import { Footer } from './Footer'
+import { ThermalBackground } from './ui/ThermalBackground'
 
 export function Layout() {
   const { pathname } = useLocation()
@@ -11,7 +12,8 @@ export function Layout() {
   }, [pathname])
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-bg">
+    <div className="relative flex min-h-screen flex-col">
+      <ThermalBackground />
       <div
         className="bg-grain pointer-events-none fixed inset-0 z-30 opacity-[0.05]"
         aria-hidden="true"
