@@ -48,8 +48,8 @@ export function Kit() {
     <div>
       <PageHero
         eyebrow="The Kit"
-        title="What every ambassador carries."
-        lede="Wearables for events, membership cards for onboarding, and a private line into the club. Nothing here is a gimmick — every piece has a job."
+        title="The official uniform of the movement."
+        lede="Premium wearables and official Digital Spenders Club membership cards issued upon approval to those moving our culture forward."
       />
 
       <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">

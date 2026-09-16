@@ -11,8 +11,8 @@ export function Program() {
     <div>
       <PageHero
         eyebrow="The Program"
-        title="Ambassadors fill the gap between brand and culture."
-        lede="Content, IRL activations, conference presence, and member onboarding — without turning DSC into a side-event vendor at every international conference."
+        title="Culture moves through action."
+        lede="Original content, IRL activations, and member onboarding. Driving real-world motion wherever spenders gather."
       >
         <div className="mt-8">
           <LinkButton to="/apply" variant="solid">
