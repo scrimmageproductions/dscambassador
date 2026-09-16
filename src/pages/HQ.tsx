@@ -1,20 +1,49 @@
+import { lazy, Suspense, useState } from 'react'
 import { PageHero } from '../components/ui/PageHero'
 import { SectionLabel } from '../components/ui/SectionLabel'
 import { HairlineCard } from '../components/ui/HairlineCard'
-import { LinkButton } from '../components/ui/Button'
+import { Button, LinkButton } from '../components/ui/Button'
 import { SyncAgendaAccordion } from '../components/interactive/SyncAgendaAccordion'
 import { ReferralCounterPreview } from '../components/interactive/ReferralCounterPreview'
 import { Reveal } from '../components/motion/Reveal'
+import { useAmbassadorSession } from '../context/useAmbassadorSession'
+import { SignInModal } from '../components/hq/SignInModal'
+
+const AmbassadorDashboard = lazy(() =>
+  import('../components/hq/AmbassadorDashboard').then((m) => ({ default: m.AmbassadorDashboard })),
+)
 
 export function HQ() {
+  const { session, signOut } = useAmbassadorSession()
+  const [modalOpen, setModalOpen] = useState(false)
+
+  if (session) {
+    return (
+      <Suspense
+        fallback={
+          <div className="mx-auto flex max-w-7xl items-center justify-center px-6 py-32">
+            <p className="label-mono text-[0.65rem] text-cream-wash">Loading HQ…</p>
+          </div>
+        }
+      >
+        <AmbassadorDashboard name={session.name} onSignOut={signOut} />
+      </Suspense>
+    )
+  }
+
   return (
     <div>
       <PageHero
         eyebrow="Ambassador HQ"
         title="A preview of what opens after approval."
-        lede="This is a look, not a login. Nothing here is live until your application is approved and you're added to the private channels."
+        lede="This is a look, not a login. Sign in with a demo account below to try the full ambassador dashboard, or apply to get the real thing."
       >
-        <p className="label-mono mt-6 text-[0.65rem] text-gold">Access granted after approval</p>
+        <div className="mt-8 flex flex-wrap items-center gap-4">
+          <Button variant="solid" onClick={() => setModalOpen(true)}>
+            Sign in to HQ
+          </Button>
+          <p className="label-mono text-[0.65rem] text-gold">Access granted after approval</p>
+        </div>
       </PageHero>
 
       <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
@@ -70,6 +99,11 @@ export function HQ() {
         <div className="mt-10">
           <ReferralCounterPreview />
         </div>
+        <div className="mt-6">
+          <Button variant="ghost" onClick={() => setModalOpen(true)}>
+            Try the full dashboard
+          </Button>
+        </div>
       </section>
 
       <section className="hairline-t bg-ink">
@@ -85,6 +119,8 @@ export function HQ() {
           </Reveal>
         </div>
       </section>
+
+      <SignInModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </div>
   )
 }

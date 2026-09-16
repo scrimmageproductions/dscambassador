@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
+import { AmbassadorSessionProvider } from './context/AmbassadorSession'
 import { Layout } from './components/Layout'
 import { Home } from './pages/Home'
 import { Program } from './pages/Program'
@@ -12,19 +13,21 @@ import { NotFound } from './pages/NotFound'
 
 function App() {
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route index element={<Home />} />
-        <Route path="program" element={<Program />} />
-        <Route path="kit" element={<Kit />} />
-        <Route path="campus" element={<Campus />} />
-        <Route path="events" element={<Events />} />
-        <Route path="apply" element={<Apply />} />
-        <Route path="guidelines" element={<Guidelines />} />
-        <Route path="hq" element={<HQ />} />
-        <Route path="*" element={<NotFound />} />
-      </Route>
-    </Routes>
+    <AmbassadorSessionProvider>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="program" element={<Program />} />
+          <Route path="kit" element={<Kit />} />
+          <Route path="campus" element={<Campus />} />
+          <Route path="events" element={<Events />} />
+          <Route path="apply" element={<Apply />} />
+          <Route path="guidelines" element={<Guidelines />} />
+          <Route path="hq" element={<HQ />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
+    </AmbassadorSessionProvider>
   )
 }
 
