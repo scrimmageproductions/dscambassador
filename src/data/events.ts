@@ -22,6 +22,27 @@ export const sourceBadge: Record<EventSource, string> = {
 }
 
 /**
+ * Known city/region → [lng, lat] for plotting on the circuit map. Locations
+ * that aren't a fixed point ("Location TBD", "Virtual + regional hubs",
+ * "Rotating cities") are intentionally left out rather than plotted at a
+ * fabricated coordinate — CircuitMap surfaces those as an off-map count
+ * instead.
+ */
+export const locationCoordinates: Record<string, [number, number]> = {
+  'Denver, CO': [-104.9903, 39.7392],
+  'Austin, TX': [-97.7431, 30.2672],
+  Singapore: [103.8198, 1.3521],
+  'New York, NY': [-74.006, 40.7128],
+  'Washington, D.C.': [-77.0369, 38.9072],
+  'San Francisco, CA': [-122.4194, 37.7749],
+  'Boston, MA': [-71.0589, 42.3601],
+}
+
+export function resolveCoordinates(location: string): [number, number] | null {
+  return locationCoordinates[location] ?? null
+}
+
+/**
  * Illustrative circuit sample — not a live feed. Live scraping of
  * standwithcrypto.org/events, plan.wtf, lu.ma/crypto, and lu.ma/Team1 isn't
  * available from this build environment (all four domains are blocked by

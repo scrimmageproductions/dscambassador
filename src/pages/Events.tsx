@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { PageHero } from '../components/ui/PageHero'
 import { SectionLabel } from '../components/ui/SectionLabel'
 import { HairlineCard } from '../components/ui/HairlineCard'
@@ -7,12 +7,21 @@ import { EventMaterialsRequest } from '../components/interactive/EventMaterialsR
 import { CardTapDemo } from '../components/interactive/CardTapDemo'
 import { CultureMedia } from '../components/ui/CultureMedia'
 import { EventFeed } from '../components/interactive/EventFeed'
+import type { EventSource } from '../data/events'
 
 const CircuitMap = lazy(() =>
   import('../components/interactive/CircuitMap').then((m) => ({ default: m.CircuitMap })),
 )
 
 export function Events() {
+  const [activeFilter, setActiveFilter] = useState<EventSource | 'All'>('All')
+  const [highlightIds, setHighlightIds] = useState<string[]>([])
+
+  function handleFilterChange(value: EventSource | 'All') {
+    setActiveFilter(value)
+    setHighlightIds([])
+  }
+
   return (
     <div>
       <PageHero
@@ -57,7 +66,11 @@ export function Events() {
             What&rsquo;s next, by category.
           </h2>
           <div className="mt-10">
-            <EventFeed />
+            <EventFeed
+              active={activeFilter}
+              onActiveChange={handleFilterChange}
+              highlightIds={highlightIds}
+            />
           </div>
         </div>
       </section>
@@ -96,7 +109,7 @@ export function Events() {
                 </div>
               }
             >
-              <CircuitMap />
+              <CircuitMap active={activeFilter} onSelectEvents={setHighlightIds} />
             </Suspense>
           </div>
           <p className="mt-6 text-sm leading-relaxed text-cream-3">

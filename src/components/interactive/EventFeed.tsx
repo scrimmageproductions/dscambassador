@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { events, sourceBadge, type EventSource, type DscStatus } from '../../data/events'
 import { LinkButton } from '../ui/Button'
 
@@ -17,10 +17,21 @@ const statusStyle: Record<DscStatus, string> = {
   'Open Call': 'text-cream-wash',
 }
 
-export function EventFeed() {
-  const [active, setActive] = useState<EventSource | 'All'>('All')
+type EventFeedProps = {
+  active: EventSource | 'All'
+  onActiveChange: (value: EventSource | 'All') => void
+  highlightIds?: string[]
+}
 
+export function EventFeed({ active, onActiveChange, highlightIds = [] }: EventFeedProps) {
   const visible = active === 'All' ? events : events.filter((e) => e.source === active)
+  const rowRefs = useRef<Record<string, HTMLDivElement | null>>({})
+
+  useEffect(() => {
+    if (highlightIds.length === 0) return
+    const firstId = highlightIds.find((id) => rowRefs.current[id])
+    rowRefs.current[firstId ?? '']?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }, [highlightIds])
 
   return (
     <div>
@@ -29,7 +40,7 @@ export function EventFeed() {
           <button
             key={f.value}
             type="button"
-            onClick={() => setActive(f.value)}
+            onClick={() => onActiveChange(f.value)}
             aria-pressed={active === f.value}
             className={`label-mono border px-4 py-2 text-[0.65rem] transition-colors ${
               active === f.value
@@ -46,32 +57,43 @@ export function EventFeed() {
         {visible.length === 0 ? (
           <p className="p-8 text-sm text-cream-wash/70">No events in this category right now.</p>
         ) : (
-          visible.map((e) => (
-            <div key={e.id} className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between md:p-8">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="label-mono border border-cream/25 px-2 py-0.5 text-[0.6rem] text-cream-wash">
-                    {sourceBadge[e.source]}
-                  </span>
-                  <span className={`label-mono text-[0.62rem] ${statusStyle[e.dscStatus]}`}>
-                    {e.dscStatus}
-                  </span>
+          visible.map((e) => {
+            const isHighlighted = highlightIds.includes(e.id)
+            return (
+              <div
+                key={e.id}
+                ref={(el) => {
+                  rowRefs.current[e.id] = el
+                }}
+                className={`flex flex-col gap-4 p-6 transition-colors sm:flex-row sm:items-center sm:justify-between md:p-8 ${
+                  isHighlighted ? 'bg-surface-2/60 ring-1 ring-inset ring-gold/50' : ''
+                }`}
+              >
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="label-mono border border-cream/25 px-2 py-0.5 text-[0.6rem] text-cream-wash">
+                      {sourceBadge[e.source]}
+                    </span>
+                    <span className={`label-mono text-[0.62rem] ${statusStyle[e.dscStatus]}`}>
+                      {e.dscStatus}
+                    </span>
+                  </div>
+                  <h3 className="mt-2 font-display text-xl text-cream">{e.title}</h3>
+                  <p className="label-mono mt-2 text-[0.65rem] text-cream-3">
+                    {e.date} &middot; {e.location}
+                  </p>
+                  <p className="mt-3 max-w-2xl text-sm leading-relaxed text-cream-3">
+                    {e.description}
+                  </p>
                 </div>
-                <h3 className="mt-2 font-display text-xl text-cream">{e.title}</h3>
-                <p className="label-mono mt-2 text-[0.65rem] text-cream-3">
-                  {e.date} &middot; {e.location}
-                </p>
-                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-cream-3">
-                  {e.description}
-                </p>
+                <div className="shrink-0">
+                  <LinkButton to={e.link} variant="ghost" className="!px-5 !py-2.5 whitespace-nowrap">
+                    RSVP / Onboard
+                  </LinkButton>
+                </div>
               </div>
-              <div className="shrink-0">
-                <LinkButton to={e.link} variant="ghost" className="!px-5 !py-2.5 whitespace-nowrap">
-                  RSVP / Onboard
-                </LinkButton>
-              </div>
-            </div>
-          ))
+            )
+          })
         )}
       </div>
 

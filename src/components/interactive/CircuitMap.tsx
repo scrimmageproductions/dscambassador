@@ -1,111 +1,42 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps'
 import countries from 'world-atlas/countries-110m.json'
 import type { GeoJsonObject } from 'geojson'
+import {
+  events,
+  sourceBadge,
+  resolveCoordinates,
+  type CircuitEvent,
+  type EventSource,
+} from '../../data/events'
+import { LinkButton } from '../ui/Button'
+
+/** Local, in-person chapter activity — rendered as a solid cream dot. */
+const GRASSROOTS_SOURCES: EventSource[] = ['Stand With Crypto', 'Campus']
+/** Conference / hub circuit — rendered as a hollow gold ring. */
+const CIRCUIT_SOURCES: EventSource[] = ['Lu.ma Crypto', 'Team1', 'Plan.wtf']
 
 type CircuitPin = {
   id: string
-  city: string
-  region: string
+  location: string
   coordinates: [number, number]
-  kind: 'swc' | 'conference'
-  nextEvent: string
-  nextEventDate: string
-  action: 'IRL Onboarding' | 'Panel Presence' | 'Local Chapter Activation'
+  events: CircuitEvent[]
 }
 
-const pins: CircuitPin[] = [
-  {
-    id: 'nyc',
-    city: 'New York',
-    region: 'United States',
-    coordinates: [-74.006, 40.7128],
-    kind: 'swc',
-    nextEvent: 'Local SWC chapter meetup',
-    nextEventDate: 'Ongoing, monthly',
-    action: 'Local Chapter Activation',
-  },
-  {
-    id: 'denver',
-    city: 'Denver',
-    region: 'United States',
-    coordinates: [-104.9903, 39.7392],
-    kind: 'conference',
-    nextEvent: 'ETHDenver builder week',
-    nextEventDate: 'February 2026',
-    action: 'IRL Onboarding',
-  },
-  {
-    id: 'sf',
-    city: 'San Francisco',
-    region: 'United States',
-    coordinates: [-122.4194, 37.7749],
-    kind: 'swc',
-    nextEvent: 'SWC regional meetup',
-    nextEventDate: 'Ongoing, monthly',
-    action: 'Local Chapter Activation',
-  },
-  {
-    id: 'london',
-    city: 'London',
-    region: 'United Kingdom',
-    coordinates: [-0.1278, 51.5074],
-    kind: 'conference',
-    nextEvent: 'European builder circuit',
-    nextEventDate: 'Ongoing',
-    action: 'Panel Presence',
-  },
-  {
-    id: 'paris',
-    city: 'Paris',
-    region: 'France',
-    coordinates: [2.3522, 48.8566],
-    kind: 'conference',
-    nextEvent: 'European conference season',
-    nextEventDate: 'Q2 2026',
-    action: 'Panel Presence',
-  },
-  {
-    id: 'dubai',
-    city: 'Dubai',
-    region: 'United Arab Emirates',
-    coordinates: [55.2708, 25.2048],
-    kind: 'conference',
-    nextEvent: 'Token & infrastructure summit circuit',
-    nextEventDate: 'Q1 2026',
-    action: 'IRL Onboarding',
-  },
-  {
-    id: 'singapore',
-    city: 'Singapore',
-    region: 'Singapore',
-    coordinates: [103.8198, 1.3521],
-    kind: 'conference',
-    nextEvent: 'Token2049',
-    nextEventDate: 'Q3 2026',
-    action: 'Panel Presence',
-  },
-  {
-    id: 'tokyo',
-    city: 'Tokyo',
-    region: 'Japan',
-    coordinates: [139.6503, 35.6762],
-    kind: 'conference',
-    nextEvent: 'Asia builder week',
-    nextEventDate: 'Ongoing',
-    action: 'IRL Onboarding',
-  },
-  {
-    id: 'seoul',
-    city: 'Seoul',
-    region: 'South Korea',
-    coordinates: [126.978, 37.5665],
-    kind: 'conference',
-    nextEvent: 'Korea Blockchain Week',
-    nextEventDate: 'Ongoing',
-    action: 'Panel Presence',
-  },
-]
+function buildPins(list: CircuitEvent[]): CircuitPin[] {
+  const byLocation = new Map<string, CircuitPin>()
+  for (const e of list) {
+    const coordinates = resolveCoordinates(e.location)
+    if (!coordinates) continue
+    const existing = byLocation.get(e.location)
+    if (existing) {
+      existing.events.push(e)
+    } else {
+      byLocation.set(e.location, { id: e.location, location: e.location, coordinates, events: [e] })
+    }
+  }
+  return Array.from(byLocation.values())
+}
 
 function CircuitPinMarker({
   pin,
@@ -116,7 +47,9 @@ function CircuitPinMarker({
   isActive: boolean
   onSelect: () => void
 }) {
-  const ringColor = pin.kind === 'swc' ? '#F3EDE3' : '#C4A574'
+  const hasGrassroots = pin.events.some((e) => GRASSROOTS_SOURCES.includes(e.source))
+  const hasCircuit = pin.events.some((e) => CIRCUIT_SOURCES.includes(e.source))
+  const pulseColor = hasCircuit ? '#C4A574' : '#F3EDE3'
 
   return (
     <Marker
@@ -125,7 +58,7 @@ function CircuitPinMarker({
       tabIndex={0}
       role="button"
       aria-pressed={isActive}
-      aria-label={`${pin.city} circuit pin`}
+      aria-label={`${pin.location} — ${pin.events.length} event${pin.events.length > 1 ? 's' : ''}`}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
@@ -134,16 +67,12 @@ function CircuitPinMarker({
       }}
       className="group cursor-pointer outline-none"
     >
-      <circle r={3} fill="none" stroke={ringColor} strokeWidth={1} opacity={0.6}>
+      <circle r={3} fill="none" stroke={pulseColor} strokeWidth={1} opacity={0.6}>
         <animate attributeName="r" values="3;9" dur="1.8s" repeatCount="indefinite" />
         <animate attributeName="opacity" values="0.55;0" dur="1.8s" repeatCount="indefinite" />
       </circle>
-      <circle
-        r={3.2}
-        fill={pin.kind === 'swc' ? '#F3EDE3' : '#0A0A0A'}
-        stroke={pin.kind === 'conference' ? '#C4A574' : 'none'}
-        strokeWidth={pin.kind === 'conference' ? 1.4 : 0}
-      />
+      {hasCircuit && <circle r={4} fill="none" stroke="#C4A574" strokeWidth={1.4} />}
+      {hasGrassroots && <circle r={hasCircuit ? 2 : 3.2} fill="#F3EDE3" />}
       {isActive && <circle r={7.5} fill="none" stroke="#F3EDE3" strokeWidth={1} />}
       <text
         textAnchor="middle"
@@ -153,14 +82,40 @@ function CircuitPinMarker({
         fill="#C4B8A4"
         className="pointer-events-none opacity-0 transition-opacity duration-150 group-hover:opacity-100"
       >
-        {pin.city}
+        {pin.location}
+        {pin.events.length > 1 ? ` (${pin.events.length})` : ''}
       </text>
     </Marker>
   )
 }
 
-export function CircuitMap() {
-  const [active, setActive] = useState<CircuitPin | null>(null)
+type CircuitMapProps = {
+  active: EventSource | 'All'
+  onSelectEvents: (ids: string[]) => void
+}
+
+export function CircuitMap({ active, onSelectEvents }: CircuitMapProps) {
+  const [activePinId, setActivePinId] = useState<string | null>(null)
+
+  const filteredEvents = active === 'All' ? events : events.filter((e) => e.source === active)
+  const pins = buildPins(filteredEvents)
+  const plottedCount = pins.reduce((n, p) => n + p.events.length, 0)
+  const offMapCount = filteredEvents.length - plottedCount
+  const selectedPin = pins.find((p) => p.id === activePinId) ?? null
+
+  // Filter changed out from under the current selection — clear it.
+  useEffect(() => {
+    if (activePinId && !pins.some((p) => p.id === activePinId)) {
+      setActivePinId(null)
+      onSelectEvents([])
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active])
+
+  function handleSelect(pin: CircuitPin) {
+    setActivePinId(pin.id)
+    onSelectEvents(pin.events.map((e) => e.id))
+  }
 
   return (
     <div className="hairline bg-surface/40 p-6 md:p-8">
@@ -168,10 +123,10 @@ export function CircuitMap() {
         <p className="label-mono text-[0.68rem] text-cream-wash">Circuit map</p>
         <div className="flex gap-4 text-xs text-cream-3">
           <span className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-cream" /> Local SWC
+            <span className="h-2 w-2 rounded-full bg-cream" /> Grassroots (SWC / Campus)
           </span>
           <span className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full border border-gold" /> Conference circuit
+            <span className="h-2 w-2 rounded-full border border-gold" /> Circuit (Lu.ma / Team1)
           </span>
         </div>
       </div>
@@ -201,31 +156,53 @@ export function CircuitMap() {
             <CircuitPinMarker
               key={pin.id}
               pin={pin}
-              isActive={active?.id === pin.id}
-              onSelect={() => setActive(pin)}
+              isActive={activePinId === pin.id}
+              onSelect={() => handleSelect(pin)}
             />
           ))}
         </ComposableMap>
       </div>
 
       <div className="mt-6 min-h-[7rem] hairline bg-ink p-5">
-        {active ? (
-          <div className="animate-tick flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="font-display text-lg text-cream">{active.city}</p>
-              <p className="label-mono text-[0.62rem] text-cream-wash">{active.region}</p>
-              <p className="mt-2 text-sm text-cream-3">
-                {active.nextEvent} — {active.nextEventDate}
-              </p>
-            </div>
-            <span className="label-mono inline-block w-fit shrink-0 border border-gold/40 px-3 py-1.5 text-[0.62rem] text-gold">
-              {active.action}
-            </span>
+        {selectedPin ? (
+          <div className="animate-tick flex flex-col gap-5">
+            {selectedPin.events.map((e) => (
+              <div
+                key={e.id}
+                className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="min-w-0">
+                  <span className="label-mono border border-cream/25 px-2 py-0.5 text-[0.6rem] text-cream-wash">
+                    {sourceBadge[e.source]}
+                  </span>
+                  <p className="mt-2 font-display text-lg text-cream">{e.title}</p>
+                  <p className="label-mono mt-1 text-[0.62rem] text-cream-wash">
+                    {e.location} &mdash; {e.date}
+                  </p>
+                </div>
+                <LinkButton
+                  to={e.link}
+                  variant="ghost"
+                  className="!px-5 !py-2.5 shrink-0 whitespace-nowrap"
+                >
+                  RSVP / Onboard
+                </LinkButton>
+              </div>
+            ))}
           </div>
         ) : (
-          <p className="text-sm text-cream-wash/70">Click a pin to see how ambassadors show up there.</p>
+          <p className="text-sm text-cream-wash/70">
+            Click a pin to see who&rsquo;s showing up there.
+          </p>
         )}
       </div>
+
+      {offMapCount > 0 && (
+        <p className="label-mono mt-4 text-[0.6rem] text-cream-wash/60">
+          +{offMapCount} {offMapCount === 1 ? 'event runs' : 'events run'} virtually or across
+          rotating cities and {offMapCount === 1 ? "isn't" : "aren't"} pinned above.
+        </p>
+      )}
     </div>
   )
 }
