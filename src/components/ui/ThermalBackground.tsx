@@ -1,17 +1,17 @@
 import { useEffect, useRef } from 'react'
 
 const blobs = [
-  { drift: 'thermal-blob-a', color: 'rgba(243,237,227,0.08)', size: '46vw', top: '-12%', left: '-10%' },
-  { drift: 'thermal-blob-b', color: 'rgba(196,165,116,0.05)', size: '40vw', top: '8%', left: '58%' },
-  { drift: 'thermal-blob-c', color: 'rgba(243,237,227,0.05)', size: '50vw', top: '52%', left: '-16%' },
-  { drift: 'thermal-blob-d', color: 'rgba(255,255,255,0.035)', size: '38vw', top: '62%', left: '52%' },
+  { drift: 'thermal-blob-a', color: 'rgba(243,237,227,0.24)', size: '46vw', top: '-12%', left: '-10%' },
+  { drift: 'thermal-blob-b', color: 'rgba(196,165,116,0.20)', size: '40vw', top: '8%', left: '58%' },
+  { drift: 'thermal-blob-c', color: 'rgba(243,237,227,0.18)', size: '50vw', top: '52%', left: '-16%' },
+  { drift: 'thermal-blob-d', color: 'rgba(196,165,116,0.12)', size: '38vw', top: '62%', left: '52%' },
 ]
 
 /**
  * Fixed, decorative ambient background: slow-drifting blurred blobs in the
- * site's cream/gold/charcoal palette, with a subtle cursor-parallax offset.
- * Sits behind all page content (negative z-index) and below the grain
- * overlay, which paints above everything.
+ * site's cream/gold palette, with a subtle cursor-parallax offset. Sits
+ * behind all page content (z-0, inside the shared z-10 content wrapper in
+ * Layout) and below the grain overlay, which paints above everything.
  */
 export function ThermalBackground() {
   const ref = useRef<HTMLDivElement>(null)
@@ -43,7 +43,7 @@ export function ThermalBackground() {
   return (
     <div
       ref={ref}
-      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-bg"
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-bg"
       aria-hidden="true"
     >
       {blobs.map((b) => (
