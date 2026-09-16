@@ -82,7 +82,7 @@ export function CardTapDemo() {
               <h3 className="mt-3 font-display text-2xl text-cream">Tap in to open Burner.</h3>
               <p className="mt-3 text-sm leading-relaxed text-cream-3">
                 Every member taps their DSC Membership Card to their phone to unlock the Burner
-                app — that&rsquo;s the access model, no separate login. Ambassadors trigger the
+                app. That&rsquo;s the access model, no separate login. Ambassadors trigger the
                 same moment for someone new at an event.
               </p>
               <button
@@ -114,7 +114,7 @@ export function CardTapDemo() {
               <p className="label-mono text-[0.68rem] text-gold">Burner unlocked</p>
               <p className="font-display text-2xl text-cream">You&rsquo;re in.</p>
               <p className="text-sm leading-relaxed text-cream-3">
-                This is what opens every time — for a member checking the SYNC agenda, or someone
+                This is what opens every time, for a member checking the SYNC agenda, or someone
                 tapping in for the first time at a conference booth.
               </p>
               <div className="flex flex-wrap gap-3 pt-2">

@@ -18,7 +18,7 @@ export function useDraft() {
     try {
       localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
     } catch {
-      // localStorage unavailable — draft simply won't persist across refresh
+      // localStorage unavailable, draft simply won't persist across refresh
     }
   }, [draft])
 

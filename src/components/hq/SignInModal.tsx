@@ -94,7 +94,7 @@ export function SignInModal({ open, onClose }: { open: boolean; onClose: () => v
         </Button>
 
         <p className="mt-4 text-xs leading-relaxed text-cream-wash/70">
-          Demo mode — no real account needed. This drops you straight into a full preview of what
+          Demo mode. No real account needed. This drops you straight into a full preview of what
           opens inside HQ once your application is approved.
         </p>
       </form>

@@ -4,16 +4,16 @@ import { HairlineCard } from '../components/ui/HairlineCard'
 import { LinkButton } from '../components/ui/Button'
 import { KitConfigurator } from '../components/interactive/KitConfigurator'
 import { CardTapDemo } from '../components/interactive/CardTapDemo'
-import { MembershipCardIllustration } from '../components/illustrations/Garments'
 import { ExternalImage } from '../components/ui/ExternalImage'
 import { Reveal } from '../components/motion/Reveal'
 import { TiltCard } from '../components/motion/TiltCard'
+import { ParallaxImage } from '../components/motion/ParallaxImage'
 
 const drops = [
   {
     src: 'https://www.spenders.club/cdn/shop/files/Digital_Spenders_Club_7-23_bitcoin_jacket_1.png',
     label: 'BTC Varsity Jacket',
-    note: 'Heavyweight varsity — the kind of piece that reads across a conference floor.',
+    note: 'Heavyweight varsity, the kind of piece that reads across a conference floor.',
   },
   {
     src: 'https://www.spenders.club/cdn/shop/files/Digital_Spenders_Club_7-23_Real_Jacket_1_78e08668-3abe-490a-a9fa-04dc3a4854ca.png',
@@ -31,17 +31,17 @@ const columns = [
   {
     label: 'Wearables',
     title: 'One core piece, issued from your form.',
-    body: 'From the clothing size and region on the Ambassador Program form, DSC issues a complimentary shirt, sweater, or sweatshirt to wear during events and meetups. Other kit items may be included with a given drop — not guaranteed beyond the core piece.',
+    body: 'From the clothing size and region on the Ambassador Program form, DSC issues a complimentary shirt, sweater, or sweatshirt to wear during events and meetups. Other kit items may be included with a given drop, not guaranteed beyond the core piece.',
   },
   {
     label: 'Tools',
     title: 'What you use to move IRL.',
-    body: 'Event materials — flyers, banners, extra membership cards — request through the Assets channel in the private Telegram group after approval. DSC Membership Cards come as an allotment to give out as you see fit, only to people who will actually push the movement forward. Be mindful.',
+    body: 'Event materials (flyers, banners, extra membership cards) request through the Assets channel in the private Telegram group after approval. DSC Membership Cards come as an allotment to give out as you see fit, only to people who will actually push the movement forward. Be mindful.',
   },
   {
     label: 'Comms',
     title: 'Where the program actually happens.',
-    body: 'The private Ambassador Program Telegram Group is HQ after approval — a global ambassador network. A monthly SYNC call covers growth, opportunities, and friction. A Discord role unlocks the private Ambassador voice channel where calls live.',
+    body: 'The private Ambassador Program Telegram Group is HQ after approval, a global ambassador network. A monthly SYNC call covers growth, opportunities, and friction. A Discord role unlocks the private Ambassador voice channel where calls live.',
   },
 ]
 
@@ -76,7 +76,7 @@ export function Kit() {
               The DSC Membership Card.
             </h2>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-cream-3">
-              Every member — ambassador or not — taps their card to their phone to get into Burner,
+              Every member, ambassador or not, taps their card to their phone to get into Burner,
               the club&rsquo;s app. There&rsquo;s no separate login. The card is the key.
             </p>
           </Reveal>
@@ -92,8 +92,13 @@ export function Kit() {
         </Reveal>
         <div className="mt-8 grid items-center gap-10 md:grid-cols-2">
           <Reveal>
-            <TiltCard maxTilt={10} className="rounded-2xl">
-              <MembershipCardIllustration className="w-full" />
+            <TiltCard maxTilt={10} className="hairline overflow-hidden rounded-2xl bg-surface/40">
+              <ParallaxImage
+                src="/spendersclubcard.jpeg"
+                alt="Digital Spenders Club membership card"
+                loading="lazy"
+                className="aspect-square w-full rounded-2xl object-cover"
+              />
             </TiltCard>
           </Reveal>
           <Reveal delay={0.1}>
@@ -131,8 +136,8 @@ export function Kit() {
               What the club actually wears.
             </h2>
             <p className="mt-4 max-w-xl text-sm leading-relaxed text-cream-3">
-              The complimentary piece above is the guaranteed core. The rest of the line — drops
-              like these — lives at the shop.
+              The complimentary piece above is the guaranteed core. The rest of the line, drops
+              like these, lives at the shop.
             </p>
           </Reveal>
           <LinkButton to="https://www.spenders.club/collections/all" variant="ghost">
@@ -164,7 +169,7 @@ export function Kit() {
           <HairlineCard className="text-left md:text-center">
             <p className="label-mono text-[0.68rem] text-cream-wash">Assets, post-approval</p>
             <p className="mt-3 text-sm leading-relaxed text-cream-3 md:mx-auto md:max-w-md">
-              Extra event assets — flyers, banners, more membership cards — are requested directly
+              Extra event assets (flyers, banners, more membership cards) are requested directly
               in the Telegram Assets channel once you&rsquo;re approved.
             </p>
           </HairlineCard>

@@ -25,7 +25,7 @@ export const sourceBadge: Record<EventSource, string> = {
  * Known city/region → [lng, lat] for plotting on the circuit map. Locations
  * that aren't a fixed point ("Location TBD", "Virtual + regional hubs",
  * "Rotating cities") are intentionally left out rather than plotted at a
- * fabricated coordinate — CircuitMap surfaces those as an off-map count
+ * fabricated coordinate. CircuitMap surfaces those as an off-map count
  * instead.
  */
 export const locationCoordinates: Record<string, [number, number]> = {
@@ -43,7 +43,7 @@ export function resolveCoordinates(location: string): [number, number] | null {
 }
 
 /**
- * Illustrative circuit sample — not a live feed. Live scraping of
+ * Illustrative circuit sample, not a live feed. Live scraping of
  * standwithcrypto.org/events, plan.wtf, lu.ma/crypto, and lu.ma/Team1 isn't
  * available from this build environment (all four domains are blocked by
  * the sandbox's egress policy), so dates below are seasonal placeholders,
@@ -70,7 +70,7 @@ export const events: CircuitEvent[] = [
     date: 'Spring 2026',
     location: 'Austin, TX',
     description:
-      'Mainstage conference with a heavy founder and institutional presence — a strong booth-adjacent onboarding opportunity.',
+      'Mainstage conference with a heavy founder and institutional presence, a strong booth-adjacent onboarding opportunity.',
     link: 'https://lu.ma/crypto',
     dscStatus: 'Ambassadors Attending',
   },
@@ -103,7 +103,7 @@ export const events: CircuitEvent[] = [
     date: 'Ongoing',
     location: 'Virtual + regional hubs',
     description:
-      'Avalanche Team1’s cross-ecosystem ambassador gathering. High overlap audience — builders already fluent in chapter-style ambassador programs.',
+      'Avalanche Team1’s cross-ecosystem ambassador gathering. High overlap audience, builders already fluent in chapter-style ambassador programs.',
     link: 'https://lu.ma/Team1',
     dscStatus: 'Open Call',
   },
@@ -111,7 +111,7 @@ export const events: CircuitEvent[] = [
     id: 'team1-regional',
     title: 'Team1 Regional Builder Meetup',
     source: 'Team1',
-    date: 'Ongoing — monthly',
+    date: 'Ongoing, monthly',
     location: 'Rotating cities',
     description:
       'Regional builder meetups run under the Team1 banner. A natural cross-promotion lane for DSC ambassadors already covering that city.',
@@ -125,7 +125,7 @@ export const events: CircuitEvent[] = [
     date: 'February 2026',
     location: 'Denver, CO',
     description:
-      'The unofficial events running alongside ETHDenver — house parties, founder dinners, and pop-ups. This is where most onboarding conversations actually happen.',
+      'The unofficial events running alongside ETHDenver: house parties, founder dinners, and pop-ups. This is where most onboarding conversations actually happen.',
     link: 'https://plan.wtf',
     dscStatus: 'Priority Circuit',
   },
@@ -144,7 +144,7 @@ export const events: CircuitEvent[] = [
     id: 'swc-austin',
     title: 'Local SWC Chapter Meetup',
     source: 'Stand With Crypto',
-    date: 'Ongoing — monthly',
+    date: 'Ongoing, monthly',
     location: 'Austin, TX',
     description:
       'Grassroots gathering for the Austin chapter. Ambassadors show up, represent the brand, and onboard newcomers face to face.',
@@ -158,7 +158,7 @@ export const events: CircuitEvent[] = [
     date: 'Spring 2026',
     location: 'Washington, D.C.',
     description:
-      'Where SWC meets legislators and policy staff directly. High-visibility, advocacy-first — not a merch moment.',
+      'Where SWC meets legislators and policy staff directly. High-visibility, advocacy-first, not a merch moment.',
     link: 'https://www.standwithcrypto.org',
     dscStatus: 'Priority Circuit',
   },
@@ -166,7 +166,7 @@ export const events: CircuitEvent[] = [
     id: 'swc-sf',
     title: 'SWC Regional Meetup',
     source: 'Stand With Crypto',
-    date: 'Ongoing — monthly',
+    date: 'Ongoing, monthly',
     location: 'San Francisco, CA',
     description:
       'Bay Area chapter gathering alongside the region’s builder-heavy conference calendar.',
@@ -180,7 +180,7 @@ export const events: CircuitEvent[] = [
     date: 'Fall semester',
     location: 'Austin, TX',
     description:
-      'First-semester chapter launches at university blockchain clubs — cards, kit, and the after-party distribution that follows.',
+      'First-semester chapter launches at university blockchain clubs: cards, kit, and the after-party distribution that follows.',
     link: '/campus',
     dscStatus: 'Open Call',
   },

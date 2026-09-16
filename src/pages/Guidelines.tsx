@@ -84,7 +84,7 @@ export function Guidelines() {
           <ul className="mt-5 space-y-4 text-base leading-relaxed text-cream-2">
             {successMetrics.map((m) => (
               <li key={m.title}>
-                <strong className="text-cream">{m.title}</strong> — {m.detail}
+                <strong className="text-cream">{m.title}</strong>: {m.detail}
               </li>
             ))}
           </ul>

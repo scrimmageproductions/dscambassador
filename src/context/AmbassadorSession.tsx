@@ -17,7 +17,7 @@ function readStoredSession(): AmbassadorSession | null {
 }
 
 /**
- * Client-only demo session for the HQ dashboard preview — there is no real
+ * Client-only demo session for the HQ dashboard preview. There is no real
  * backend, so this just persists a name in localStorage on this device so
  * the demo state survives a refresh. Never treat this as real auth.
  */
@@ -31,7 +31,7 @@ export function AmbassadorSessionProvider({ children }: { children: ReactNode })
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
     } catch {
-      // localStorage unavailable (private mode, etc.) — session still works for this render
+      // localStorage unavailable (private mode, etc.). Session still works for this render
     }
   }
 

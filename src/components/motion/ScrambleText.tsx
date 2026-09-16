@@ -10,7 +10,7 @@ function randomChar() {
 /**
  * Hover scramble/decode effect for short monospace labels: cycles every
  * character through random glyphs for ~150ms, then settles on the real
- * text. Meant for small interactive tags (nav links, captions, badges) —
+ * text. Meant for small interactive tags (nav links, captions, badges),
  * not body copy. No-ops under prefers-reduced-motion.
  */
 export function ScrambleText({

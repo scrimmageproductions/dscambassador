@@ -87,7 +87,7 @@ export function Events() {
             </h2>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-cream-3">
               A folding table, a rack of kit, and people who showed up. No side-event vendor
-              energy — just the club, in a room, moving.
+              energy, just the club, in a room, moving.
             </p>
           </Reveal>
           <CultureMedia
@@ -141,7 +141,7 @@ export function Events() {
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-cream-3">
             Hand someone a DSC Membership Card at a conference, meetup, or club night, and their
             first tap to their own phone is what opens Burner and makes them a member. No
-            separate sign-up flow — the card is the onboarding.
+            separate sign-up flow. The card is the onboarding.
           </p>
         </Reveal>
         <div className="mt-10">

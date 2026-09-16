@@ -68,7 +68,7 @@ export function ReimbursementView() {
         />
       </div>
       <p className="mt-4 text-xs leading-relaxed text-cream-wash/70">
-        Attach receipts once you&rsquo;re in — this preview skips the upload step.
+        Attach receipts once you&rsquo;re in. This preview skips the upload step.
       </p>
       <Button type="submit" variant="solid" className="mt-6">
         Submit for reimbursement

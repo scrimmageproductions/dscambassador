@@ -33,7 +33,7 @@ const bubbles: Bubble[] = [
 
 /**
  * Fixed, decorative ambient background: soft pools of cream/amber light
- * that drift and swell into each other. No hard-edged shapes — an extreme
+ * that drift and swell into each other. No hard-edged shapes, an extreme
  * blur dissolves every blob into pure ambient glow, and a screen blend
  * between blobs makes overlaps brighten like merging light rather than
  * composite like flat cutouts. Bubbles carry a subtle cursor-parallax

@@ -98,7 +98,7 @@ export function EventFeed({ active, onActiveChange, highlightIds = [] }: EventFe
       </div>
 
       <p className="label-mono mt-6 text-[0.62rem] text-cream-wash/70">
-        Sample circuit — illustrative, not a live feed. Confirm dates directly at{' '}
+        Sample circuit, illustrative, not a live feed. Confirm dates directly at{' '}
         <a href="https://www.standwithcrypto.org" target="_blank" rel="noreferrer" className="underline decoration-cream-wash/40 underline-offset-2 hover:text-cream">
           standwithcrypto.org
         </a>

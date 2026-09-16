@@ -14,7 +14,7 @@ const tiles = [
     to: '/program',
     label: 'Program',
     title: 'What ambassadors do',
-    body: 'Content, IRL activations, and member onboarding — the criteria, the cadence, the rules.',
+    body: 'Content, IRL activations, and member onboarding: the criteria, the cadence, the rules.',
   },
   {
     to: '/kit',
@@ -72,7 +72,7 @@ export function Home() {
             </h2>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-cream-3">
               Pop-ups, drops, and ecosystem activations. We don&rsquo;t just talk about the
-              movement—we show up.
+              movement. We show up.
             </p>
           </Reveal>
         </div>
@@ -108,7 +108,7 @@ export function Home() {
               The kit is one piece of a much bigger line.
             </h2>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-cream-3">
-              Varsity jackets, collab bombers, full bundles — the club&rsquo;s actual shop floor.
+              Varsity jackets, collab bombers, full bundles: the club&rsquo;s actual shop floor.
               See what ambassadors are already wearing before you apply.
             </p>
             <div className="mt-6">

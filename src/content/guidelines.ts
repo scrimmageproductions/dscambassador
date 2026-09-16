@@ -6,7 +6,7 @@ export const eligibility = [
   {
     title: 'Active online',
     detail:
-      'Active on Instagram, TikTok, or X — minimum 500 followers for ambassadorship consideration.',
+      'Active on Instagram, TikTok, or X: minimum 500 followers for ambassadorship consideration.',
   },
   {
     title: '18 or older',
@@ -39,7 +39,7 @@ export const commitments: CommitmentRow[] = [
     task: 'Engage with @DigitalSpendersClub posts when they drop',
     example: 'Like, repost, and comment within 24 hours of drop.',
     detail:
-      '"This colorway is insane," "been waiting for this collab," "can\'t wait until this collection drops" — genuine, timely engagement that shows up in the first 24 hours.',
+      '"This colorway is insane," "been waiting for this collab," "can\'t wait until this collection drops." Genuine, timely engagement that shows up in the first 24 hours.',
   },
   {
     frequency: '1x / quarter',
@@ -53,7 +53,7 @@ export const commitments: CommitmentRow[] = [
 export const contentRules = [
   'No edits to our logo or product images.',
   'Use common sense and be kind. Don’t use hurtful or discriminatory messaging while repping the brand.',
-  'No reselling free product meant for the ambassadorship program — instant termination.',
+  'No reselling free product meant for the ambassadorship program. Instant termination.',
 ]
 
 export const successMetrics = [

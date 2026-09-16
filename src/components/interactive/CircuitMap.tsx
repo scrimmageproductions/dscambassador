@@ -11,9 +11,9 @@ import {
 } from '../../data/events'
 import { LinkButton } from '../ui/Button'
 
-/** Local, in-person chapter activity — rendered as a solid cream dot. */
+/** Local, in-person chapter activity. Rendered as a solid cream dot. */
 const GRASSROOTS_SOURCES: EventSource[] = ['Stand With Crypto', 'Campus']
-/** Conference / hub circuit — rendered as a hollow gold ring. */
+/** Conference / hub circuit. Rendered as a hollow gold ring. */
 const CIRCUIT_SOURCES: EventSource[] = ['Lu.ma Crypto', 'Team1', 'Plan.wtf']
 
 type CircuitPin = {
@@ -58,7 +58,7 @@ function CircuitPinMarker({
       tabIndex={0}
       role="button"
       aria-pressed={isActive}
-      aria-label={`${pin.location} — ${pin.events.length} event${pin.events.length > 1 ? 's' : ''}`}
+      aria-label={`${pin.location}: ${pin.events.length} event${pin.events.length > 1 ? 's' : ''}`}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
@@ -103,7 +103,7 @@ export function CircuitMap({ active, onSelectEvents }: CircuitMapProps) {
   const offMapCount = filteredEvents.length - plottedCount
   const selectedPin = pins.find((p) => p.id === activePinId) ?? null
 
-  // Filter changed out from under the current selection — clear it.
+  // Filter changed out from under the current selection, clear it.
   useEffect(() => {
     if (activePinId && !pins.some((p) => p.id === activePinId)) {
       setActivePinId(null)

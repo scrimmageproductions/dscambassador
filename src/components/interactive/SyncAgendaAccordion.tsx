@@ -11,7 +11,7 @@ const agenda = [
   },
   {
     title: 'Friction',
-    detail: 'What is slowing ambassadors down — shipping, assets, communication — said out loud and fixed.',
+    detail: 'What is slowing ambassadors down: shipping, assets, communication, said out loud and fixed.',
   },
   {
     title: 'Suggestions',

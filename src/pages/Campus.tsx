@@ -9,7 +9,7 @@ import { TiltCard } from '../components/motion/TiltCard'
 const flow = [
   { step: '01', title: 'Identify the club', body: 'A university blockchain club, crypto society, or builder group already gathering the next wave of spenders.' },
   { step: '02', title: 'Issue cards + kit', body: 'Custom chapter membership cards and core kit pieces, sized and shipped to the chapter lead.' },
-  { step: '03', title: 'Distribute IRL', body: 'Club meetings and after-parties — where cards move hand to hand, not through a form.' },
+  { step: '03', title: 'Distribute IRL', body: 'Club meetings and after-parties, where cards move hand to hand, not through a form.' },
   { step: '04', title: 'Referral apparel', body: 'Members onboarded through the chapter unlock additional apparel for the people who brought them in.' },
 ]
 
@@ -19,7 +19,7 @@ export function Campus() {
       <PageHero
         eyebrow="Campus"
         title="Clubs are where the next wave of spenders already gathers."
-        lede="University blockchain clubs are a high-value expansion surface — campus chapters put custom cards, kit, and a merch program directly into that existing energy."
+        lede="University blockchain clubs are a high-value expansion surface. Campus chapters put custom cards, kit, and a merch program directly into that existing energy."
       />
 
       <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
@@ -34,7 +34,7 @@ export function Campus() {
             <p className="mt-4 text-sm leading-relaxed text-cream-3">
               Custom membership cards for each college blockchain club, distributed at meetings and
               after-parties. Conference-ready DSC cards can also carry a loaded activation
-              experience — presented as example activations for campus conference presence, not a
+              experience, presented as example activations for campus conference presence, not a
               standing promise on any single card.
             </p>
           </Reveal>
@@ -55,7 +55,7 @@ export function Campus() {
             </h2>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-cream-3">
               Simple math: a chapter moves DSC merch through its own network, and keeps 20% of the
-              profit. No points, no tiers — a straight kickback for chapters that actually sell.
+              profit. No points, no tiers, just a straight kickback for chapters that actually sell.
             </p>
           </Reveal>
         </div>
@@ -77,8 +77,8 @@ export function Campus() {
         <p className="mt-8 max-w-2xl text-sm leading-relaxed text-cream-wash/80">
           Conference support may include approved travel or ticket reimbursement against receipts,
           capped and reviewed case by case. Campus chapters sit inside the broader advocacy and
-          builder-club circuit — the same grassroots energy behind Stand With Crypto and campus
-          chapter operations elsewhere in the ecosystem — and can operate as the adults in the room
+          builder-club circuit, the same grassroots energy behind Stand With Crypto and campus
+          chapter operations elsewhere in the ecosystem, and can operate as the adults in the room
           for club-level logistics.
         </p>
       </section>

@@ -153,7 +153,7 @@ function ChannelsCard() {
   return (
     <HairlineCard>
       <p className="label-mono text-[0.68rem] text-gold">Private channels</p>
-      <p className="mt-2 text-sm text-cream-3">Request an invite — it lands in your email within minutes.</p>
+      <p className="mt-2 text-sm text-cream-3">Request an invite. It lands in your email within minutes.</p>
       <div className="mt-4 space-y-2">
         {channels.map((c) => (
           <button
@@ -187,7 +187,7 @@ function ReferralLinkCard({ name }: { name: string }) {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
-      // clipboard unavailable — link is still selectable/visible below
+      // clipboard unavailable, link is still selectable/visible below
     }
   }
 

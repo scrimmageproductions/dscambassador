@@ -16,7 +16,7 @@ type Tag = keyof typeof tags
 /**
  * Scroll-triggered fade-up reveal. With `stagger`, each direct child is
  * animated in sequence (0.15s apart) instead of the block animating as one
- * unit — use it around a header + paragraph + CTA group. Animates once, and
+ * unit. Use it around a header + paragraph + CTA group. Animates once, and
  * is skipped entirely under prefers-reduced-motion.
  */
 export function Reveal({

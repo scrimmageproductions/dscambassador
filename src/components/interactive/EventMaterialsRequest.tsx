@@ -26,7 +26,7 @@ export function EventMaterialsRequest() {
       </button>
 
       <p className="mt-4 text-xs text-cream-wash/70">
-        Approved ambassadors request assets directly in Telegram — no waiting on a form.
+        Approved ambassadors request assets directly in Telegram, no waiting on a form.
       </p>
     </div>
   )

@@ -118,7 +118,7 @@ export function KitConfigurator() {
         </div>
 
         <p className="text-xs leading-relaxed text-cream-wash/80">
-          Issued from your application form. Other kit items may be included with a given drop —
+          Issued from your application form. Other kit items may be included with a given drop,
           not guaranteed beyond the core piece above.
         </p>
       </div>

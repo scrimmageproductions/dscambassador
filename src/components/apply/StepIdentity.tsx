@@ -40,7 +40,7 @@ export function StepIdentity({
       />
       {draft.membership === 'no' ? (
         <p className="text-xs leading-relaxed text-cream-wash/80">
-          Ambassadors are genuine DSC members. You can still submit — join the club at{' '}
+          Ambassadors are genuine DSC members. You can still submit. Join the club at{' '}
           <a href="https://spenders.club" target="_blank" rel="noreferrer" className="underline decoration-cream/40 underline-offset-4 hover:text-cream">
             spenders.club
           </a>{' '}
