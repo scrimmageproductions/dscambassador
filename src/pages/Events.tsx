@@ -7,7 +7,6 @@ import { EventMaterialsRequest } from '../components/interactive/EventMaterialsR
 import { CardTapDemo } from '../components/interactive/CardTapDemo'
 import { CultureMedia } from '../components/ui/CultureMedia'
 import { EventFeed } from '../components/interactive/EventFeed'
-import { Link } from 'react-router-dom'
 
 const CircuitMap = lazy(() =>
   import('../components/interactive/CircuitMap').then((m) => ({ default: m.CircuitMap })),
@@ -18,8 +17,8 @@ export function Events() {
     <div>
       <PageHero
         eyebrow="Events"
-        title="One IRL activation, every quarter."
-        lede="Ambassadors represent DSC at major conferences and local crypto events — building a presence, not running a booth at every stop."
+        title="Presence on the ground."
+        lede="Ambassadors anchor the movement at major conferences, key side-events, and local gatherings worldwide."
       />
 
       <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
@@ -28,28 +27,24 @@ export function Events() {
             <p className="label-mono text-[0.68rem] text-gold">Circuit</p>
             <h3 className="mt-4 font-display text-xl text-cream">Ecosystem events</h3>
             <p className="mt-2 text-sm leading-relaxed text-cream-3">
-              Priority coverage of major conferences, side-events, and grassroots meetups.
-              Ambassadors represent the brand, onboard members, and network with founders,
-              builders, and newcomers across the globe.
+              Global conference circuits, side-events, and local meetups. Wear the kit, onboard
+              new members, and connect directly with the ecosystem.
             </p>
           </HairlineCard>
           <HairlineCard>
             <p className="label-mono text-[0.68rem] text-gold">Builders</p>
             <h3 className="mt-4 font-display text-xl text-cream">Hackathons</h3>
             <p className="mt-2 text-sm leading-relaxed text-cream-3">
-              Position DSC as the default kit for builders — showing up where the next cycle of
-              product people actually spend their weekends.
+              Representing the club where the next wave is being built. Outfitting founders and
+              developers on the frontlines.
             </p>
           </HairlineCard>
           <HairlineCard>
             <p className="label-mono text-[0.68rem] text-gold">Campus</p>
             <h3 className="mt-4 font-display text-xl text-cream">University clubs</h3>
             <p className="mt-2 text-sm leading-relaxed text-cream-3">
-              College blockchain clubs are a high-value expansion surface — see the{' '}
-              <Link to="/campus" className="underline decoration-cream/40 underline-offset-4 hover:text-cream">
-                Campus
-              </Link>{' '}
-              page for how chapters work.
+              Custom campus activations and university blockchain partnerships. Bringing DSC
+              culture directly to student networks.
             </p>
           </HairlineCard>
         </div>
