@@ -48,7 +48,7 @@ export function CampusInterestForm() {
           </label>
           <label className="hairline flex flex-1 items-center gap-3 px-4 py-3 text-sm text-cream-2">
             <input type="checkbox" name="merch" className="h-4 w-4 accent-[#F3EDE3]" />
-            20% merch kickback details
+            Chapter treasury funding details
           </label>
         </div>
       </fieldset>
