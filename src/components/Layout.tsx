@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { Nav } from './Nav'
 import { Footer } from './Footer'
 import { ThermalBackground } from './ui/ThermalBackground'
-import { KineticCursor } from './ui/KineticCursor'
+import { PixelCursor } from './ui/PixelCursor'
 
 export function Layout() {
   const { pathname } = useLocation()
@@ -50,7 +50,7 @@ export function Layout() {
         aria-hidden="true"
       />
 
-      <KineticCursor />
+      <PixelCursor />
 
       <div className="relative z-50 flex flex-1 flex-col bg-transparent">
         <a
