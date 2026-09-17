@@ -196,10 +196,10 @@
   }
 }
 
-/* Native cursor hidden only while the custom editorial cursor (hover-capable desktops) is active. */
+/* Native cursor hidden only while the kinetic velocity-morph cursor (hover-capable desktops) is active. */
 @media (hover: hover) {
-  .crosshair-cursor-active,
-  .crosshair-cursor-active * {
+  .kinetic-cursor-active,
+  .kinetic-cursor-active * {
     cursor: none !important;
   }
 }

@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { Nav } from './Nav'
 import { Footer } from './Footer'
 import { ThermalBackground } from './ui/ThermalBackground'
-import { CrosshairCursor } from './ui/CrosshairCursor'
+import { KineticCursor } from './ui/KineticCursor'
 
 export function Layout() {
   const { pathname } = useLocation()
@@ -42,7 +42,7 @@ export function Layout() {
         aria-hidden="true"
       />
 
-      <CrosshairCursor />
+      <KineticCursor />
 
       <div className="relative z-10 flex flex-1 flex-col bg-transparent">
         <a
