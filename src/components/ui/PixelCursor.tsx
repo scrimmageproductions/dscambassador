@@ -22,9 +22,34 @@ const ARROW_BITMAP = [
   '.....XX.',
 ]
 
+// Pad by 1 unit on every side so the dark outline halo (drawn just
+// outside the fill) has room without clipping against the SVG bounds.
+const OUTLINE_PAD = 1
+const GRID_W = 8 + OUTLINE_PAD * 2
+const GRID_H = 13 + OUTLINE_PAD * 2
+
 const ARROW_PIXELS = ARROW_BITMAP.flatMap((row, y) =>
-  [...row].flatMap((cell, x) => (cell === 'X' ? [{ x, y }] : [])),
+  [...row].flatMap((cell, x) => (cell === 'X' ? [{ x: x + OUTLINE_PAD, y: y + OUTLINE_PAD }] : [])),
 )
+
+const ARROW_SET = new Set(ARROW_PIXELS.map(({ x, y }) => `${x},${y}`))
+const outlineSeen = new Set<string>()
+const OUTLINE_PIXELS = ARROW_PIXELS.flatMap(({ x, y }) => {
+  const neighbors = []
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      if (dx === 0 && dy === 0) continue
+      const nx = x + dx
+      const ny = y + dy
+      const key = `${nx},${ny}`
+      if (!ARROW_SET.has(key) && !outlineSeen.has(key)) {
+        outlineSeen.add(key)
+        neighbors.push({ x: nx, y: ny })
+      }
+    }
+  }
+  return neighbors
+})
 
 const AURA_SPRING = { stiffness: 260, damping: 26, mass: 0.5 }
 const AURA_SIZE_SPRING = { stiffness: 300, damping: 28 }
@@ -58,8 +83,11 @@ export function PixelCursor() {
   const auraX = useSpring(x, AURA_SPRING)
   const auraY = useSpring(y, AURA_SPRING)
 
-  const auraSizeTarget = useMotionValue(32)
+  const auraSizeTarget = useMotionValue(24)
   const auraSize = useSpring(auraSizeTarget, AURA_SIZE_SPRING)
+
+  const auraOpacityTarget = useMotionValue(0)
+  const auraOpacity = useSpring(auraOpacityTarget, AURA_SIZE_SPRING)
 
   useEffect(() => {
     if (window.matchMedia('(hover: none)').matches) return
@@ -69,11 +97,13 @@ export function PixelCursor() {
       y.set(e.clientY)
       const v = variantFor(e.target)
       setVariant(v)
-      auraSizeTarget.set(v === 'interactive' ? 48 : 32)
+      auraSizeTarget.set(v === 'interactive' ? 36 : 24)
+      auraOpacityTarget.set(v === 'interactive' ? 0.08 : 0.05)
       setVisible(true)
     }
     function handleLeave() {
       setVisible(false)
+      auraOpacityTarget.set(0)
     }
 
     window.addEventListener('mousemove', handleMove)
@@ -93,7 +123,12 @@ export function PixelCursor() {
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[90] hidden md:block" aria-hidden="true">
-      {/* Ambient diffusion aura, centered behind the arrow, trailing on a spring. */}
+      {/*
+        Ambient diffusion aura: a barely-perceptible haze, not a hotspot.
+        Gradient carries full-strength color so the opacity spring alone
+        (0.05 resting, 0.08 on interactive hover) sets the true visible
+        intensity, smoothly, without needing to animate the gradient text.
+      */}
       <motion.div
         className="pointer-events-none fixed left-0 top-0 rounded-full"
         style={{
@@ -103,36 +138,46 @@ export function PixelCursor() {
           translateY: '-50%',
           width: auraSize,
           height: auraSize,
-          opacity: visible ? 1 : 0,
-          background: 'radial-gradient(circle, rgba(243, 237, 227, 0.12) 0%, rgba(243, 237, 227, 0) 75%)',
+          opacity: auraOpacity,
+          background: 'radial-gradient(circle, rgba(225, 219, 207, 1) 0%, rgba(225, 219, 207, 0) 65%)',
           backdropFilter: 'blur(12px)',
           mixBlendMode: blend,
           willChange: 'transform',
         }}
       />
 
-      {/* Pixel-art arrow, tip pinned exactly to the pointer position. */}
+      {/*
+        Pixel-art arrow, tip pinned exactly to the pointer position. The
+        SVG grid is padded by OUTLINE_PAD to fit the dark outline halo, so
+        the wrapper is nudged back by that same amount to keep the tip
+        aligned with the real cursor position.
+      */}
       <motion.div
         className="pointer-events-none fixed left-0 top-0"
         style={{
           x,
           y,
+          translateX: `-${OUTLINE_PAD * PIXEL}px`,
+          translateY: `-${OUTLINE_PAD * PIXEL}px`,
           opacity: visible ? 1 : 0,
           mixBlendMode: blend,
           filter:
-            'drop-shadow(-1px 0px 0px rgba(255, 0, 80, 0.6)) drop-shadow(1px 0px 0px rgba(0, 220, 255, 0.6))',
+            'drop-shadow(-1px 0px 0px rgba(230, 40, 70, 0.55)) drop-shadow(1px 0px 0px rgba(0, 200, 240, 0.55))',
           willChange: 'transform',
         }}
       >
         <svg
-          width={8 * PIXEL}
-          height={13 * PIXEL}
-          viewBox="0 0 8 13"
+          width={GRID_W * PIXEL}
+          height={GRID_H * PIXEL}
+          viewBox={`0 0 ${GRID_W} ${GRID_H}`}
           shapeRendering="crispEdges"
           style={{ imageRendering: 'pixelated', display: 'block' }}
         >
+          {OUTLINE_PIXELS.map(({ x: px, y: py }) => (
+            <rect key={`outline-${px}-${py}`} x={px} y={py} width={1} height={1} fill="#0D0D0D" />
+          ))}
           {ARROW_PIXELS.map(({ x: px, y: py }) => (
-            <rect key={`${px}-${py}`} x={px} y={py} width={1} height={1} fill="#F3EDE3" />
+            <rect key={`fill-${px}-${py}`} x={px} y={py} width={1} height={1} fill="#E1DBCF" />
           ))}
         </svg>
       </motion.div>
