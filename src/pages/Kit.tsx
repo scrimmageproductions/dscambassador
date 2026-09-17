@@ -2,7 +2,6 @@ import { PageHero } from '../components/ui/PageHero'
 import { SectionLabel } from '../components/ui/SectionLabel'
 import { HairlineCard } from '../components/ui/HairlineCard'
 import { LinkButton } from '../components/ui/Button'
-import { KitConfigurator } from '../components/interactive/KitConfigurator'
 import { CardTapDemo } from '../components/interactive/CardTapDemo'
 import { ExternalImage } from '../components/ui/ExternalImage'
 import { Reveal } from '../components/motion/Reveal'
@@ -114,21 +113,7 @@ export function Kit() {
         </div>
       </section>
 
-      <section className="hairline-t bg-surface/20">
-        <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
-          <Reveal stagger>
-            <SectionLabel>Configure yours</SectionLabel>
-            <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
-              Preview your complimentary piece.
-            </h2>
-          </Reveal>
-          <div className="mt-10">
-            <KitConfigurator />
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
+      <section className="hairline-t mx-auto max-w-6xl px-6 py-20 md:py-24">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <Reveal stagger>
             <SectionLabel>From the shop floor</SectionLabel>
