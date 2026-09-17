@@ -19,7 +19,7 @@ export function CultureMedia({
           src={src}
           alt={alt}
           loading="lazy"
-          className="h-full w-full object-cover grayscale-[35%] contrast-125 brightness-90"
+          className="h-full w-full object-cover brightness-90"
         />
         <div className="pointer-events-none absolute inset-0 bg-cream/[0.05] mix-blend-overlay" aria-hidden="true" />
         <div

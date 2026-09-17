@@ -11,7 +11,7 @@ export function GalleryView() {
               src={item.src}
               alt={item.caption}
               loading="lazy"
-              className="h-full w-full object-cover grayscale-[35%] contrast-125 brightness-90"
+              className="h-full w-full object-cover brightness-90"
             />
             <div
               className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/85 via-transparent to-transparent"

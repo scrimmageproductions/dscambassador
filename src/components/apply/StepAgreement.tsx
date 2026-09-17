@@ -35,7 +35,7 @@ export function StepAgreement({
               </li>
             ))}
           </ul>
-          <p className="mt-2">All posts must tag @DigitalSpendersClub.</p>
+          <p className="mt-2">All posts must tag @spenders_club.</p>
         </section>
 
         <section className="mt-5">

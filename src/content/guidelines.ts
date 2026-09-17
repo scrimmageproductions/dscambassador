@@ -36,7 +36,7 @@ export const commitments: CommitmentRow[] = [
   },
   {
     frequency: 'Daily',
-    task: 'Engage with @DigitalSpendersClub posts when they drop',
+    task: 'Engage with @spenders_club posts when they drop',
     example: 'Like, repost, and comment within 24 hours of drop.',
     detail:
       '"This colorway is insane," "been waiting for this collab," "can\'t wait until this collection drops." Genuine, timely engagement that shows up in the first 24 hours.',

@@ -49,8 +49,8 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a href="https://instagram.com/DigitalSpendersClub" target="_blank" rel="noreferrer" className="hover:text-cream">
-                  @DigitalSpendersClub
+                <a href="https://instagram.com/spenders_club" target="_blank" rel="noreferrer" className="hover:text-cream">
+                  @spenders_club
                 </a>
               </li>
               <li>

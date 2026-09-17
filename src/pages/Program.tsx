@@ -51,7 +51,7 @@ export function Program() {
             <CommitmentCalendar />
           </div>
           <p className="mt-6 text-sm text-cream-3">
-            All posts must tag <span className="text-cream">@DigitalSpendersClub</span>.
+            All posts must tag <span className="text-cream">@spenders_club</span>.
           </p>
         </div>
       </section>

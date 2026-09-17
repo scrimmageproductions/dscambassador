@@ -81,7 +81,7 @@ export const directory = [
 ]
 
 export const activityFeed = [
-  { title: 'Content posted to X', detail: 'Tagged @DigitalSpendersClub, counted toward this month.', time: '2 days ago' },
+  { title: 'Content posted to X', detail: 'Tagged @spenders_club, counted toward this month.', time: '2 days ago' },
   { title: 'Onboarded a new member', detail: 'Tap-to-verify via your Membership Card at ETHDenver.', time: '5 days ago' },
   { title: 'Attended monthly SYNC call', detail: 'Growth + event opportunities agenda.', time: '1 week ago' },
   { title: 'Event report submitted', detail: 'Builder Week Side-Event Circuit, Denver, CO.', time: '1 week ago' },

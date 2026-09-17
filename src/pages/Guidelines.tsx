@@ -63,7 +63,7 @@ export function Guidelines() {
             </table>
           </div>
           <p className="mt-6 text-base text-cream-2">
-            All posts must tag <strong className="text-cream">@DigitalSpendersClub</strong>.
+            All posts must tag <strong className="text-cream">@spenders_club</strong>.
           </p>
         </section>
 
