@@ -1,5 +1,6 @@
 import { myEvents } from '../../../data/dashboard'
 import { LinkButton } from '../../ui/Button'
+import { EventRequestModule } from '../EventRequestModule'
 
 const statusStyle: Record<string, string> = {
   Confirmed: 'text-gold',
@@ -29,6 +30,18 @@ export function EventsView() {
         <LinkButton to="/events" variant="ghost">
           Browse the full circuit
         </LinkButton>
+      </div>
+
+      <div className="mt-12">
+        <p className="label-mono text-[0.68rem] text-cream-wash">Request budget &amp; assets</p>
+        <h3 className="mt-3 font-display text-xl text-cream">Prep your next activation.</h3>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-cream-3">
+          Submit a budget request with receipts attached, and pull whatever physical gear you
+          need from the club.
+        </p>
+        <div className="mt-6">
+          <EventRequestModule />
+        </div>
       </div>
     </div>
   )
