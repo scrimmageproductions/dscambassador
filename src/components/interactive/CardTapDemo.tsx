@@ -35,7 +35,7 @@ export function CardTapDemo() {
         <div className="relative flex items-center justify-center py-6">
           <div
             className={`relative z-10 w-44 transition-transform duration-500 ease-out ${
-              stage === 'idle' ? '-translate-x-8' : 'translate-x-6'
+              stage === 'idle' ? '-translate-x-8 translate-y-4' : '-translate-y-14 translate-x-6'
             } ${stage === 'tapping' ? 'scale-95' : ''}`}
           >
             <TiltCard maxTilt={10} className="rounded-2xl">
@@ -48,6 +48,27 @@ export function CardTapDemo() {
               unlocked ? 'border-gold' : 'border-cream/25'
             } bg-ink`}
           >
+            {/* NFC antenna zone: upper-rear of the phone, where real hardware sits */}
+            <span
+              className={`pointer-events-none absolute left-1/2 top-9 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full border transition-colors ${
+                unlocked ? 'border-gold/50' : 'border-cream/15'
+              }`}
+              aria-hidden="true"
+            />
+
+            {stage === 'tapping' && (
+              <>
+                <span
+                  className="pointer-events-none absolute left-1/2 top-9 h-3 w-3 -translate-x-1/2 -translate-y-1/2 animate-ping rounded-full bg-cream [animation-duration:0.6s]"
+                  aria-hidden="true"
+                />
+                <span
+                  className="pointer-events-none absolute left-1/2 top-9 h-16 w-16 -translate-x-1/2 -translate-y-1/2 animate-ping rounded-full border border-cream/40"
+                  aria-hidden="true"
+                />
+              </>
+            )}
+
             {stage === 'app' ? (
               <div className="w-full animate-tick text-center">
                 <p className="label-mono text-[0.55rem] text-cream-wash">DSC</p>
@@ -69,10 +90,6 @@ export function CardTapDemo() {
               <span className="pointer-events-none absolute inset-0 animate-pulse rounded-[1.4rem] border border-gold/40" />
             )}
           </div>
-
-          {stage === 'tapping' && (
-            <span className="absolute h-24 w-24 animate-ping rounded-full border border-cream/30" />
-          )}
         </div>
 
         <div>
