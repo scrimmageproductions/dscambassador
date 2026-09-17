@@ -45,7 +45,7 @@ export function DashboardSidebar({
                       onClick={() => onSelect(item.key)}
                       aria-current={active === item.key ? 'page' : undefined}
                       className={`w-full rounded px-3 py-2 text-left text-sm transition-colors ${
-                        active === item.key ? 'bg-cream text-ink' : 'text-cream-2 hover:bg-cream/[0.06]'
+                        active === item.key ? 'bg-cream text-ink' : 'text-cream hover:bg-cream/[0.06]'
                       }`}
                     >
                       {item.label}
