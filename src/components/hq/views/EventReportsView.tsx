@@ -2,7 +2,7 @@ import { submittedEventReports } from '../../../data/dashboard'
 
 export function EventReportsView() {
   return (
-    <div className="hairline divide-y divide-cream/10 bg-surface/40">
+    <div className="hairline divide-y divide-cream/10 glass-card">
       <div className="hidden gap-4 px-6 py-4 sm:grid sm:grid-cols-3">
         {['Event', 'Submitted', 'Status'].map((h) => (
           <p key={h} className="label-mono text-[0.62rem] text-cream-wash">

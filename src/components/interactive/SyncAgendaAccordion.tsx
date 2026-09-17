@@ -27,7 +27,7 @@ export function SyncAgendaAccordion() {
   const [open, setOpen] = useState<number | null>(0)
 
   return (
-    <div className="hairline divide-y divide-cream/10 bg-surface/40">
+    <div className="hairline divide-y divide-cream/10 glass-card">
       {agenda.map((item, i) => {
         const isOpen = open === i
         return (

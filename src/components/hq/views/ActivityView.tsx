@@ -2,7 +2,7 @@ import { activityFeed } from '../../../data/dashboard'
 
 export function ActivityView() {
   return (
-    <div className="hairline divide-y divide-cream/10 bg-surface/40">
+    <div className="hairline divide-y divide-cream/10 glass-card">
       {activityFeed.map((item) => (
         <div key={item.title + item.time} className="flex flex-col gap-1 px-6 py-5 sm:flex-row sm:items-start sm:justify-between">
           <div>

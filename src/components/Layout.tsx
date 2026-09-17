@@ -20,14 +20,17 @@ export function Layout() {
         aria-hidden="true"
       />
 
-      {/* Architectural grid: faint vertical hairlines echoing a print column grid. */}
+      {/*
+        Architectural grid: hairlines at the outer layout gutters only (the
+        edges of the max-w-7xl content bounds), never crossing into
+        single-column content. Sits at z-0, behind the z-10 content
+        wrapper, so glass-card containers correctly blur it via
+        backdrop-filter instead of it slicing over card text.
+      */}
       <div
-        className="pointer-events-none fixed inset-0 z-20 mx-auto hidden max-w-7xl justify-between px-6 md:flex"
+        className="pointer-events-none fixed inset-0 z-0 mx-auto hidden max-w-7xl justify-between px-6 md:flex"
         aria-hidden="true"
       >
-        <span className="h-full w-px bg-white/[0.04]" />
-        <span className="h-full w-px bg-white/[0.04]" />
-        <span className="h-full w-px bg-white/[0.04]" />
         <span className="h-full w-px bg-white/[0.04]" />
         <span className="h-full w-px bg-white/[0.04]" />
       </div>

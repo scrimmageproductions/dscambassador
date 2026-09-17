@@ -2,7 +2,7 @@ const materials = ['Flyers', 'Banners', 'Extra membership cards', 'Signage']
 
 export function EventMaterialsRequest() {
   return (
-    <div className="hairline relative overflow-hidden bg-surface/40 p-6 md:p-8">
+    <div className="hairline relative overflow-hidden glass-card p-6 md:p-8">
       <p className="label-mono text-[0.68rem] text-cream-wash">Event materials request</p>
       <p className="mt-2 text-sm text-cream-3">
         Preview only. This request unlocks in the private Telegram Assets channel after approval.

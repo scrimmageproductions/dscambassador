@@ -20,7 +20,7 @@ export function DashboardSidebar({
   }
 
   return (
-    <nav className="hairline bg-surface/40 p-4 md:p-5" aria-label="Ambassador HQ sections">
+    <nav className="hairline glass-card p-4 md:p-5" aria-label="Ambassador HQ sections">
       {navGroups.map((group) => {
         const collapsed = collapsedGroups.has(group.label)
         return (

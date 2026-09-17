@@ -74,7 +74,7 @@ export function EligibilityChecker() {
   }
 
   return (
-    <div className="hairline bg-surface/60 p-6 md:p-8">
+    <div className="hairline glass-card p-6 md:p-8">
       <p className="label-mono text-[0.7rem] text-cream-wash">Eligibility check</p>
       <p className="mt-2 text-sm text-cream-3">Four questions. No account needed.</p>
 

@@ -30,7 +30,7 @@ export function CardTapDemo() {
   const unlocked = stage === 'verified' || stage === 'app'
 
   return (
-    <div className="hairline bg-surface/40 p-6 md:p-10">
+    <div className="hairline glass-card p-6 md:p-10">
       <div className="grid items-center gap-10 md:grid-cols-2">
         <div className="relative flex items-center justify-center py-6">
           <div

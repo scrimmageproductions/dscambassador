@@ -4,7 +4,7 @@ import { LinkButton } from '../../ui/Button'
 export function BrandAssetsView() {
   return (
     <div>
-      <div className="hairline divide-y divide-cream/10 bg-surface/40">
+      <div className="hairline divide-y divide-cream/10 glass-card">
         {brandAssets.map((asset) => (
           <div key={asset.name} className="flex items-center justify-between gap-4 px-6 py-4">
             <div>

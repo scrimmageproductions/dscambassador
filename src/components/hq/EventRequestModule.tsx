@@ -138,10 +138,7 @@ export function EventRequestModule() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div
-        className="hairline rounded-2xl p-6 transition-shadow duration-300 hover:shadow-[0_0_40px_-16px_rgba(243,237,227,0.15)] md:p-8"
-        style={{ backgroundColor: '#0D0D0D' }}
-      >
+      <div className="hairline glass-card rounded-2xl p-6 transition-shadow duration-300 hover:shadow-[0_0_40px_-16px_rgba(243,237,227,0.15)] md:p-8">
         <p className="label-mono text-[0.68rem] text-gold">Event budget &amp; reimbursement</p>
         <div className="mt-6 grid gap-5 sm:grid-cols-2">
           <div>
@@ -262,10 +259,7 @@ export function EventRequestModule() {
         </div>
       </div>
 
-      <div
-        className="hairline rounded-2xl p-6 md:p-8"
-        style={{ backgroundColor: '#0D0D0D' }}
-      >
+      <div className="hairline glass-card rounded-2xl p-6 md:p-8">
         <p className="label-mono text-[0.68rem] text-gold">Physical assets request</p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           {assetItems.map((item) => (

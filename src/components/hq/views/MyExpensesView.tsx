@@ -2,7 +2,7 @@ import { expenseReports } from '../../../data/dashboard'
 
 export function MyExpensesView() {
   return (
-    <div className="hairline divide-y divide-cream/10 bg-surface/40">
+    <div className="hairline divide-y divide-cream/10 glass-card">
       <div className="hidden gap-4 px-6 py-4 sm:grid sm:grid-cols-3">
         {['Item', 'Amount', 'Status'].map((h) => (
           <p key={h} className="label-mono text-[0.62rem] text-cream-wash">

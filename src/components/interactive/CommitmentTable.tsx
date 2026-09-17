@@ -5,7 +5,7 @@ export function CommitmentTable() {
   const [openIndex, setOpenIndex] = useState<number | null>(0)
 
   return (
-    <div className="hairline divide-y divide-cream/10 bg-surface/40">
+    <div className="hairline divide-y divide-cream/10 glass-card">
       <div className="hidden grid-cols-[140px_1fr_1fr] gap-4 px-6 py-4 md:grid">
         <span className="label-mono text-[0.68rem] text-cream-wash">Frequency</span>
         <span className="label-mono text-[0.68rem] text-cream-wash">Task</span>

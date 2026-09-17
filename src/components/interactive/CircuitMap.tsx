@@ -118,7 +118,7 @@ export function CircuitMap({ active, onSelectEvents }: CircuitMapProps) {
   }
 
   return (
-    <div className="hairline bg-surface/40 p-6 md:p-8">
+    <div className="hairline glass-card p-6 md:p-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="label-mono text-[0.68rem] text-cream-wash">Circuit map</p>
         <div className="flex gap-4 text-xs text-cream-3">

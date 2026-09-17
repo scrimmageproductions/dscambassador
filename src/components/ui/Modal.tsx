@@ -42,7 +42,7 @@ export function Modal({
             role="dialog"
             aria-modal="true"
             aria-labelledby={labelledBy}
-            className="hairline relative z-10 max-h-[85vh] w-full max-w-lg overflow-y-auto bg-surface p-6 shadow-[0_0_60px_-12px_rgba(0,0,0,0.8)] md:p-8"
+            className="hairline glass-card relative z-10 max-h-[85vh] w-full max-w-lg overflow-y-auto p-6 shadow-[0_0_60px_-12px_rgba(0,0,0,0.8)] md:p-8"
             initial={{ opacity: 0, y: 16, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.98 }}

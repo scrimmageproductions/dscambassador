@@ -31,7 +31,7 @@ export function CampusInterestForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="hairline bg-surface/40 p-6 md:p-8">
+    <form onSubmit={handleSubmit} className="hairline glass-card p-6 md:p-8">
       <div className="grid gap-5 sm:grid-cols-2">
         <Field label="School" name="school" placeholder="e.g. Arizona State University" />
         <Field label="Blockchain club" name="club" placeholder="e.g. ASU Blockchain Club" />

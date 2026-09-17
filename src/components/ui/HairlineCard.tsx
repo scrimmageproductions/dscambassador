@@ -15,7 +15,7 @@ export function HairlineCard({
 }) {
   return (
     <Reveal as={Tag} delay={delay} amount={0.15}>
-      <TiltCard maxTilt={6} className={`hairline bg-surface/60 p-6 ${className}`}>
+      <TiltCard maxTilt={6} className={`hairline glass-card p-6 ${className}`}>
         {children}
       </TiltCard>
     </Reveal>

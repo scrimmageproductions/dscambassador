@@ -29,7 +29,7 @@ export function KitConfigurator() {
 
   return (
     <div className="grid gap-8 md:grid-cols-2">
-      <div className="hairline flex flex-col items-center justify-center bg-surface/40 p-8">
+      <div className="hairline flex flex-col items-center justify-center glass-card p-8">
         <Illustration colorway={colorway} className="w-full max-w-[280px]" />
         <p className="label-mono mt-6 text-[0.68rem] text-cream-wash">
           {garments.find((g) => g.key === garment)?.label} · {size} · {colorway === 'black' ? 'Black' : 'Cream'}

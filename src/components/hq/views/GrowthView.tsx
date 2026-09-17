@@ -5,7 +5,7 @@ export function GrowthView() {
   const totalOnboarded = dashboardMetrics.find((m) => m.label === 'Members onboarded')?.value ?? 'N/A'
 
   return (
-    <div className="hairline bg-surface/40 p-6 md:p-8">
+    <div className="hairline glass-card p-6 md:p-8">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <p className="label-mono text-[0.68rem] text-cream-wash">Members onboarded (last 6 months)</p>
         <p className="font-display text-2xl text-cream">{totalOnboarded} total</p>

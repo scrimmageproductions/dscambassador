@@ -11,7 +11,7 @@ const statusStyle: Record<string, string> = {
 export function EventsView() {
   return (
     <div>
-      <div className="hairline divide-y divide-cream/10 bg-surface/40">
+      <div className="hairline divide-y divide-cream/10 glass-card">
         {myEvents.map((e) => (
           <div key={e.title} className="flex flex-col gap-2 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div>

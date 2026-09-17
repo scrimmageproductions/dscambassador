@@ -59,7 +59,7 @@ export function StepAgreement({
         </section>
       </div>
 
-      <label className="hairline flex items-start gap-3 bg-surface/40 px-4 py-4 text-sm text-cream-2">
+      <label className="hairline flex items-start gap-3 glass-card px-4 py-4 text-sm text-cream-2">
         <input
           type="checkbox"
           checked={draft.agreed}

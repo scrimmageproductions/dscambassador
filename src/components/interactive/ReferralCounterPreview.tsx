@@ -7,7 +7,7 @@ const stats = [
 
 export function ReferralCounterPreview() {
   return (
-    <div className="hairline bg-surface/40 p-6 md:p-8">
+    <div className="hairline glass-card p-6 md:p-8">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="label-mono text-[0.68rem] text-cream-wash">Ambassador HQ preview</p>
         <span className="label-mono text-[0.6rem] text-gold">Live tracking after approval</span>

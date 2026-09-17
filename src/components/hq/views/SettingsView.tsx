@@ -17,7 +17,7 @@ export function SettingsView() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="hairline max-w-xl bg-surface/40 p-6 md:p-8">
+    <form onSubmit={handleSubmit} className="hairline max-w-xl glass-card p-6 md:p-8">
       <div>
         <label htmlFor="settings-name" className="label-mono text-[0.68rem] text-cream-wash">
           Display name

@@ -11,7 +11,7 @@ export function MailingAddressView() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="hairline max-w-xl bg-surface/40 p-6 md:p-8">
+    <form onSubmit={handleSubmit} className="hairline max-w-xl glass-card p-6 md:p-8">
       <p className="text-sm leading-relaxed text-cream-3">
         Where kit drops and membership card restocks ship.
       </p>
