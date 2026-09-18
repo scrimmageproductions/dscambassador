@@ -3,6 +3,7 @@ import { SectionLabel } from '../components/ui/SectionLabel'
 import { HairlineCard } from '../components/ui/HairlineCard'
 import { LinkButton } from '../components/ui/Button'
 import { CardTapDemo } from '../components/interactive/CardTapDemo'
+import { BurnerVideoEmbed } from '../components/interactive/BurnerVideoEmbed'
 import { ExternalImage } from '../components/ui/ExternalImage'
 import { Reveal } from '../components/motion/Reveal'
 import { TiltCard } from '../components/motion/TiltCard'
@@ -69,6 +70,9 @@ export function Kit() {
 
       <section className="hairline-t hairline-b bg-surface/20">
         <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
+          <div className="mb-10">
+            <BurnerVideoEmbed />
+          </div>
           <Reveal stagger>
             <SectionLabel>Featured object</SectionLabel>
             <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">

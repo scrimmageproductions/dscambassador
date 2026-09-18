@@ -3,7 +3,6 @@ import { SectionLabel } from '../components/ui/SectionLabel'
 import { HairlineCard } from '../components/ui/HairlineCard'
 import { LinkButton } from '../components/ui/Button'
 import { CommitmentTable } from '../components/interactive/CommitmentTable'
-import { BurnerVideoEmbed } from '../components/interactive/BurnerVideoEmbed'
 import { eligibility, contentRules, successMetrics } from '../content/guidelines'
 import { Reveal } from '../components/motion/Reveal'
 
@@ -46,9 +45,6 @@ export function Program() {
           </Reveal>
           <div className="mt-10">
             <CommitmentTable />
-          </div>
-          <div className="mt-8">
-            <BurnerVideoEmbed />
           </div>
           <p className="mt-6 text-sm text-cream-3">
             All posts must tag <span className="text-cream">@spenders_club</span>.
