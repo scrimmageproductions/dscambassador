@@ -54,6 +54,10 @@ const OUTLINE_PIXELS = ARROW_PIXELS.flatMap(({ x, y }) => {
 const AURA_SPRING = { stiffness: 260, damping: 26, mass: 0.5 }
 const AURA_SIZE_SPRING = { stiffness: 300, damping: 28 }
 
+const CREAM = '#E8DFD0'
+const MATTE_BLACK = '#0D0D0D'
+const AURA_OPACITY_RESTING = 0.04
+
 const INTERACTIVE_SELECTOR = 'a, button, [role="button"], input, select, textarea, label, [tabindex]'
 const MEDIA_SELECTOR = 'img, video'
 
@@ -67,12 +71,13 @@ function variantFor(target: EventTarget | null): Variant {
 }
 
 /**
- * Luxury pixel-art cursor for fine-pointer, hover-capable desktops: a crisp
- * pixel-grid arrow with a CRT-style chromatic-aberration fringe, backed by a
- * soft cream aura that trails on a damped spring and blooms wider over
- * interactive elements. Both layers invert via mix-blend-mode over media.
- * Entirely inert on touch (`@media (hover: none)`); every layer stays
- * pointer-events: none so clicks always pass straight through.
+ * Monochrome pixel-art cursor for fine-pointer, hover-capable desktops: a
+ * crisp black-outlined cream pixel arrow (no color fringing) backed by an
+ * ultra-subtle warm cream aura that trails on a damped spring and blooms
+ * slightly wider over interactive elements. Both layers invert via
+ * mix-blend-mode over media. Entirely inert on touch (`@media (hover:
+ * none)`); every layer stays pointer-events: none so clicks always pass
+ * straight through.
  */
 export function PixelCursor() {
   const [variant, setVariant] = useState<Variant>('default')
@@ -97,8 +102,8 @@ export function PixelCursor() {
       y.set(e.clientY)
       const v = variantFor(e.target)
       setVariant(v)
-      auraSizeTarget.set(v === 'interactive' ? 36 : 24)
-      auraOpacityTarget.set(v === 'interactive' ? 0.08 : 0.05)
+      auraSizeTarget.set(v === 'interactive' ? 32 : 24)
+      auraOpacityTarget.set(AURA_OPACITY_RESTING)
       setVisible(true)
     }
     function handleLeave() {
@@ -124,10 +129,11 @@ export function PixelCursor() {
   return (
     <div className="pointer-events-none fixed inset-0 z-[90] hidden md:block" aria-hidden="true">
       {/*
-        Ambient diffusion aura: a barely-perceptible haze, not a hotspot.
+        Ambient diffusion aura: an ultra-subtle warm-cream haze, not a
+        hotspot -- zero color contamination, just a faint monochrome glow.
         Gradient carries full-strength color so the opacity spring alone
-        (0.05 resting, 0.08 on interactive hover) sets the true visible
-        intensity, smoothly, without needing to animate the gradient text.
+        (a flat 0.04 whenever visible) sets the true visible intensity,
+        smoothly, without needing to animate the gradient text itself.
       */}
       <motion.div
         className="pointer-events-none fixed left-0 top-0 rounded-full"
@@ -139,8 +145,8 @@ export function PixelCursor() {
           width: auraSize,
           height: auraSize,
           opacity: auraOpacity,
-          background: 'radial-gradient(circle, rgba(225, 219, 207, 1) 0%, rgba(225, 219, 207, 0) 65%)',
-          backdropFilter: 'blur(12px)',
+          background: 'radial-gradient(circle, rgba(232, 223, 208, 1) 0%, rgba(232, 223, 208, 0) 65%)',
+          backdropFilter: 'blur(8px)',
           mixBlendMode: blend,
           willChange: 'transform',
         }}
@@ -161,8 +167,6 @@ export function PixelCursor() {
           translateY: `-${OUTLINE_PAD * PIXEL}px`,
           opacity: visible ? 1 : 0,
           mixBlendMode: blend,
-          filter:
-            'drop-shadow(-1px 0px 0px rgba(230, 40, 70, 0.55)) drop-shadow(1px 0px 0px rgba(0, 200, 240, 0.55))',
           willChange: 'transform',
         }}
       >
@@ -174,10 +178,10 @@ export function PixelCursor() {
           style={{ imageRendering: 'pixelated', display: 'block' }}
         >
           {OUTLINE_PIXELS.map(({ x: px, y: py }) => (
-            <rect key={`outline-${px}-${py}`} x={px} y={py} width={1} height={1} fill="#0D0D0D" />
+            <rect key={`outline-${px}-${py}`} x={px} y={py} width={1} height={1} fill={MATTE_BLACK} />
           ))}
           {ARROW_PIXELS.map(({ x: px, y: py }) => (
-            <rect key={`fill-${px}-${py}`} x={px} y={py} width={1} height={1} fill="#E1DBCF" />
+            <rect key={`fill-${px}-${py}`} x={px} y={py} width={1} height={1} fill={CREAM} />
           ))}
         </svg>
       </motion.div>
