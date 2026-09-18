@@ -1,7 +1,17 @@
 import { useEffect, useState } from 'react'
 import { motion, useMotionValue, useSpring } from 'framer-motion'
 
-const PIXEL = 2
+// CSS px per finest sub-pixel. Kept at a whole integer, along with every
+// other size below, so the dot-matrix grout lines land on exact device
+// pixels instead of getting anti-aliased into a blur.
+const PIXEL = 1
+// Each original grid unit subdivides into a SUBDIV x SUBDIV block of
+// sub-pixels for the interior dot-matrix; DOT is the cream dot's size
+// within that block (in sub-pixels), so SUBDIV - DOT is the width of the
+// dark grout line between adjacent dots.
+const SUBDIV = 3
+const DOT = 2
+const UNIT_PX = SUBDIV * PIXEL
 
 // 8x13 pixel-grid arrow (classic pointer silhouette with a back "foot"),
 // drawn as unit squares so shape-rendering: crispEdges keeps every edge
@@ -72,13 +82,15 @@ function variantFor(target: EventTarget | null): Variant {
 
 /**
  * Monochrome pixel-art cursor for fine-pointer, hover-capable desktops: a
- * crisp black-outlined arrow with a dense, solid cream interior fill (no
- * lattice, dither, or hollow gaps, and no color fringing anywhere), backed
- * by an ultra-subtle warm cream aura that trails on a damped spring and
- * blooms slightly wider over interactive elements. Both layers invert via
- * mix-blend-mode over media. Entirely inert on touch (`@media (hover:
- * none)`); every layer stays pointer-events: none so clicks always pass
- * straight through.
+ * crisp black-outlined arrow whose interior is a tight, structured
+ * cream/matte-black dot-matrix -- a dense grid of cream sub-pixel dots
+ * separated by 1-sub-pixel dark grout lines, like a CRT subpixel mask
+ * rendered in the site's own warm-cream palette (no color fringing
+ * anywhere) -- backed by an ultra-subtle warm cream aura that trails on a
+ * damped spring and blooms slightly wider over interactive elements. Both
+ * layers invert via mix-blend-mode over media. Entirely inert on touch
+ * (`@media (hover: none)`); every layer stays pointer-events: none so
+ * clicks always pass straight through.
  */
 export function PixelCursor() {
   const [variant, setVariant] = useState<Variant>('default')
@@ -164,25 +176,39 @@ export function PixelCursor() {
         style={{
           x,
           y,
-          translateX: `-${OUTLINE_PAD * PIXEL}px`,
-          translateY: `-${OUTLINE_PAD * PIXEL}px`,
+          translateX: `-${OUTLINE_PAD * UNIT_PX}px`,
+          translateY: `-${OUTLINE_PAD * UNIT_PX}px`,
           opacity: visible ? 1 : 0,
           mixBlendMode: blend,
           willChange: 'transform',
         }}
       >
         <svg
-          width={GRID_W * PIXEL}
-          height={GRID_H * PIXEL}
-          viewBox={`0 0 ${GRID_W} ${GRID_H}`}
+          width={GRID_W * UNIT_PX}
+          height={GRID_H * UNIT_PX}
+          viewBox={`0 0 ${GRID_W * SUBDIV} ${GRID_H * SUBDIV}`}
           shapeRendering="crispEdges"
           style={{ imageRendering: 'pixelated', display: 'block' }}
         >
           {OUTLINE_PIXELS.map(({ x: px, y: py }) => (
-            <rect key={`outline-${px}-${py}`} x={px} y={py} width={1} height={1} fill={MATTE_BLACK} />
+            <rect
+              key={`outline-${px}-${py}`}
+              x={px * SUBDIV}
+              y={py * SUBDIV}
+              width={SUBDIV}
+              height={SUBDIV}
+              fill={MATTE_BLACK}
+            />
           ))}
           {ARROW_PIXELS.map(({ x: px, y: py }) => (
-            <rect key={`fill-${px}-${py}`} x={px} y={py} width={1} height={1} fill={CREAM} />
+            <g key={`fill-${px}-${py}`}>
+              {/* Grout base: fills the whole cell so it tiles seamlessly with
+                  the outline and neighboring cells into one solid silhouette. */}
+              <rect x={px * SUBDIV} y={py * SUBDIV} width={SUBDIV} height={SUBDIV} fill={MATTE_BLACK} />
+              {/* The dot itself, inset to leave a grout line on its right and
+                  bottom edge -- tiling across cells into a continuous grid. */}
+              <rect x={px * SUBDIV} y={py * SUBDIV} width={DOT} height={DOT} fill={CREAM} />
+            </g>
           ))}
         </svg>
       </motion.div>
