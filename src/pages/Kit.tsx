@@ -56,8 +56,8 @@ export function Kit() {
       <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
         <div className="grid gap-px overflow-hidden hairline bg-cream/10 md:grid-cols-3">
           {columns.map((c, i) => (
-            <Reveal key={c.label} as="div" delay={i * 0.1} amount={0.2}>
-              <div className="bg-ink p-8">
+            <Reveal key={c.label} as="div" className="h-full" delay={i * 0.1} amount={0.2}>
+              <div className="h-full bg-ink p-8">
                 <p className="label-mono text-[0.68rem] text-gold">{c.label}</p>
                 <h3 className="mt-4 font-display text-xl text-cream">{c.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-cream-3">{c.body}</p>
@@ -75,8 +75,10 @@ export function Kit() {
               The DSC Membership Card.
             </h2>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-cream-3">
-              Every member, ambassador or not, taps their card to their phone to get into Burner,
-              the club&rsquo;s app. There&rsquo;s no separate login. The card is the key.
+              The physical DSC Membership Card is the primary key to Burner, the club&rsquo;s
+              member-exclusive app. Every member, ambassador or not, taps their card to their
+              phone to get in. There&rsquo;s no separate login, no password to lose. The card
+              is the key.
             </p>
           </Reveal>
           <div className="mt-10">
@@ -104,10 +106,12 @@ export function Kit() {
             <h3 className="font-display text-2xl text-cream">Make the connection count.</h3>
             <p className="mt-3 text-sm leading-relaxed text-cream-3">
               Every ambassador carries an allotment of physical DSC Membership Cards to distribute
-              at their discretion. As the face of the movement, you hold the key to someone&rsquo;s
-              initiation. A single tap to phone instantly unlocks the full Digital Spenders Club
-              experience for a new member on the spot. Bringing someone into the fold is a
-              privilege.
+              at their discretion. As the initial physical face of the club, you&rsquo;re often
+              the first person a new member ever interacts with, and the card in your hand is
+              their primary key into Burner, the member-exclusive app. Walking someone through
+              that first tap, phone to card, is what makes their onboarding seamless, and doing
+              that well, ambassador by ambassador, is essential to how the club actually grows
+              worldwide.
             </p>
           </Reveal>
         </div>

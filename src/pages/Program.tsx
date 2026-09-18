@@ -3,7 +3,7 @@ import { SectionLabel } from '../components/ui/SectionLabel'
 import { HairlineCard } from '../components/ui/HairlineCard'
 import { LinkButton } from '../components/ui/Button'
 import { CommitmentTable } from '../components/interactive/CommitmentTable'
-import { CommitmentCalendar } from '../components/interactive/CommitmentCalendar'
+import { BurnerVideoEmbed } from '../components/interactive/BurnerVideoEmbed'
 import { eligibility, contentRules, successMetrics } from '../content/guidelines'
 import { Reveal } from '../components/motion/Reveal'
 
@@ -28,7 +28,7 @@ export function Program() {
         </Reveal>
         <div className="mt-8 grid gap-5 sm:grid-cols-2">
           {eligibility.map((e, i) => (
-            <HairlineCard key={e.title} delay={i * 0.1}>
+            <HairlineCard key={e.title} className="h-full" delay={i * 0.1}>
               <h3 className="font-display text-xl text-cream">{e.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-cream-3">{e.detail}</p>
             </HairlineCard>
@@ -48,7 +48,7 @@ export function Program() {
             <CommitmentTable />
           </div>
           <div className="mt-8">
-            <CommitmentCalendar />
+            <BurnerVideoEmbed />
           </div>
           <p className="mt-6 text-sm text-cream-3">
             All posts must tag <span className="text-cream">@spenders_club</span>.
@@ -62,8 +62,8 @@ export function Program() {
         </Reveal>
         <div className="mt-8 grid gap-px overflow-hidden hairline bg-cream/10 md:grid-cols-3">
           {contentRules.map((rule, i) => (
-            <Reveal key={rule} as="div" delay={i * 0.1} amount={0.2}>
-              <div className="bg-ink p-8">
+            <Reveal key={rule} as="div" className="h-full" delay={i * 0.1} amount={0.2}>
+              <div className="h-full bg-ink p-8">
                 <p className="label-mono text-[0.68rem] text-gold">0{i + 1}</p>
                 <p className="mt-4 text-base leading-relaxed text-cream-2">{rule}</p>
               </div>
@@ -79,7 +79,7 @@ export function Program() {
           </Reveal>
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {successMetrics.map((m, i) => (
-              <HairlineCard key={m.title} delay={i * 0.1}>
+              <HairlineCard key={m.title} className="h-full" delay={i * 0.1}>
                 <h3 className="font-display text-lg text-cream">{m.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-cream-3">{m.detail}</p>
               </HairlineCard>

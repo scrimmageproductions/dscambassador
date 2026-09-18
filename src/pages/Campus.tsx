@@ -46,7 +46,7 @@ export function Campus() {
       <PageHero
         eyebrow="Campus"
         title="Where the next wave gathers."
-        lede="Custom chapter cards, heavy apparel, and direct treasury funding for university blockchain groups moving culture forward."
+        lede="Custom chapter cards, our culture, and profit splitting opportunities for blockchain club treasuries moving culture forward."
       />
 
       <CampusTicker />
@@ -57,7 +57,7 @@ export function Campus() {
         </Reveal>
         <div className="mt-8 grid gap-5 md:grid-cols-2">
           {featureCards.map((c, i) => (
-            <HairlineCard key={c.label} delay={i * 0.1}>
+            <HairlineCard key={c.label} className="h-full" delay={i * 0.1}>
               <h3 className="font-display text-xl text-cream">{c.label}</h3>
               <p className="mt-3 text-sm leading-relaxed text-cream-3">{c.body}</p>
             </HairlineCard>
@@ -72,7 +72,7 @@ export function Campus() {
           </Reveal>
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {flow.map((f, i) => (
-              <HairlineCard key={f.step} delay={i * 0.1}>
+              <HairlineCard key={f.step} className="h-full" delay={i * 0.1}>
                 <p className="label-mono text-[0.68rem] text-gold">{f.step} //</p>
                 <h3 className="mt-4 font-display text-lg text-cream">{f.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-cream-3">{f.body}</p>

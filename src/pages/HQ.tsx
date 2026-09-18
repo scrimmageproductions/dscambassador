@@ -48,7 +48,7 @@ export function HQ() {
 
       <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
         <div className="grid gap-5 sm:grid-cols-3">
-          <HairlineCard delay={0}>
+          <HairlineCard className="h-full" delay={0}>
             <p className="label-mono text-[0.68rem] text-gold">Telegram</p>
             <h3 className="mt-4 font-display text-xl text-cream">The Ambassador Program group</h3>
             <p className="mt-2 text-sm leading-relaxed text-cream-3">
@@ -56,7 +56,7 @@ export function HQ() {
               announcements, and day-to-day coordination happen.
             </p>
           </HairlineCard>
-          <HairlineCard delay={0.1}>
+          <HairlineCard className="h-full" delay={0.1}>
             <p className="label-mono text-[0.68rem] text-gold">Monthly</p>
             <h3 className="mt-4 font-display text-xl text-cream">The SYNC call</h3>
             <p className="mt-2 text-sm leading-relaxed text-cream-3">
@@ -64,7 +64,7 @@ export function HQ() {
               calls as needed. Attendance is expected.
             </p>
           </HairlineCard>
-          <HairlineCard delay={0.2}>
+          <HairlineCard className="h-full" delay={0.2}>
             <p className="label-mono text-[0.68rem] text-gold">Discord</p>
             <h3 className="mt-4 font-display text-xl text-cream">Ambassador voice channel</h3>
             <p className="mt-2 text-sm leading-relaxed text-cream-3">

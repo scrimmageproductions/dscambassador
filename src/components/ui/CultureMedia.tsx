@@ -28,7 +28,7 @@ export function CultureMedia({
         />
       </div>
       <figcaption className="label-mono absolute bottom-5 left-5 text-[0.68rem] text-cream">
-        <ScrambleText>Spenders in motion</ScrambleText> <span className="text-gold">©</span>
+        <ScrambleText>Spenders in motion</ScrambleText>
       </figcaption>
     </figure>
   )

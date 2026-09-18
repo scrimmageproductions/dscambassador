@@ -13,6 +13,9 @@ function validateStep(step: number, draft: ReturnType<typeof useDraft>['draft'])
     if (!draft.city.trim()) return 'Add your city or region.'
     if (!draft.isAdult) return 'You must confirm you are 18 or older.'
     if (!draft.membership) return 'Let us know your membership status.'
+    if (draft.membership === 'yes' && !draft.dscBurnerWalletAddress.trim()) {
+      return 'Add your DSC Burner Wallet Address.'
+    }
   }
   if (step === 1) {
     if (!draft.instagramHandle && !draft.tiktokHandle && !draft.xHandle) {

@@ -85,9 +85,6 @@ export function MembershipCardIllustration({ className = '' }: { className?: str
       <text x="40" y="166" fontFamily="ui-monospace, monospace" fontSize="11" letterSpacing="3" fill="#F3EDE3">
         •••• •••• 04
       </text>
-      <text x="280" y="166" textAnchor="end" fontFamily="Georgia, serif" fontSize="13" fill="#C4A574">
-        ©
-      </text>
     </svg>
   )
 }

@@ -68,7 +68,7 @@ export function Footer() {
         </div>
 
         <div className="hairline-t mt-12 flex flex-col gap-3 pt-8 text-xs text-cream-wash/70 sm:flex-row sm:items-center sm:justify-between">
-          <p>© Digital Spenders Club. Ambassador Program.</p>
+          <p>Digital Spenders Club. Ambassador Program.</p>
           <p className="label-mono">Members move first.</p>
         </div>
       </div>

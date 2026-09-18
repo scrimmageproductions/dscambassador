@@ -76,6 +76,3 @@ export const successMetrics = [
     detail: 'Are you attending? Are you contributing and helping move the program forward?',
   },
 ]
-
-export const AGREEMENT_TEXT =
-  'By checking “I agree,” the applicant confirms they have read and accept these guidelines.'

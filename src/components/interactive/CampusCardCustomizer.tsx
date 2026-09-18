@@ -108,12 +108,13 @@ export function CampusCardCustomizer() {
                 </div>
 
                 <div className="flex flex-1 items-center justify-end py-2">
-                  <div className="h-16 w-16 shrink-0">
+                  <div className="h-16 w-16 shrink-0 bg-transparent">
                     {crestUrl ? (
                       <img
                         src={crestUrl}
                         alt="Uploaded club crest"
-                        className="h-full w-full rounded-full object-contain"
+                        className="h-full w-full rounded-full bg-transparent object-contain"
+                        style={{ backgroundColor: 'transparent' }}
                       />
                     ) : (
                       <CrestPlaceholder color={accent} />

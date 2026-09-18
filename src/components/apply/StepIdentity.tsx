@@ -38,6 +38,17 @@ export function StepIdentity({
           { value: 'no', label: 'Not yet' },
         ]}
       />
+      {draft.membership === 'yes' ? (
+        <TextField
+          label="DSC Burner Wallet Address"
+          name="dscBurnerWalletAddress"
+          value={draft.dscBurnerWalletAddress}
+          onChange={(v) => update('dscBurnerWalletAddress', v)}
+          placeholder="Paste the wallet address linked to your Burner account"
+          required
+        />
+      ) : null}
+
       {draft.membership === 'no' ? (
         <p className="text-xs leading-relaxed text-cream-wash/80">
           Ambassadors are genuine DSC members. You can still submit. Join the club at{' '}

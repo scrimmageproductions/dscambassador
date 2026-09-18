@@ -43,6 +43,21 @@ export function resolveCoordinates(location: string): [number, number] | null {
 }
 
 /**
+ * Known city/region -> country name, matching the `properties.name` field
+ * on the world-atlas/countries-110m topojson features, so clicking a
+ * country on the circuit map can aggregate every event within it.
+ */
+export const locationCountry: Record<string, string> = {
+  'Denver, CO': 'United States of America',
+  'Austin, TX': 'United States of America',
+  Singapore: 'Singapore',
+  'New York, NY': 'United States of America',
+  'Washington, D.C.': 'United States of America',
+  'San Francisco, CA': 'United States of America',
+  'Boston, MA': 'United States of America',
+}
+
+/**
  * Illustrative circuit sample, not a live feed. Live scraping of
  * standwithcrypto.org/events, plan.wtf, lu.ma/crypto, and lu.ma/Team1 isn't
  * available from this build environment (all four domains are blocked by

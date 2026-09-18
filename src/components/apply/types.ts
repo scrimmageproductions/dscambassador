@@ -3,6 +3,7 @@ export type ApplicationDraft = {
   city: string
   isAdult: boolean
   membership: 'yes' | 'no' | ''
+  dscBurnerWalletAddress: string
   instagramHandle: string
   instagramFollowers: string
   tiktokHandle: string
@@ -23,6 +24,7 @@ export const emptyDraft: ApplicationDraft = {
   city: '',
   isAdult: false,
   membership: '',
+  dscBurnerWalletAddress: '',
   instagramHandle: '',
   instagramFollowers: '',
   tiktokHandle: '',

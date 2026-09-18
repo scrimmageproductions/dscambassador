@@ -48,7 +48,8 @@ export function Home() {
               <Tagline className="text-sm md:text-base" />
             </div>
             <p className="mt-8 max-w-lg text-base leading-relaxed text-cream-3 md:text-lg">
-              The people who wear the kit, post the work, and bring new members into the club.
+              The people committed to moving us forward, expanding our membership, and proud to
+              represent the best culture in the blockchain ecosystem.
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
               <LinkButton to="/apply" variant="solid">

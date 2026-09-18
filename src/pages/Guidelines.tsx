@@ -1,6 +1,6 @@
 import { Button, LinkButton } from '../components/ui/Button'
 import { Tagline } from '../components/ui/Tagline'
-import { eligibility, commitments, contentRules, successMetrics, AGREEMENT_TEXT } from '../content/guidelines'
+import { eligibility, commitments, contentRules, successMetrics } from '../content/guidelines'
 import { Reveal } from '../components/motion/Reveal'
 
 export function Guidelines() {
@@ -91,10 +91,7 @@ export function Guidelines() {
         </section>
 
         <section className="hairline-t mt-12 pt-12">
-          <p className="text-sm italic leading-relaxed text-cream-wash">{AGREEMENT_TEXT}</p>
-          <div className="mt-8">
-            <Tagline />
-          </div>
+          <Tagline />
           <p className="mt-4 text-sm text-cream-3">Questions? DM @YoungScrimmage.</p>
         </section>
       </article>
