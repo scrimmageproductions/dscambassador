@@ -58,13 +58,6 @@ const CREAM = '#E8DFD0'
 const MATTE_BLACK = '#0D0D0D'
 const AURA_OPACITY_RESTING = 0.04
 
-/** Sparse 2x2 dither: most interior pixels stay cream, one in four reads
- * matte black, so the fill is a tight pixel-grid texture rather than a
- * flat solid block. */
-function isDitherPixel(x: number, y: number) {
-  return x % 2 === 0 && y % 2 === 0
-}
-
 const INTERACTIVE_SELECTOR = 'a, button, [role="button"], input, select, textarea, label, [tabindex]'
 const MEDIA_SELECTOR = 'img, video'
 
@@ -79,13 +72,13 @@ function variantFor(target: EventTarget | null): Variant {
 
 /**
  * Monochrome pixel-art cursor for fine-pointer, hover-capable desktops: a
- * crisp black-outlined arrow whose interior is a tight cream/matte-black
- * dither pattern rather than a flat cream block (no color fringing
- * anywhere), backed by an ultra-subtle warm cream aura that trails on a
- * damped spring and blooms slightly wider over interactive elements. Both
- * layers invert via mix-blend-mode over media. Entirely inert on touch
- * (`@media (hover: none)`); every layer stays pointer-events: none so
- * clicks always pass straight through.
+ * crisp black-outlined arrow with a dense, solid cream interior fill (no
+ * lattice, dither, or hollow gaps, and no color fringing anywhere), backed
+ * by an ultra-subtle warm cream aura that trails on a damped spring and
+ * blooms slightly wider over interactive elements. Both layers invert via
+ * mix-blend-mode over media. Entirely inert on touch (`@media (hover:
+ * none)`); every layer stays pointer-events: none so clicks always pass
+ * straight through.
  */
 export function PixelCursor() {
   const [variant, setVariant] = useState<Variant>('default')
@@ -189,14 +182,7 @@ export function PixelCursor() {
             <rect key={`outline-${px}-${py}`} x={px} y={py} width={1} height={1} fill={MATTE_BLACK} />
           ))}
           {ARROW_PIXELS.map(({ x: px, y: py }) => (
-            <rect
-              key={`fill-${px}-${py}`}
-              x={px}
-              y={py}
-              width={1}
-              height={1}
-              fill={isDitherPixel(px, py) ? MATTE_BLACK : CREAM}
-            />
+            <rect key={`fill-${px}-${py}`} x={px} y={py} width={1} height={1} fill={CREAM} />
           ))}
         </svg>
       </motion.div>
