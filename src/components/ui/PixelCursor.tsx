@@ -1,17 +1,23 @@
 import { useEffect, useState } from 'react'
 import { motion, useMotionValue, useSpring } from 'framer-motion'
 
-// CSS px per finest sub-pixel. Kept at a whole integer, along with every
-// other size below, so the dot-matrix grout lines land on exact device
-// pixels instead of getting anti-aliased into a blur.
-const PIXEL = 1
 // Each original grid unit subdivides into a SUBDIV x SUBDIV block of
 // sub-pixels for the interior dot-matrix; DOT is the cream dot's size
 // within that block (in sub-pixels), so SUBDIV - DOT is the width of the
-// dark grout line between adjacent dots.
+// dark grout line between adjacent dots. This defines the dot-matrix
+// texture and outline geometry in the SVG's own coordinate space (the
+// viewBox), entirely independent of how large the cursor renders on
+// screen -- see DISPLAY_UNIT_PX below for that.
 const SUBDIV = 3
 const DOT = 2
-const UNIT_PX = SUBDIV * PIXEL
+
+// CSS px per original grid unit for the on-screen (rendered) size, kept a
+// whole integer so the dot-matrix grout lines still land on exact device
+// pixels rather than anti-aliasing into a blur, even at this smaller
+// scale. 2px/unit over the 10x15 grid (with 1-unit outline padding) comes
+// to a 20x30px cursor, matching standard browser pointer proportions --
+// about a 33% reduction from the previous 3px/unit (30x45px).
+const DISPLAY_UNIT_PX = 2
 
 // 8x13 pixel-grid arrow (classic pointer silhouette with a back "foot"),
 // drawn as unit squares so shape-rendering: crispEdges keeps every edge
@@ -101,7 +107,7 @@ export function PixelCursor() {
   const auraX = useSpring(x, AURA_SPRING)
   const auraY = useSpring(y, AURA_SPRING)
 
-  const auraSizeTarget = useMotionValue(24)
+  const auraSizeTarget = useMotionValue(20)
   const auraSize = useSpring(auraSizeTarget, AURA_SIZE_SPRING)
 
   const auraOpacityTarget = useMotionValue(0)
@@ -115,7 +121,7 @@ export function PixelCursor() {
       y.set(e.clientY)
       const v = variantFor(e.target)
       setVariant(v)
-      auraSizeTarget.set(v === 'interactive' ? 32 : 24)
+      auraSizeTarget.set(v === 'interactive' ? 27 : 20)
       auraOpacityTarget.set(AURA_OPACITY_RESTING)
       setVisible(true)
     }
@@ -159,7 +165,7 @@ export function PixelCursor() {
           height: auraSize,
           opacity: auraOpacity,
           background: 'radial-gradient(circle, rgba(232, 223, 208, 1) 0%, rgba(232, 223, 208, 0) 65%)',
-          backdropFilter: 'blur(8px)',
+          backdropFilter: 'blur(6px)',
           mixBlendMode: blend,
           willChange: 'transform',
         }}
@@ -176,16 +182,16 @@ export function PixelCursor() {
         style={{
           x,
           y,
-          translateX: `-${OUTLINE_PAD * UNIT_PX}px`,
-          translateY: `-${OUTLINE_PAD * UNIT_PX}px`,
+          translateX: `-${OUTLINE_PAD * DISPLAY_UNIT_PX}px`,
+          translateY: `-${OUTLINE_PAD * DISPLAY_UNIT_PX}px`,
           opacity: visible ? 1 : 0,
           mixBlendMode: blend,
           willChange: 'transform',
         }}
       >
         <svg
-          width={GRID_W * UNIT_PX}
-          height={GRID_H * UNIT_PX}
+          width={GRID_W * DISPLAY_UNIT_PX}
+          height={GRID_H * DISPLAY_UNIT_PX}
           viewBox={`0 0 ${GRID_W * SUBDIV} ${GRID_H * SUBDIV}`}
           shapeRendering="crispEdges"
           style={{ imageRendering: 'pixelated', display: 'block' }}
