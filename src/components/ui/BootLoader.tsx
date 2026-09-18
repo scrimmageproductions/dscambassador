@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { EASE_CINEMATIC } from '../../lib/motion'
+import { motion } from 'framer-motion'
 
 const BAR_DURATION_MS = 1800
-const HOLD_MS = 300
-const BAR_FADE_MS = 400
+const HOLD_MS = 200
+const FADE_MS = 150
+
+export type BootLoaderExitStyle = 'cut' | 'fade'
 
 const BOOT_SEEN_KEY = 'dsc-boot-seen'
 
@@ -89,29 +90,36 @@ function DotMatrixMark() {
 
 /**
  * First-visit-only boot screen: a centered dot-matrix "DSC" mark fades in
- * while a hairline cream progress bar fills over ~1.8s, holds briefly, then
- * the whole charcoal overlay dissolves and slides up to reveal the app.
+ * while a hairline cream progress bar fills over ~1.8s. Once it hits 100%
+ * and holds briefly, the overlay exits and unmounts -- no slide, sweep, or
+ * translation, ever: either an instant hard cut (`exitStyle="cut"`, the
+ * default -- zero fade, the frame just cuts straight to the site) or a
+ * swift linear opacity fade (`exitStyle="fade"`, 150ms).
+ *
  * Gated on sessionStorage so it fires exactly once per browser session --
  * never on client-side route navigation (App itself only mounts once per
  * page load anyway) and never again on a reload within the same session.
  */
-export function BootLoader() {
+export function BootLoader({ exitStyle = 'cut' }: { exitStyle?: BootLoaderExitStyle } = {}) {
   const [shouldRender] = useState(() => {
     if (typeof window === 'undefined') return false
     if (sessionStorage.getItem(BOOT_SEEN_KEY)) return false
     sessionStorage.setItem(BOOT_SEEN_KEY, '1')
     return true
   })
-  const [barVisible, setBarVisible] = useState(true)
-  const [screenVisible, setScreenVisible] = useState(true)
-  const [unmounted, setUnmounted] = useState(false)
+  const [phase, setPhase] = useState<'loading' | 'exiting' | 'done'>('loading')
 
   useEffect(() => {
     if (!shouldRender) return
     let fadeTimer: ReturnType<typeof setTimeout> | undefined
     const fillTimer = setTimeout(() => {
-      setBarVisible(false)
-      fadeTimer = setTimeout(() => setScreenVisible(false), BAR_FADE_MS)
+      if (exitStyle === 'cut') {
+        // Zero fade, zero delay: unmount on the very next frame.
+        setPhase('done')
+      } else {
+        setPhase('exiting')
+        fadeTimer = setTimeout(() => setPhase('done'), FADE_MS)
+      }
     }, BAR_DURATION_MS + HOLD_MS)
     return () => {
       clearTimeout(fillTimer)
@@ -120,36 +128,28 @@ export function BootLoader() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (!shouldRender || unmounted) return null
+  if (!shouldRender || phase === 'done') return null
 
   return (
-    <AnimatePresence onExitComplete={() => setUnmounted(true)}>
-      {screenVisible && (
-        <motion.div
-          key="boot-loader"
-          className="fixed inset-0 z-[200] flex flex-col items-center justify-center"
-          style={{ backgroundColor: MATTE_BLACK }}
-          exit={{ opacity: 0, y: '-100%' }}
-          transition={{ duration: 0.6, ease: EASE_CINEMATIC }}
-        >
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.5, ease: 'easeOut' }}>
-            <DotMatrixMark />
-          </motion.div>
+    <motion.div
+      className="fixed inset-0 z-[200] flex flex-col items-center justify-center"
+      style={{ backgroundColor: MATTE_BLACK }}
+      animate={{ opacity: phase === 'exiting' ? 0 : 1 }}
+      transition={{ duration: FADE_MS / 1000, ease: 'linear' }}
+    >
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.5, ease: 'easeOut' }}>
+        <DotMatrixMark />
+      </motion.div>
 
-          <div className="relative mt-10 h-[2px] w-40 overflow-hidden rounded-full bg-cream/10">
-            <motion.div
-              className="absolute inset-y-0 left-0 rounded-full bg-cream"
-              initial={{ width: '0%' }}
-              animate={{ width: '100%', opacity: barVisible ? 1 : 0 }}
-              transition={{
-                width: { duration: BAR_DURATION_MS / 1000, ease: 'circOut' },
-                opacity: { duration: BAR_FADE_MS / 1000, ease: 'easeOut' },
-              }}
-              style={{ willChange: 'width, opacity' }}
-            />
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+      <div className="relative mt-10 h-[2px] w-40 overflow-hidden rounded-full bg-cream/10">
+        <motion.div
+          className="absolute inset-y-0 left-0 rounded-full bg-cream"
+          initial={{ width: '0%' }}
+          animate={{ width: '100%' }}
+          transition={{ duration: BAR_DURATION_MS / 1000, ease: 'circOut' }}
+          style={{ willChange: 'width' }}
+        />
+      </div>
+    </motion.div>
   )
 }
