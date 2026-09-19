@@ -32,7 +32,7 @@ export function StepPresence({
       </div>
 
       {underMinimum ? (
-        <p className="hairline bg-ink px-4 py-3 text-xs leading-relaxed text-cream-wash">
+        <p className="hairline rounded-lg bg-ink px-4 py-3 text-xs leading-relaxed text-cream-wash">
           Below the 500-follower minimum. Reviewed case by case. You can still submit.
         </p>
       ) : null}

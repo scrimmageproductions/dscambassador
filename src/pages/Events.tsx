@@ -109,7 +109,7 @@ export function Events() {
           <div className="mt-10">
             <Suspense
               fallback={
-                <div className="hairline flex aspect-[2/1] items-center justify-center bg-surface/40">
+                <div className="hairline flex aspect-[2/1] items-center justify-center rounded-2xl bg-surface/40">
                   <p className="label-mono text-[0.65rem] text-cream-wash">Loading map…</p>
                 </div>
               }

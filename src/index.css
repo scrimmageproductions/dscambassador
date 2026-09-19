@@ -84,6 +84,8 @@
   .glass-card {
     background-color: rgba(10, 10, 10, 0.75);
     backdrop-filter: blur(16px);
+    border-radius: 1rem;
+    overflow: hidden;
   }
 }
 

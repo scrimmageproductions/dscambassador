@@ -13,7 +13,7 @@ export function CultureMedia({
   aspectClassName?: string
 }) {
   return (
-    <figure className={`hairline group relative overflow-hidden bg-surface/40 ${className}`}>
+    <figure className={`hairline group relative overflow-hidden rounded-2xl bg-surface/40 ${className}`}>
       <div className={`relative ${aspectClassName} w-full overflow-hidden`}>
         <ParallaxImage
           src={src}

@@ -86,7 +86,7 @@ export function EligibilityChecker() {
               {(['yes', 'no'] as const).map((val) => (
                 <label
                   key={val}
-                  className={`label-mono cursor-pointer border px-4 py-2 text-[0.68rem] transition-colors ${
+                  className={`label-mono cursor-pointer rounded-lg border px-4 py-2 text-[0.68rem] transition-colors ${
                     answers[q.key] === val
                       ? 'border-cream bg-cream text-ink'
                       : 'border-cream/25 text-cream-3 hover:border-cream/60'
@@ -109,7 +109,7 @@ export function EligibilityChecker() {
       </div>
 
       {result ? (
-        <div className="mt-6 hairline bg-ink p-6" role="status">
+        <div className="mt-6 rounded-lg hairline bg-ink p-6" role="status">
           <p
             className={`font-display text-2xl ${
               result.tone === 'ready' ? 'text-cream' : result.tone === 'talk' ? 'text-gold' : 'text-cream-wash'

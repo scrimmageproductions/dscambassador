@@ -55,7 +55,7 @@ export function Kit() {
       />
 
       <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
-        <div className="grid gap-px overflow-hidden hairline bg-cream/10 md:grid-cols-3">
+        <div className="grid gap-px overflow-hidden rounded-2xl hairline bg-cream/10 md:grid-cols-3">
           {columns.map((c, i) => (
             <Reveal key={c.label} as="div" className="h-full" delay={i * 0.1} amount={0.2}>
               <div className="h-full bg-ink p-8">
@@ -140,7 +140,7 @@ export function Kit() {
         <div className="mt-10 grid gap-5 sm:grid-cols-3">
           {drops.map((d, i) => (
             <Reveal key={d.label} delay={i * 0.1} amount={0.2}>
-              <div className="hairline overflow-hidden bg-surface/40">
+              <div className="hairline overflow-hidden rounded-2xl bg-surface/40">
                 <ExternalImage
                   src={d.src}
                   alt={d.label}

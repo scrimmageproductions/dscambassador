@@ -11,7 +11,7 @@ export function ReimbursementView() {
 
   if (submitted) {
     return (
-      <div className="hairline bg-ink p-8 text-center md:p-12" role="status">
+      <div className="hairline rounded-2xl bg-ink p-8 text-center md:p-12" role="status">
         <p className="label-mono text-[0.68rem] text-gold">Request received</p>
         <p className="mt-4 font-display text-2xl text-cream md:text-3xl">
           Sent for approval.
@@ -39,7 +39,7 @@ export function ReimbursementView() {
             id="reimb-item"
             required
             placeholder="e.g. Ground transport"
-            className="hairline mt-2 w-full bg-ink px-4 py-3 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
+            className="hairline mt-2 w-full rounded-lg bg-ink px-4 py-3 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
           />
         </div>
         <div>
@@ -52,7 +52,7 @@ export function ReimbursementView() {
             step="0.01"
             required
             placeholder="0.00"
-            className="hairline mt-2 w-full bg-ink px-4 py-3 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
+            className="hairline mt-2 w-full rounded-lg bg-ink px-4 py-3 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
           />
         </div>
       </div>
@@ -64,7 +64,7 @@ export function ReimbursementView() {
           id="reimb-notes"
           rows={3}
           placeholder="What it was for, which event it ties to"
-          className="hairline mt-2 w-full resize-none bg-ink px-4 py-3 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
+          className="hairline mt-2 w-full resize-none rounded-lg bg-ink px-4 py-3 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
         />
       </div>
       <p className="mt-4 text-xs leading-relaxed text-cream-wash/70">

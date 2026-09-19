@@ -215,7 +215,7 @@ export function CircuitMap({ active, onSelectEvents }: CircuitMapProps) {
         </div>
       </div>
 
-      <div className="relative mt-6 aspect-[2/1] w-full overflow-hidden hairline bg-bg">
+      <div className="relative mt-6 aspect-[2/1] w-full overflow-hidden rounded-xl hairline bg-bg">
         <ComposableMap
           projection="geoEqualEarth"
           projectionConfig={{ scale: 148 }}
@@ -259,7 +259,7 @@ export function CircuitMap({ active, onSelectEvents }: CircuitMapProps) {
         </ComposableMap>
       </div>
 
-      <div className="mt-6 min-h-[7rem] hairline bg-ink p-5">
+      <div className="mt-6 min-h-[7rem] rounded-xl hairline bg-ink p-5">
         {selectedEvents.length > 0 ? (
           <div className="animate-tick flex flex-col gap-5">
             {selectedLabel && (

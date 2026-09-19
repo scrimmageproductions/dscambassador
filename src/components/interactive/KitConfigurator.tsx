@@ -46,7 +46,7 @@ export function KitConfigurator() {
                 type="button"
                 onClick={() => setGarment(g.key)}
                 aria-pressed={garment === g.key}
-                className={`label-mono border px-4 py-2 text-[0.68rem] transition-colors ${
+                className={`label-mono rounded-lg border px-4 py-2 text-[0.68rem] transition-colors ${
                   garment === g.key ? 'border-cream bg-cream text-ink' : 'border-cream/25 text-cream-3 hover:border-cream/60'
                 }`}
               >
@@ -65,7 +65,7 @@ export function KitConfigurator() {
                 type="button"
                 onClick={() => setColorway(c)}
                 aria-pressed={colorway === c}
-                className={`label-mono flex items-center gap-2 border px-4 py-2 text-[0.68rem] transition-colors ${
+                className={`label-mono flex items-center gap-2 rounded-lg border px-4 py-2 text-[0.68rem] transition-colors ${
                   colorway === c ? 'border-cream bg-cream text-ink' : 'border-cream/25 text-cream-3 hover:border-cream/60'
                 }`}
               >
@@ -89,7 +89,7 @@ export function KitConfigurator() {
                 type="button"
                 onClick={() => setSize(s)}
                 aria-pressed={size === s}
-                className={`label-mono h-10 w-12 border text-[0.7rem] transition-colors ${
+                className={`label-mono h-10 w-12 rounded-lg border text-[0.7rem] transition-colors ${
                   size === s ? 'border-cream bg-cream text-ink' : 'border-cream/25 text-cream-3 hover:border-cream/60'
                 }`}
               >
@@ -107,7 +107,7 @@ export function KitConfigurator() {
             id="region"
             value={region}
             onChange={(e) => setRegion(e.target.value as (typeof regions)[number])}
-            className="hairline mt-3 w-full bg-surface px-4 py-3 text-sm text-cream focus-visible:outline-cream"
+            className="hairline mt-3 w-full rounded-lg bg-surface px-4 py-3 text-sm text-cream focus-visible:outline-cream"
           >
             {regions.map((r) => (
               <option key={r} value={r}>

@@ -30,7 +30,7 @@ export function TextField({
         value={value}
         placeholder={placeholder}
         onChange={(e: ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
-        className="hairline mt-2 w-full bg-surface px-4 py-3 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
+        className="hairline mt-2 w-full rounded-lg bg-surface px-4 py-3 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
       />
     </div>
   )
@@ -62,7 +62,7 @@ export function SelectField({
         required={required}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="hairline mt-2 w-full bg-surface px-4 py-3 text-sm text-cream focus-visible:outline-cream"
+        className="hairline mt-2 w-full rounded-lg bg-surface px-4 py-3 text-sm text-cream focus-visible:outline-cream"
       >
         <option value="" disabled>
           Select
@@ -102,7 +102,7 @@ export function PillGroup<T extends string>({
             type="button"
             onClick={() => onChange(o.value)}
             aria-pressed={value === o.value}
-            className={`label-mono border px-4 py-2 text-[0.68rem] transition-colors ${
+            className={`label-mono rounded-lg border px-4 py-2 text-[0.68rem] transition-colors ${
               value === o.value ? 'border-cream bg-cream text-ink' : 'border-cream/25 text-cream-3 hover:border-cream/60'
             }`}
           >

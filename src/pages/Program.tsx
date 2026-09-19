@@ -56,7 +56,7 @@ export function Program() {
         <Reveal>
           <SectionLabel>Content rules: non-negotiable</SectionLabel>
         </Reveal>
-        <div className="mt-8 grid gap-px overflow-hidden hairline bg-cream/10 md:grid-cols-3">
+        <div className="mt-8 grid gap-px overflow-hidden rounded-2xl hairline bg-cream/10 md:grid-cols-3">
           {contentRules.map((rule, i) => (
             <Reveal key={rule} as="div" className="h-full" delay={i * 0.1} amount={0.2}>
               <div className="h-full bg-ink p-8">

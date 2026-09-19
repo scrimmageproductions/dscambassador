@@ -5,7 +5,7 @@ export function GalleryView() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {galleryItems.map((item, i) => (
-        <figure key={item.caption + i} className="hairline group relative overflow-hidden bg-surface/40">
+        <figure key={item.caption + i} className="hairline group relative overflow-hidden rounded-2xl bg-surface/40">
           <div className="relative aspect-square w-full overflow-hidden">
             <ParallaxImage
               src={item.src}

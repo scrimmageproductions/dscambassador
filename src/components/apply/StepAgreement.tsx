@@ -16,7 +16,7 @@ export function StepAgreement({
         <p className="mt-2 text-sm text-cream-3">Read the official guidelines before you submit.</p>
       </div>
 
-      <div className="hairline max-h-72 overflow-y-auto bg-ink p-6 text-sm leading-relaxed text-cream-3">
+      <div className="hairline max-h-72 overflow-y-auto rounded-lg bg-ink p-6 text-sm leading-relaxed text-cream-3">
         <section>
           <h3 className="label-mono text-[0.68rem] text-cream-wash">1. Who we&rsquo;re looking for</h3>
           <ul className="mt-2 list-disc space-y-1 pl-4">
@@ -80,7 +80,7 @@ export function StepAgreement({
           value={draft.note}
           onChange={(e) => update('note', e.target.value)}
           rows={3}
-          className="hairline mt-2 w-full resize-none bg-surface px-4 py-3 text-sm text-cream focus-visible:outline-cream"
+          className="hairline mt-2 w-full resize-none rounded-lg bg-surface px-4 py-3 text-sm text-cream focus-visible:outline-cream"
         />
       </div>
     </div>

@@ -119,7 +119,7 @@ export function EventRequestModule() {
 
   if (submitted) {
     return (
-      <div className="hairline bg-ink p-8 text-center md:p-12" role="status">
+      <div className="hairline rounded-2xl bg-ink p-8 text-center md:p-12" role="status">
         <p className="label-mono text-[0.68rem] text-gold">Request received</p>
         <p className="mt-4 font-display text-2xl text-cream md:text-3xl">Sent for approval.</p>
         <p className="mt-3 text-sm text-cream-3">
@@ -149,7 +149,7 @@ export function EventRequestModule() {
               id="req-event-name"
               required
               placeholder="e.g. ETHDenver Side Event"
-              className="hairline mt-2 w-full bg-surface px-4 py-3 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
+              className="hairline mt-2 w-full rounded-lg bg-surface px-4 py-3 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
             />
           </div>
           <div>
@@ -160,7 +160,7 @@ export function EventRequestModule() {
               id="req-location"
               required
               placeholder="e.g. Denver, CO"
-              className="hairline mt-2 w-full bg-surface px-4 py-3 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
+              className="hairline mt-2 w-full rounded-lg bg-surface px-4 py-3 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
             />
           </div>
           <div>
@@ -173,14 +173,14 @@ export function EventRequestModule() {
               min={0}
               required
               placeholder="e.g. 40"
-              className="hairline mt-2 w-full bg-surface px-4 py-3 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
+              className="hairline mt-2 w-full rounded-lg bg-surface px-4 py-3 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
             />
           </div>
           <div>
             <label htmlFor="req-budget" className="label-mono text-[0.62rem] text-cream-wash">
               Requested Budget Amount (USD)
             </label>
-            <div className="hairline mt-2 flex items-center bg-surface px-4 focus-within:outline focus-within:outline-2 focus-within:outline-cream">
+            <div className="hairline mt-2 flex items-center rounded-lg bg-surface px-4 focus-within:outline focus-within:outline-2 focus-within:outline-cream">
               <span className="text-sm text-cream-wash">$</span>
               <input
                 id="req-budget"
@@ -279,7 +279,7 @@ export function EventRequestModule() {
                 value={customItem}
                 onChange={(e) => setCustomItem(e.target.value)}
                 placeholder="Describe the item"
-                className="hairline w-full flex-1 bg-surface px-4 py-2.5 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
+                className="hairline w-full flex-1 rounded-lg bg-surface px-4 py-2.5 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
               />
               <QtyStepper value={customQty} onChange={setCustomQty} />
             </div>

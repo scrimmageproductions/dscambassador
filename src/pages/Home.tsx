@@ -118,7 +118,7 @@ export function Home() {
               </LinkButton>
             </div>
           </Reveal>
-          <div className="hairline aspect-square w-full overflow-hidden bg-surface/40">
+          <div className="hairline aspect-square w-full overflow-hidden rounded-2xl bg-surface/40">
             <ParallaxImage
               src="/apparelgif.gif"
               alt="Digital Spenders Club apparel"

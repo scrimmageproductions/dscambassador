@@ -20,7 +20,7 @@ export function CampusInterestForm() {
 
   if (submitted) {
     return (
-      <div className="hairline bg-ink p-8 text-center md:p-12" role="status">
+      <div className="hairline rounded-2xl bg-ink p-8 text-center md:p-12" role="status">
         <p className="label-mono text-[0.68rem] text-gold">Interest received</p>
         <p className="mt-4 font-display text-2xl text-cream md:text-3xl">
           We&rsquo;ll follow up with your chapter.
@@ -42,11 +42,11 @@ export function CampusInterestForm() {
       <fieldset className="mt-6">
         <legend className="label-mono text-[0.68rem] text-cream-wash">Interested in</legend>
         <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-          <label className="hairline flex flex-1 items-center gap-3 px-4 py-3 text-sm text-cream-2">
+          <label className="hairline flex flex-1 items-center gap-3 rounded-lg px-4 py-3 text-sm text-cream-2">
             <input type="checkbox" name="cards" className="h-4 w-4 accent-[#F3EDE3]" />
             Custom chapter membership cards
           </label>
-          <label className="hairline flex flex-1 items-center gap-3 px-4 py-3 text-sm text-cream-2">
+          <label className="hairline flex flex-1 items-center gap-3 rounded-lg px-4 py-3 text-sm text-cream-2">
             <input type="checkbox" name="merch" className="h-4 w-4 accent-[#F3EDE3]" />
             Chapter treasury funding details
           </label>
@@ -83,7 +83,7 @@ function Field({
         name={name}
         type={type}
         placeholder={placeholder}
-        className="hairline mt-2 w-full bg-surface px-4 py-3 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
+        className="hairline mt-2 w-full rounded-lg bg-surface px-4 py-3 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
       />
     </div>
   )

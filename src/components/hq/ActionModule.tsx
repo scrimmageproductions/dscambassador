@@ -44,7 +44,7 @@ function EventReportCard() {
             <select
               id="report-event"
               required
-              className="hairline mt-1.5 w-full bg-ink px-3 py-2.5 text-sm text-cream focus-visible:outline-cream"
+              className="hairline mt-1.5 w-full rounded-lg bg-ink px-3 py-2.5 text-sm text-cream focus-visible:outline-cream"
               defaultValue=""
             >
               <option value="" disabled>
@@ -66,7 +66,7 @@ function EventReportCard() {
               required
               rows={2}
               placeholder="Turnout, cards handed out, what worked"
-              className="hairline mt-1.5 w-full resize-none bg-ink px-3 py-2.5 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
+              className="hairline mt-1.5 w-full resize-none rounded-lg bg-ink px-3 py-2.5 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
             />
           </div>
           <Button type="submit" variant="ghost" className="!px-5 !py-2.5 w-full">
@@ -120,7 +120,7 @@ function MerchDropCard() {
             {merchOptions.map((item) => (
               <label
                 key={item}
-                className="hairline flex items-center gap-2 px-3 py-2.5 text-xs text-cream-2"
+                className="hairline flex items-center gap-2 rounded-lg px-3 py-2.5 text-xs text-cream-2"
               >
                 <input
                   type="checkbox"
@@ -161,7 +161,7 @@ function ChannelsCard() {
             type="button"
             disabled={requested[c.key]}
             onClick={() => setRequested((prev) => ({ ...prev, [c.key]: true }))}
-            className={`label-mono flex w-full items-center justify-between border px-4 py-2.5 text-[0.65rem] transition-colors ${
+            className={`label-mono flex w-full items-center justify-between rounded-lg border px-4 py-2.5 text-[0.65rem] transition-colors ${
               requested[c.key]
                 ? 'cursor-default border-gold/40 text-gold'
                 : 'border-cream/25 text-cream-3 hover:border-cream hover:text-cream'
@@ -197,7 +197,7 @@ function ReferralLinkCard({ name }: { name: string }) {
       <p className="mt-2 text-sm text-cream-3">
         Every member who joins through this link counts toward your onboarding total.
       </p>
-      <div className="hairline mt-4 flex items-center justify-between gap-3 bg-ink px-4 py-3">
+      <div className="hairline mt-4 flex items-center justify-between gap-3 rounded-lg bg-ink px-4 py-3">
         <span className="label-mono truncate text-[0.68rem] text-cream">{link}</span>
         <button
           type="button"

@@ -10,7 +10,7 @@ export function EventMaterialsRequest() {
 
       <fieldset disabled className="mt-6 grid gap-3 opacity-50 sm:grid-cols-2" aria-disabled="true">
         {materials.map((m) => (
-          <label key={m} className="hairline flex items-center gap-3 px-4 py-3 text-sm text-cream-3">
+          <label key={m} className="hairline flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-cream-3">
             <input type="checkbox" className="h-4 w-4" />
             {m}
           </label>

@@ -4,7 +4,7 @@ export function BurnerVideoEmbed() {
   return (
     <div className="hairline glass-card p-6 md:p-8">
       <p className="label-mono text-[0.68rem] text-cream-wash">Learn about Burner</p>
-      <div className="mt-6 aspect-video w-full overflow-hidden rounded-lg border border-cream/15 bg-ink">
+      <div className="mt-6 aspect-video w-full overflow-hidden rounded-2xl border border-cream/15 bg-ink">
         <iframe
           className="h-full w-full"
           src={`https://www.youtube.com/embed/${VIDEO_ID}`}

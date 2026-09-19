@@ -62,7 +62,7 @@ export function ApplyWizard() {
 
   if (submittedAt) {
     return (
-      <div className="hairline bg-ink p-8 text-center md:p-16" role="status">
+      <div className="hairline rounded-2xl bg-ink p-8 text-center md:p-16" role="status">
         <p className="label-mono text-[0.68rem] text-gold">Application received · {submittedAt}</p>
         <p className="mt-5 font-display text-3xl text-cream md:text-5xl">We&rsquo;ll be in touch.</p>
         <p className="mt-3 font-display text-xl text-cream-wash md:text-2xl">Spenders move.</p>
@@ -78,7 +78,7 @@ export function ApplyWizard() {
     <div>
       <ProgressBar step={step} />
 
-      <div className="mt-10 hairline bg-surface/30 p-6 md:p-10">
+      <div className="mt-10 rounded-2xl hairline bg-surface/30 p-6 md:p-10">
         {step === 0 && <StepIdentity draft={draft} update={update} />}
         {step === 1 && <StepPresence draft={draft} update={update} />}
         {step === 2 && <StepFit draft={draft} update={update} />}

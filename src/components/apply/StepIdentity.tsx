@@ -18,7 +18,7 @@ export function StepIdentity({
       <TextField label="Full name" name="name" value={draft.name} onChange={(v) => update('name', v)} placeholder="Your name" required />
       <TextField label="City / region" name="city" value={draft.city} onChange={(v) => update('city', v)} placeholder="e.g. Austin, TX" required />
 
-      <label className="hairline flex items-start gap-3 px-4 py-4 text-sm text-cream-2">
+      <label className="hairline flex items-start gap-3 rounded-lg px-4 py-4 text-sm text-cream-2">
         <input
           type="checkbox"
           checked={draft.isAdult}
