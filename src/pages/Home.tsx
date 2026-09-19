@@ -33,25 +33,25 @@ const tiles = [
 export function Home() {
   return (
     <div>
-      <section className="relative flex min-h-[92vh] flex-col justify-between overflow-hidden bg-noise hairline-b">
+      <section className="relative flex min-h-[80vh] flex-col items-center justify-center overflow-hidden bg-noise hairline-b">
         <div
-          className="glow-gold pointer-events-none absolute left-1/2 top-1/3 h-[42rem] w-[42rem] -translate-x-1/2 -translate-y-1/2"
+          className="glow-gold pointer-events-none absolute left-1/2 top-1/2 h-[42rem] w-[42rem] -translate-x-1/2 -translate-y-1/2"
           aria-hidden="true"
         />
-        <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-6 py-24">
+        <div className="relative z-10 mx-auto w-full max-w-4xl px-6 py-24 text-center">
           <Reveal stagger>
-            <SectionLabel>Digital Spenders Club</SectionLabel>
-            <h1 className="mt-8 max-w-4xl font-display text-5xl font-extrabold leading-[1.02] tracking-tight text-cream sm:text-6xl md:text-8xl">
+            <SectionLabel className="justify-center">Digital Spenders Club</SectionLabel>
+            <h1 className="mx-auto mt-8 max-w-3xl font-display text-5xl font-extrabold leading-[1.02] tracking-tight text-cream sm:text-6xl md:text-8xl">
               Ambassador Program
             </h1>
             <div className="mt-8">
               <Tagline className="text-sm md:text-base" />
             </div>
-            <p className="mt-8 max-w-lg text-base leading-relaxed text-cream-3 md:text-lg">
+            <p className="mx-auto mt-8 max-w-lg text-base leading-relaxed text-cream-3 md:text-lg">
               The people committed to moving us forward, expanding our membership, and proud to
               represent the best culture in the blockchain ecosystem.
             </p>
-            <div className="mt-10 flex flex-wrap gap-4">
+            <div className="mt-10 flex flex-wrap justify-center gap-4">
               <LinkButton to="/apply" variant="solid">
                 Apply
               </LinkButton>
