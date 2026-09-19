@@ -8,7 +8,10 @@ export function DashboardSidebar({
   active: DashboardViewKey
   onSelect: (key: DashboardViewKey) => void
 }) {
-  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(() => {
+    const activeGroup = navGroups.find((g) => g.items.some((i) => i.key === active))
+    return new Set(navGroups.filter((g) => g.label !== activeGroup?.label).map((g) => g.label))
+  })
 
   function toggleGroup(label: string) {
     setCollapsedGroups((prev) => {

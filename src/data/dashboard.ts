@@ -29,18 +29,13 @@ export const navGroups: NavGroup[] = [
     ],
   },
   {
-    label: 'Finances',
+    label: 'Operations',
     items: [
       { key: 'budget', label: '2026 Budget' },
       { key: 'events', label: 'Events' },
       { key: 'event-reports', label: 'Event Reports' },
       { key: 'reimbursement', label: 'Expense Reimbursement' },
       { key: 'my-expenses', label: 'My Expenses' },
-    ],
-  },
-  {
-    label: 'Operations',
-    items: [
       { key: 'gallery', label: 'Photo Gallery' },
       { key: 'merch', label: 'Order Merch' },
       { key: 'growth', label: 'Community Growth' },
@@ -51,7 +46,7 @@ export const navGroups: NavGroup[] = [
     items: [{ key: 'brand-assets', label: 'Brand Assets & Guidelines' }],
   },
   {
-    label: 'System',
+    label: 'Settings',
     items: [
       { key: 'settings', label: 'Settings' },
       { key: 'mailing-address', label: 'Mailing Address' },

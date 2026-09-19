@@ -12,10 +12,7 @@ export function TakeActionView({ name }: { name: string }) {
         </div>
       </div>
       <div>
-        <SectionLabel>Take action</SectionLabel>
-        <div className="mt-4">
-          <ActionModule name={name} />
-        </div>
+        <ActionModule name={name} />
       </div>
     </div>
   )
