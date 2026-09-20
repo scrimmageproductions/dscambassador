@@ -60,7 +60,7 @@ export function Home() {
           <div className="relative z-10 mx-auto w-full max-w-4xl px-6 py-24 text-center">
             <Reveal stagger>
               <SectionLabel className="justify-center">Digital Spenders Club</SectionLabel>
-              <h1 className="mx-auto mt-8 max-w-3xl font-display text-5xl font-extrabold leading-[1.02] text-cream sm:text-6xl md:text-8xl">
+              <h1 className="mx-auto mt-8 max-w-3xl font-display text-5xl text-cream sm:text-6xl md:text-8xl">
                 Ambassador Program
               </h1>
               <div className="mt-8">

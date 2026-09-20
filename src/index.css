@@ -11,7 +11,7 @@
   --color-cream-wash: #c4b8a4;
   --color-gold: #c4a574;
 
-  --font-display: "Syne", "Inter", -apple-system, sans-serif;
+  --font-display: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
 }
@@ -44,10 +44,18 @@
     outline-offset: 3px;
   }
 
-  h1, h2, h3, h4, .font-display {
+  h1, h2, h3, h4 {
     font-family: var(--font-display);
-    font-weight: 700;
-    letter-spacing: -0.03em;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    /* Tailwind's text-size utilities (text-3xl, text-8xl, etc.) each bundle
+       their own default line-height, which -- being a utility in the same
+       cascade layer -- wins over a plain declaration here regardless of
+       source order. !important is the narrow, deliberate override needed
+       to keep every heading's line-height inside the intended 1.05-1.15
+       band regardless of which size utility it happens to use. */
+    line-height: 1.1 !important;
   }
 }
 
