@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { LinkButton } from '../components/ui/Button'
 import { Tagline } from '../components/ui/Tagline'
 import { SectionLabel } from '../components/ui/SectionLabel'
@@ -32,54 +33,63 @@ const tiles = [
 ]
 
 export function Home() {
+  const ctaRef = useRef<HTMLDivElement>(null)
+  const headingRef = useRef<HTMLHeadingElement>(null)
+
   return (
     <div>
-      <section className="relative flex min-h-[80vh] flex-col items-center justify-center overflow-hidden bg-noise hairline-b">
-        <div
-          className="glow-gold pointer-events-none absolute left-1/2 top-1/2 h-[42rem] w-[42rem] -translate-x-1/2 -translate-y-1/2"
-          aria-hidden="true"
-        />
-        <MatrixTransition />
-        <div className="relative z-10 mx-auto w-full max-w-4xl px-6 py-24 text-center">
-          <Reveal stagger>
-            <SectionLabel className="justify-center">Digital Spenders Club</SectionLabel>
-            <h1 className="mx-auto mt-8 max-w-3xl font-display text-5xl font-extrabold leading-[1.02] tracking-tight text-cream sm:text-6xl md:text-8xl">
-              Ambassador Program
-            </h1>
-            <div className="mt-8">
-              <Tagline className="text-sm md:text-base" />
-            </div>
-            <p className="mx-auto mt-8 max-w-lg text-base leading-relaxed text-cream-3 md:text-lg">
-              The people committed to moving us forward, expanding our membership, and proud to
-              represent the best culture in the blockchain ecosystem.
-            </p>
-            <div className="mt-10 flex flex-wrap justify-center gap-4">
-              <LinkButton to="/apply" variant="solid">
-                Apply
-              </LinkButton>
-              <LinkButton to="/guidelines" variant="ghost">
-                Read the guidelines
-              </LinkButton>
-            </div>
-          </Reveal>
-        </div>
-      </section>
+      <div className="relative">
+        <MatrixTransition ctaRef={ctaRef} headingRef={headingRef} />
 
-      <section className="mx-auto max-w-7xl px-6 py-20 md:py-24">
-        <div className="grid items-center gap-10 md:grid-cols-2">
-          <CultureMedia className="md:order-2" />
-          <Reveal stagger className="md:order-1">
-            <SectionLabel>IRL motion</SectionLabel>
-            <h2 className="mt-6 max-w-md font-display text-3xl text-cream md:text-4xl">
-              Real people. Real presence.
-            </h2>
-            <p className="mt-4 max-w-md text-sm leading-relaxed text-cream-3">
-              Pop-ups, drops, and ecosystem activations. We don&rsquo;t just talk about the
-              movement. We show up.
-            </p>
-          </Reveal>
-        </div>
-      </section>
+        <section className="relative z-10 flex min-h-[80vh] flex-col items-center justify-center overflow-hidden bg-noise hairline-b">
+          <div
+            className="glow-gold pointer-events-none absolute left-1/2 top-1/2 h-[42rem] w-[42rem] -translate-x-1/2 -translate-y-1/2"
+            aria-hidden="true"
+          />
+          <div className="relative z-10 mx-auto w-full max-w-4xl px-6 py-24 text-center">
+            <Reveal stagger>
+              <SectionLabel className="justify-center">Digital Spenders Club</SectionLabel>
+              <h1 className="mx-auto mt-8 max-w-3xl font-display text-5xl font-extrabold leading-[1.02] tracking-tight text-cream sm:text-6xl md:text-8xl">
+                Ambassador Program
+              </h1>
+              <div className="mt-8">
+                <Tagline className="text-sm md:text-base" />
+              </div>
+              <p className="mx-auto mt-8 max-w-lg text-base leading-relaxed text-cream-3 md:text-lg">
+                The people committed to moving us forward, expanding our membership, and proud to
+                represent the best culture in the blockchain ecosystem.
+              </p>
+              <div ref={ctaRef} className="mt-10 flex flex-wrap justify-center gap-4">
+                <LinkButton to="/apply" variant="solid">
+                  Apply
+                </LinkButton>
+                <LinkButton to="/guidelines" variant="ghost">
+                  Read the guidelines
+                </LinkButton>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        <section className="relative z-10 mx-auto max-w-7xl px-6 py-20 md:py-24">
+          <div className="grid items-center gap-10 md:grid-cols-2">
+            <CultureMedia className="md:order-2" />
+            <Reveal stagger className="md:order-1">
+              <SectionLabel>IRL motion</SectionLabel>
+              <h2
+                ref={headingRef}
+                className="mt-6 max-w-md font-display text-3xl text-cream md:text-4xl"
+              >
+                Real people. Real presence.
+              </h2>
+              <p className="mt-4 max-w-md text-sm leading-relaxed text-cream-3">
+                Pop-ups, drops, and ecosystem activations. We don&rsquo;t just talk about the
+                movement. We show up.
+              </p>
+            </Reveal>
+          </div>
+        </section>
+      </div>
 
       <section className="hairline-t">
         <div className="mx-auto max-w-7xl px-6 py-20 md:py-28">
