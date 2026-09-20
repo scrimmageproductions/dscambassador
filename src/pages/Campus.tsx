@@ -15,6 +15,10 @@ const featureCards = [
     label: 'Chapter Treasury Funding',
     body: 'Twenty percent revenue share on all apparel moved through your chapter. Direct capital deposited straight to your club to fund local events, hackathon travel, and campus activations. No points, no tiers, just real funding.',
   },
+  {
+    label: 'Travel & Hackathon Grants',
+    body: 'Dedicated micro-grants for chapter teams traveling to compete at global hackathons and builder summits.',
+  },
 ]
 
 const flow = [
@@ -55,7 +59,7 @@ export function Campus() {
         <Reveal>
           <SectionLabel>What your chapter gets</SectionLabel>
         </Reveal>
-        <div className="mt-8 grid gap-5 md:grid-cols-2">
+        <div className="mt-8 grid gap-5 md:grid-cols-3">
           {featureCards.map((c, i) => (
             <HairlineCard key={c.label} className="h-full" delay={i * 0.1}>
               <h3 className="font-display text-xl text-cream">{c.label}</h3>

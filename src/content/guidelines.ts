@@ -64,7 +64,7 @@ export const successMetrics = [
   {
     title: 'Community interactions',
     detail:
-      'Are you hyping others in the crew? Are other relevant communities interacting with your DSC content?',
+      'Are you supporting your fellow club members? Are other relevant communities interacting with your DSC content?',
   },
   {
     title: 'Member onboarding',
