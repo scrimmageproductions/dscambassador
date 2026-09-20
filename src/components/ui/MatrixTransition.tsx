@@ -10,32 +10,44 @@ const FONT_SIZE = 16
 // hyperactive regardless of a 60Hz vs. 120Hz display.
 const STEP_MS = 130
 const ROWS_PER_STEP = 0.45
-// Only draw a fresh glyph in a given column on roughly 60% of ticks, so the
-// rain reads as a scattering of ambient drips rather than a dense wall of
-// code filling every column every frame.
-const DRAW_CHANCE = 0.6
+// "Atmospheric background motion, not a dense wall of text": only this many
+// of the available column slots ever have an active stream at once.
+const MAX_COLUMNS = 26
 // #E8E4D9, the exact cream requested for these characters.
 const CREAM_RGB = '232, 228, 217'
-// Must equal --color-bg exactly -- any mismatch here is what turns the
-// trail fade into a visible solid-color box against the page background.
-const BG_RGB = '10, 10, 10'
-const BG_HEX = '#0a0a0a'
-const FADE_RGBA = `rgba(${BG_RGB}, 0.1)`
+const HEAD_ALPHA_MIN = 0.32
+const HEAD_ALPHA_MAX = 0.55
+// Per-tick multiplier applied to every trailing glyph's own alpha -- this is
+// the *entire* fade mechanism. There is no canvas-level fill of any kind, so
+// the canvas is fully transparent everywhere a character isn't currently
+// drawn, letting the page's own background/noise texture show through.
+const TRAIL_DECAY = 0.85
+const MIN_ALPHA = 0.02
+
+type TrailEntry = { char: string; alpha: number; row: number }
+type Drop = { col: number; headRow: number; trail: TrailEntry[] }
+
+function randomChar() {
+  return CHARS[Math.floor(Math.random() * CHARS.length)]
+}
 
 /**
- * Decorative canvas interstitial woven between the Hero and "Real people.
- * Real presence." sections: a restrained, cream-toned take on digital rain
- * -- digits and `$` only, falling at a deliberately unhurried, sparse pace.
+ * Ambient digital-rain overlay: a restrained, cream-toned scattering of
+ * digits and `$` that drifts down behind the Hero's own content. Meant to
+ * be rendered as an absolutely-positioned child of a `position: relative`
+ * container (the Hero section) -- it takes no space in the document flow
+ * and introduces no section of its own, so it can never read as a boxed-off
+ * block.
  *
- * To avoid reading as a separate boxed-off section, the wrapper overlaps
- * its neighbors with negative margins and is fully inert
- * (`pointer-events-none`, low z-index) so it visually flows underneath the
- * Hero's CTA row and the next section's heading rather than sitting between
- * them as its own block. The canvas itself carries a mask-image that
- * feathers its top and bottom to full transparency well inside its own
- * bounds, on top of the trail fade using --color-bg exactly (not an
- * approximation) so there's never a visible seam against the shared page
- * background. Purely decorative (aria-hidden) and skipped entirely under
+ * Trails are tracked entirely in JS state (each Drop keeps an array of
+ * {char, alpha, row} entries that decay independently) and the canvas is
+ * `clearRect`'d, never filled, every frame -- there is no background paint
+ * of any kind on the canvas, so whatever sits behind it (the Hero's own
+ * bg-noise texture, its ambient glow) is always visible through the gaps
+ * between characters. A CSS mask feathers the whole canvas to transparent
+ * well before its own top/bottom edges.
+ *
+ * Purely decorative (aria-hidden) and skipped entirely under
  * prefers-reduced-motion, matching this codebase's other ambient effects.
  */
 export function MatrixTransition() {
@@ -56,10 +68,24 @@ export function MatrixTransition() {
     const ctx: CanvasRenderingContext2D = ctxRef
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2)
-    let columns = 0
-    let drops: number[] = []
     let width = 0
     let height = 0
+    let drops: Drop[] = []
+
+    function spawnDrops() {
+      const totalColumns = Math.max(1, Math.floor(width / FONT_SIZE))
+      const activeCount = Math.min(MAX_COLUMNS, totalColumns)
+      const pool = Array.from({ length: totalColumns }, (_, i) => i)
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[pool[i], pool[j]] = [pool[j], pool[i]]
+      }
+      drops = pool.slice(0, activeCount).map((col) => ({
+        col,
+        headRow: Math.random() * -30,
+        trail: [],
+      }))
+    }
 
     function resize() {
       const rect = containerEl.getBoundingClientRect()
@@ -70,10 +96,7 @@ export function MatrixTransition() {
       canvasEl.style.width = `${width}px`
       canvasEl.style.height = `${height}px`
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      columns = Math.max(1, Math.floor(width / FONT_SIZE))
-      drops = Array.from({ length: columns }, () => Math.random() * -40)
-      ctx.fillStyle = BG_HEX
-      ctx.fillRect(0, 0, width, height)
+      spawnDrops()
     }
 
     resize()
@@ -87,26 +110,35 @@ export function MatrixTransition() {
       if (time - lastStep < STEP_MS) return
       lastStep = time
 
-      ctx.fillStyle = FADE_RGBA
-      ctx.fillRect(0, 0, width, height)
-
+      // No fillRect anywhere in this function -- clearRect is the only
+      // canvas-level paint, so nothing but individual characters is ever
+      // drawn to the canvas.
+      ctx.clearRect(0, 0, width, height)
       ctx.font = `${FONT_SIZE}px "JetBrains Mono", ui-monospace, monospace`
       ctx.textBaseline = 'top'
 
-      for (let i = 0; i < columns; i++) {
-        if (Math.random() < DRAW_CHANCE) {
-          const char = CHARS[Math.floor(Math.random() * CHARS.length)]
-          const x = i * FONT_SIZE
-          const y = drops[i] * FONT_SIZE
-          const alpha = 0.18 + Math.random() * 0.3
-          ctx.fillStyle = `rgba(${CREAM_RGB}, ${alpha})`
-          ctx.fillText(char, x, y)
+      for (const drop of drops) {
+        for (const entry of drop.trail) entry.alpha *= TRAIL_DECAY
+        drop.trail = drop.trail.filter((entry) => entry.alpha >= MIN_ALPHA)
+
+        if (drop.headRow * FONT_SIZE < height) {
+          drop.trail.push({
+            char: randomChar(),
+            alpha: HEAD_ALPHA_MIN + Math.random() * (HEAD_ALPHA_MAX - HEAD_ALPHA_MIN),
+            row: drop.headRow,
+          })
+          drop.headRow += ROWS_PER_STEP
+        } else if (drop.trail.length === 0) {
+          drop.headRow = Math.random() * -30
         }
 
-        if (drops[i] * FONT_SIZE > height && Math.random() > 0.975) {
-          drops[i] = 0
+        const x = drop.col * FONT_SIZE
+        for (const entry of drop.trail) {
+          const y = entry.row * FONT_SIZE
+          if (y < -FONT_SIZE || y > height) continue
+          ctx.fillStyle = `rgba(${CREAM_RGB}, ${entry.alpha})`
+          ctx.fillText(entry.char, x, y)
         }
-        drops[i] += ROWS_PER_STEP
       }
     }
 
@@ -119,18 +151,14 @@ export function MatrixTransition() {
   }, [])
 
   return (
-    <section
-      className="matrix-transition-wrapper pointer-events-none relative z-0 -mt-[100px] -mb-[100px] h-[400px] overflow-hidden bg-bg bg-noise"
+    <canvas
+      ref={canvasRef}
       aria-hidden="true"
-    >
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 block h-full w-full"
-        style={{
-          maskImage: 'linear-gradient(to bottom, transparent, black 35%, black 65%, transparent)',
-          WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 35%, black 65%, transparent)',
-        }}
-      />
-    </section>
+      className="pointer-events-none absolute inset-0 z-[1] block h-full w-full"
+      style={{
+        maskImage: 'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)',
+        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)',
+      }}
+    />
   )
 }
