@@ -5,6 +5,7 @@ import { HairlineCard } from '../components/ui/HairlineCard'
 import { CommitmentStrip } from '../components/interactive/CommitmentStrip'
 import { EligibilityChecker } from '../components/interactive/EligibilityChecker'
 import { CultureMedia } from '../components/ui/CultureMedia'
+import { MatrixTransition } from '../components/ui/MatrixTransition'
 import { Reveal } from '../components/motion/Reveal'
 import { ParallaxImage } from '../components/motion/ParallaxImage'
 import { Link } from 'react-router-dom'
@@ -62,6 +63,8 @@ export function Home() {
           </Reveal>
         </div>
       </section>
+
+      <MatrixTransition />
 
       <section className="mx-auto max-w-7xl px-6 py-20 md:py-24">
         <div className="grid items-center gap-10 md:grid-cols-2">
