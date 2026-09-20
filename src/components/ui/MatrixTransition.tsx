@@ -71,6 +71,31 @@ export function MatrixTransition() {
     let width = 0
     let height = 0
     let drops: Drop[] = []
+    let raf = 0
+    let lastStep = 0
+
+    // 0 while scrolled to the very top of the Hero, ramping to 1 by the
+    // time the user has scrolled 75% of the Hero's own height -- drives the
+    // fade-out and speed-up below, and gates the pause/resume of the draw
+    // loop itself. Read at draw time only, never mutated inside draw.
+    let scrollProgress = 0
+    let scrollRaf = 0
+
+    function updateScrollProgress() {
+      scrollRaf = 0
+      scrollProgress = Math.min(1, Math.max(0, window.scrollY / (height * 0.75)))
+      // The draw loop stops scheduling itself once fully faded out (see
+      // draw() below); resume it here the moment scrolling brings the Hero
+      // back into its fading range.
+      if (scrollProgress < 1 && raf === 0) {
+        raf = requestAnimationFrame(draw)
+      }
+    }
+
+    function handleScroll() {
+      if (scrollRaf) return
+      scrollRaf = requestAnimationFrame(updateScrollProgress)
+    }
 
     function spawnDrops() {
       const totalColumns = Math.max(1, Math.floor(width / FONT_SIZE))
@@ -101,11 +126,23 @@ export function MatrixTransition() {
 
     resize()
     window.addEventListener('resize', resize)
-
-    let raf = 0
-    let lastStep = 0
+    updateScrollProgress()
+    window.addEventListener('scroll', handleScroll, { passive: true })
 
     function draw(time: number) {
+      // Fully out of the Hero's fade range: stop scheduling frames entirely
+      // (no work at all, not even a clear) until a scroll event brings
+      // scrollProgress back under 1 and reschedules us from
+      // updateScrollProgress above.
+      if (scrollProgress >= 1) {
+        raf = 0
+        // A fast scroll can jump straight past the fade range in one event,
+        // freezing whatever was last drawn at a non-zero alpha -- clear it
+        // so "paused" also means "actually invisible," not just "no longer
+        // updating."
+        ctx.clearRect(0, 0, width, height)
+        return
+      }
       raf = requestAnimationFrame(draw)
       if (time - lastStep < STEP_MS) return
       lastStep = time
@@ -117,6 +154,13 @@ export function MatrixTransition() {
       ctx.font = `${FONT_SIZE}px "JetBrains Mono", ui-monospace, monospace`
       ctx.textBaseline = 'top'
 
+      // Streams fall faster and fade out as the Hero scrolls past --
+      // display-only multipliers, so the underlying trail-decay state
+      // stays untouched and streams reappear cleanly if the user scrolls
+      // back up before scrollProgress reaches 1.
+      const speedMultiplier = 1 + scrollProgress * 0.5
+      const fadeMultiplier = 1 - scrollProgress
+
       for (const drop of drops) {
         for (const entry of drop.trail) entry.alpha *= TRAIL_DECAY
         drop.trail = drop.trail.filter((entry) => entry.alpha >= MIN_ALPHA)
@@ -127,7 +171,7 @@ export function MatrixTransition() {
             alpha: HEAD_ALPHA_MIN + Math.random() * (HEAD_ALPHA_MAX - HEAD_ALPHA_MIN),
             row: drop.headRow,
           })
-          drop.headRow += ROWS_PER_STEP
+          drop.headRow += ROWS_PER_STEP * speedMultiplier
         } else if (drop.trail.length === 0) {
           drop.headRow = Math.random() * -30
         }
@@ -136,17 +180,19 @@ export function MatrixTransition() {
         for (const entry of drop.trail) {
           const y = entry.row * FONT_SIZE
           if (y < -FONT_SIZE || y > height) continue
-          ctx.fillStyle = `rgba(${CREAM_RGB}, ${entry.alpha})`
+          const alpha = entry.alpha * fadeMultiplier
+          if (alpha < MIN_ALPHA) continue
+          ctx.fillStyle = `rgba(${CREAM_RGB}, ${alpha})`
           ctx.fillText(entry.char, x, y)
         }
       }
     }
 
-    raf = requestAnimationFrame(draw)
-
     return () => {
       cancelAnimationFrame(raf)
+      cancelAnimationFrame(scrollRaf)
       window.removeEventListener('resize', resize)
+      window.removeEventListener('scroll', handleScroll)
     }
   }, [])
 
