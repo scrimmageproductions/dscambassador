@@ -7,6 +7,7 @@ import { CommitmentStrip } from '../components/interactive/CommitmentStrip'
 import { EligibilityChecker } from '../components/interactive/EligibilityChecker'
 import { CultureMedia } from '../components/ui/CultureMedia'
 import { MatrixTransition } from '../components/ui/MatrixTransition'
+import { ScrambleHeader } from '../components/ui/ScrambleHeader'
 import { Reveal } from '../components/motion/Reveal'
 import { ParallaxImage } from '../components/motion/ParallaxImage'
 import { Link } from 'react-router-dom'
@@ -32,14 +33,24 @@ const tiles = [
   },
 ]
 
+const events = [
+  { label: "Solana Summer House '26", href: 'https://x.com/spenders_club/status/2094674911898091583?s=20' },
+  { label: 'Oracle', href: 'https://x.com/spenders_club/status/2088422443904098491?s=20' },
+  {
+    label: 'Crypto Carnival @ Consensus Miami',
+    href: 'https://x.com/spenders_club/status/2072426192859447478?s=20',
+  },
+  { label: "Solana Summer House '25", href: 'https://x.com/spenders_club/status/1967998887786057734?s=20' },
+]
+
 export function Home() {
   const ctaRef = useRef<HTMLDivElement>(null)
-  const headingRef = useRef<HTMLHeadingElement>(null)
+  const scrambleRef = useRef<HTMLHeadingElement>(null)
 
   return (
     <div>
       <div className="relative">
-        <MatrixTransition ctaRef={ctaRef} headingRef={headingRef} />
+        <MatrixTransition ctaRef={ctaRef} targetRef={scrambleRef} />
 
         <section className="relative z-10 flex min-h-[80vh] flex-col items-center justify-center overflow-hidden bg-noise hairline-b">
           <div
@@ -72,20 +83,41 @@ export function Home() {
         </section>
 
         <section className="relative z-10 mx-auto max-w-7xl px-6 py-20 md:py-24">
+          <div className="pb-16 text-center md:pb-20">
+            <ScrambleHeader ref={scrambleRef} ctaRef={ctaRef} />
+          </div>
           <div className="grid items-center gap-10 md:grid-cols-2">
             <CultureMedia className="md:order-2" />
             <Reveal stagger className="md:order-1">
               <SectionLabel>IRL motion</SectionLabel>
-              <h2
-                ref={headingRef}
-                className="mt-6 max-w-md font-display text-3xl text-cream md:text-4xl"
-              >
+              <h3 className="mt-6 max-w-md font-display text-3xl text-cream md:text-4xl">
                 Real people. Real presence.
-              </h2>
+              </h3>
               <p className="mt-4 max-w-md text-sm leading-relaxed text-cream-3">
                 Pop-ups, drops, and ecosystem activations. We don&rsquo;t just talk about the
                 movement. We show up.
               </p>
+              <p className="label-mono mt-8 text-[0.62rem] text-cream-wash">Recent activations</p>
+              <ul className="mt-3 max-w-md border-t border-cream/10">
+                {events.map((event) => (
+                  <li key={event.href} className="border-b border-cream/10">
+                    <a
+                      href={event.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="group flex items-center justify-between gap-4 py-3.5 text-sm text-cream/70 transition-colors hover:text-cream"
+                    >
+                      <span>{event.label}</span>
+                      <span
+                        aria-hidden="true"
+                        className="label-mono text-xs opacity-40 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100"
+                      >
+                        &#8599;
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </Reveal>
           </div>
         </section>

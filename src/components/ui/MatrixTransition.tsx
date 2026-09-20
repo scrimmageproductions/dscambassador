@@ -1,9 +1,8 @@
 import { useEffect, useRef, type RefObject } from 'react'
 
-// Character pool restricted to digits + dollar sign only for the ambient
-// rain -- no Katakana, no Latin letters, on brand for a finance-culture
-// club rather than a generic hacker aesthetic. The decrypted message below
-// is the one deliberate exception: real letters as its *locked* end state.
+// Character pool restricted to digits + dollar sign only -- no Katakana, no
+// Latin letters, on brand for a finance-culture club rather than a generic
+// hacker aesthetic.
 const CHARS = '$0123456789'.split('')
 const FONT_SIZE = 16
 // Time between simulation ticks, decoupled from the render loop's frame
@@ -28,17 +27,11 @@ const MIN_ALPHA = 0.02
 
 // -- Two-stage scroll choreography, keyed off a single scrollProgress in
 // [0, 1] that tracks how far the gap between the Hero's CTA row and the
-// "Real people" heading has scrolled through the viewport's vertical
+// ScrambleHeader target has scrolled through the viewport's vertical
 // center. --
 const STAGE1_START = 0.1
 const STAGE1_END = 0.5
 const FEEDER_COUNT = 3
-const LANDING_OFFSET_PX = 60
-const MESSAGE = '[ REAL WORLD PRESENCE ]'
-const MESSAGE_FONT_SIZE = 13
-const MESSAGE_LETTER_SPACING_EM = 0.18
-const MESSAGE_LOCKED_ALPHA = 0.9
-const MESSAGE_SCRAMBLE_ALPHA = 0.5
 // How quickly a "feeder" stream eases toward the landing point once
 // triggered -- a fraction of the remaining distance covered per tick.
 const FEEDER_EASE = 0.08
@@ -57,20 +50,21 @@ function clamp01(v: number) {
 /**
  * Ambient digital-rain overlay for the Hero, choreographed into a two-stage
  * scroll-driven transition as the user scrolls from the Hero's CTAs toward
- * the "Real people. Real presence." heading:
+ * the ScrambleHeader (`targetRef`) that opens the next section:
  *
  * Stage 1 (scrollProgress 0.1-0.5, "Terminal Decryption"): 2-3 of the
  * ambient streams nearest horizontal center stop free-falling and ease
- * toward a fixed landing row just above the heading, while an independent
- * message layer scrambles through digits and locks left-to-right into
- * "[ REAL WORLD PRESENCE ]".
+ * toward a landing point on the target's own top edge, at the horizontal
+ * center of the viewport -- ScrambleHeader independently locks its own
+ * text once scrollProgress crosses its own (lower) threshold, so the rain
+ * visually "arrives" first and the real DOM header follows.
  *
  * Stage 2 (scrollProgress 0.5-1.0, "Cascade Acceleration Wipe"): every
  * remaining ambient stream's fall speed ramps toward 4x and its trail decay
- * slows (stretching into a streak), while both the rain and the locked
- * message fade to fully transparent by scrollProgress = 1, at which point
- * the draw loop stops scheduling itself entirely until scrolling back
- * brings the transition into range again.
+ * slows (stretching into a streak), fading to fully transparent by
+ * scrollProgress = 1, at which point the draw loop stops scheduling itself
+ * entirely until scrolling back brings the transition into range again.
+ * The DOM header itself is unaffected by this fade -- it stays put.
  *
  * Rendered as a `position: absolute` overlay spanning a shared `relative`
  * ancestor that wraps both the Hero and the next section -- it takes no
@@ -82,10 +76,10 @@ function clamp01(v: number) {
  */
 export function MatrixTransition({
   ctaRef,
-  headingRef,
+  targetRef,
 }: {
   ctaRef: RefObject<HTMLElement | null>
-  headingRef: RefObject<HTMLElement | null>
+  targetRef: RefObject<HTMLElement | null>
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -112,34 +106,32 @@ export function MatrixTransition({
     let landingY = 0
     let landingX = 0
 
-    // 0 while the CTA-to-heading gap hasn't reached the viewport's vertical
+    // 0 while the CTA-to-target gap hasn't reached the viewport's vertical
     // center yet, ramping to 1 once that gap has fully scrolled past it.
     let scrollProgress = 0
     let scrollRaf = 0
 
-    // Landing point tracks the heading itself -- both its top edge (for Y)
-    // and its own horizontal center (for X) -- rather than the canvas's
-    // full width, so the message sits directly above the heading instead
-    // of drifting under whatever sits in the other column (e.g. the
-    // lifestyle photo) in a multi-column layout.
+    // Landing point is the horizontal center of the viewport/canvas, at the
+    // target's own top edge -- the streams converge exactly where the real
+    // DOM header (rendered separately by ScrambleHeader) begins.
     function computeLandingPoint() {
-      const heading = headingRef.current
-      if (!heading) return { x: width / 2, y: height }
-      const headingRect = heading.getBoundingClientRect()
+      const target = targetRef.current
+      if (!target) return { x: width / 2, y: height }
+      const targetRect = target.getBoundingClientRect()
       const containerRect = containerEl.getBoundingClientRect()
       return {
-        x: headingRect.left - containerRect.left + headingRect.width / 2,
-        y: headingRect.top - containerRect.top - LANDING_OFFSET_PX,
+        x: width / 2,
+        y: targetRect.top - containerRect.top,
       }
     }
 
     function computeScrollProgress() {
       const cta = ctaRef.current
-      const heading = headingRef.current
-      if (!cta || !heading) return 0
+      const target = targetRef.current
+      if (!cta || !target) return 0
       const ctaRect = cta.getBoundingClientRect()
-      const headingRect = heading.getBoundingClientRect()
-      const gapSpan = headingRect.top - ctaRect.bottom
+      const targetRect = target.getBoundingClientRect()
+      const gapSpan = targetRect.top - ctaRect.bottom
       if (gapSpan <= 0) return 1
       const viewportMid = window.innerHeight / 2
       return clamp01((viewportMid - ctaRect.bottom) / gapSpan)
@@ -170,9 +162,8 @@ export function MatrixTransition({
         ;[pool[i], pool[j]] = [pool[j], pool[i]]
       }
       const chosenCols = pool.slice(0, activeCount)
-      // Feeders converge on the heading's own horizontal center (where the
-      // message will land), not the canvas's -- those only coincide in a
-      // single-column layout.
+      // Feeders converge on the viewport's horizontal center, where the
+      // ScrambleHeader lands.
       const centerCol = landingX / FONT_SIZE
       const feederCols = new Set(
         [...chosenCols].sort((a, b) => Math.abs(a - centerCol) - Math.abs(b - centerCol)).slice(0, FEEDER_COUNT),
@@ -203,29 +194,6 @@ export function MatrixTransition({
     updateScrollProgress()
     window.addEventListener('scroll', handleScroll, { passive: true })
 
-    function drawMessage(lockProgress: number, globalFade: number) {
-      const lockedCount = Math.floor(lockProgress * MESSAGE.length)
-      ctx.font = `${MESSAGE_FONT_SIZE}px "JetBrains Mono", ui-monospace, monospace`
-      ctx.textBaseline = 'middle'
-      const charWidth = ctx.measureText('0').width
-      const advance = charWidth + MESSAGE_FONT_SIZE * MESSAGE_LETTER_SPACING_EM
-      const totalWidth = advance * MESSAGE.length
-      let x = landingX - totalWidth / 2
-      for (let i = 0; i < MESSAGE.length; i++) {
-        const target = MESSAGE[i]
-        if (target !== ' ') {
-          const locked = i < lockedCount
-          const display = locked ? target : randomChar()
-          const alpha = (locked ? MESSAGE_LOCKED_ALPHA : MESSAGE_SCRAMBLE_ALPHA) * globalFade
-          if (alpha >= MIN_ALPHA) {
-            ctx.fillStyle = `rgba(${CREAM_RGB}, ${alpha})`
-            ctx.fillText(display, x, landingY)
-          }
-        }
-        x += advance
-      }
-    }
-
     function draw(time: number) {
       // Fully faded past the transition: stop scheduling frames entirely
       // (no work at all, not even a clear) until a scroll event brings
@@ -243,7 +211,6 @@ export function MatrixTransition({
       ;({ x: landingX, y: landingY } = computeLandingPoint())
 
       const stage1Active = scrollProgress >= STAGE1_START
-      const stage1Progress = clamp01((scrollProgress - STAGE1_START) / (STAGE1_END - STAGE1_START))
       const stage2Progress = clamp01((scrollProgress - STAGE1_END) / (1 - STAGE1_END))
 
       // Stage 2 ("Cascade Acceleration Wipe"): ramps in smoothly past the
@@ -296,10 +263,6 @@ export function MatrixTransition({
           ctx.fillText(entry.char, x, y)
         }
       }
-
-      if (stage1Active) {
-        drawMessage(stage1Progress, globalFade)
-      }
     }
 
     return () => {
@@ -308,7 +271,7 @@ export function MatrixTransition({
       window.removeEventListener('resize', resize)
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [ctaRef, headingRef])
+  }, [ctaRef, targetRef])
 
   return (
     <canvas
