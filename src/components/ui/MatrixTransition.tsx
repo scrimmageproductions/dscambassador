@@ -24,6 +24,14 @@ const HEAD_ALPHA_MAX = 0.55
 const TRAIL_DECAY_BASE = 0.85
 const TRAIL_DECAY_STAGE2 = 0.95
 const MIN_ALPHA = 0.02
+// How much of the gap to targetScrollProgress the smoothed value closes per
+// rAF tick -- this is what turns a fast-scroll flick's instant jump to 1
+// into a graceful multi-frame decay instead of a hard cut.
+const SCROLL_SMOOTHING = 0.08
+// How close smoothProgress must sit to a fully-faded target before the draw
+// loop actually stops scheduling itself -- LERP asymptotically approaches
+// but never exactly reaches its target.
+const FADE_EPSILON = 0.005
 
 // -- Two-stage scroll choreography, keyed off a single scrollProgress in
 // [0, 1] that tracks how far the gap between the Hero's CTA row and the
@@ -62,9 +70,18 @@ function clamp01(v: number) {
  * Stage 2 (scrollProgress 0.5-1.0, "Cascade Acceleration Wipe"): every
  * remaining ambient stream's fall speed ramps toward 4x and its trail decay
  * slows (stretching into a streak), fading to fully transparent by
- * scrollProgress = 1, at which point the draw loop stops scheduling itself
- * entirely until scrolling back brings the transition into range again.
- * The DOM header itself is unaffected by this fade -- it stays put.
+ * scrollProgress = 1. The DOM header itself is unaffected by this fade --
+ * it stays put.
+ *
+ * Every stage above is driven by smoothProgress, a LERP'd chase of the raw
+ * scroll-derived target (updated every rAF tick regardless of the STEP_MS
+ * pacing throttle below), not the raw value itself -- a fast scroll flick
+ * can jump the target straight to 1, but smoothProgress only catches up
+ * over several frames, so drops keep sweeping and fading gracefully off the
+ * bottom instead of vanishing in a single hard cut. The draw loop only
+ * stops scheduling itself once both the target AND the smoothed value have
+ * actually settled at the fully-faded end, and resumes automatically the
+ * moment scrolling brings the transition back into range.
  *
  * Rendered as a `position: absolute` overlay spanning a shared `relative`
  * ancestor that wraps both the Hero and the next section -- it takes no
@@ -106,9 +123,14 @@ export function MatrixTransition({
     let landingY = 0
     let landingX = 0
 
-    // 0 while the CTA-to-target gap hasn't reached the viewport's vertical
-    // center yet, ramping to 1 once that gap has fully scrolled past it.
-    let scrollProgress = 0
+    // targetScrollProgress: 0 while the CTA-to-target gap hasn't reached the
+    // viewport's vertical center yet, ramping to 1 once that gap has fully
+    // scrolled past it -- this can jump discontinuously on a fast scroll
+    // flick. smoothProgress chases it via LERP every rAF tick and is what
+    // actually drives the visuals below, so a fast flick decays gracefully
+    // over several frames instead of snapping straight to the end state.
+    let targetScrollProgress = 0
+    let smoothProgress = 0
     let scrollRaf = 0
 
     // Landing point is the horizontal center of the viewport/canvas, at the
@@ -137,13 +159,20 @@ export function MatrixTransition({
       return clamp01((viewportMid - ctaRect.bottom) / gapSpan)
     }
 
+    // True only once both the raw target AND the smoothed value have
+    // settled at the fully-faded end -- i.e. there's genuinely nothing left
+    // to animate, not just "the target jumped to 1 this instant."
+    function isFullyFadedOut() {
+      return targetScrollProgress >= 1 && smoothProgress >= 1 - FADE_EPSILON
+    }
+
     function updateScrollProgress() {
       scrollRaf = 0
-      scrollProgress = computeScrollProgress()
+      targetScrollProgress = computeScrollProgress()
       // The draw loop stops scheduling itself once fully faded out (see
       // draw() below); resume it here the moment scrolling brings the
       // transition back into range.
-      if (scrollProgress < 1 && raf === 0) {
+      if (!isFullyFadedOut() && raf === 0) {
         raf = requestAnimationFrame(draw)
       }
     }
@@ -195,11 +224,16 @@ export function MatrixTransition({
     window.addEventListener('scroll', handleScroll, { passive: true })
 
     function draw(time: number) {
-      // Fully faded past the transition: stop scheduling frames entirely
-      // (no work at all, not even a clear) until a scroll event brings
-      // scrollProgress back under 1 and reschedules us from
-      // updateScrollProgress above.
-      if (scrollProgress >= 1) {
+      // Chase the (possibly discontinuous, e.g. after a fast scroll flick)
+      // target every rAF tick, independent of the STEP_MS throttle below --
+      // this is what makes the whole transition decay gracefully instead of
+      // snapping straight to its end state.
+      smoothProgress += (targetScrollProgress - smoothProgress) * SCROLL_SMOOTHING
+
+      // Only stop once there's genuinely nothing left to animate: not just
+      // "the raw scroll target reached 1," but the smoothed value (and so
+      // every visual it drives) has actually settled there too.
+      if (isFullyFadedOut()) {
         raf = 0
         ctx.clearRect(0, 0, width, height)
         return
@@ -210,8 +244,8 @@ export function MatrixTransition({
 
       ;({ x: landingX, y: landingY } = computeLandingPoint())
 
-      const stage1Active = scrollProgress >= STAGE1_START
-      const stage2Progress = clamp01((scrollProgress - STAGE1_END) / (1 - STAGE1_END))
+      const stage1Active = smoothProgress >= STAGE1_START
+      const stage2Progress = clamp01((smoothProgress - STAGE1_END) / (1 - STAGE1_END))
 
       // Stage 2 ("Cascade Acceleration Wipe"): ramps in smoothly past the
       // scrollProgress = 0.5 midpoint. All three read as 1x/base/opaque
@@ -279,8 +313,8 @@ export function MatrixTransition({
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 z-[1] block h-full w-full"
       style={{
-        maskImage: 'linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)',
-        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)',
+        maskImage: 'linear-gradient(to bottom, black 0%, black 75%, transparent 100%)',
+        WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 75%, transparent 100%)',
       }}
     />
   )
