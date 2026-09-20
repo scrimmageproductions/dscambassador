@@ -14,7 +14,7 @@ const tiles = [
     to: '/program',
     label: 'Program',
     title: 'What ambassadors do',
-    body: 'Content, IRL activations, and member onboarding: the criteria, the cadence, the rules.',
+    body: 'Content, IRL activations, and member onboarding: the criteria, the pace, the rules.',
   },
   {
     to: '/kit',

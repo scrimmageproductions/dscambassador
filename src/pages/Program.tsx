@@ -40,7 +40,7 @@ export function Program() {
           <Reveal stagger>
             <SectionLabel>What you&rsquo;ll do: minimum commitment</SectionLabel>
             <h2 className="mt-6 max-w-2xl font-display text-3xl text-cream md:text-4xl">
-              Three cadences. Nothing hidden.
+              Three expectations. Clear standards.
             </h2>
           </Reveal>
           <div className="mt-10">
