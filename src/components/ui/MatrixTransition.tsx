@@ -8,22 +8,34 @@ const FONT_SIZE = 16
 // Time between simulation ticks, decoupled from the render loop's frame
 // rate -- this is what keeps the fall "moderate" and refined instead of
 // hyperactive regardless of a 60Hz vs. 120Hz display.
-const STEP_MS = 90
-const ROWS_PER_STEP = 0.5
-// The site's ambient decorative cream tone (matches PixelCursor's aura and
-// ThermalBackground's glow), distinct from the primary text --color-cream --
-// closer to "quiet luxury" than the classic Matrix green.
-const CREAM_RGB = '232, 223, 208'
+const STEP_MS = 130
+const ROWS_PER_STEP = 0.45
+// Only draw a fresh glyph in a given column on roughly 60% of ticks, so the
+// rain reads as a scattering of ambient drips rather than a dense wall of
+// code filling every column every frame.
+const DRAW_CHANCE = 0.6
+// #E8E4D9, the exact cream requested for these characters.
+const CREAM_RGB = '232, 228, 217'
+// Must equal --color-bg exactly -- any mismatch here is what turns the
+// trail fade into a visible solid-color box against the page background.
+const BG_RGB = '10, 10, 10'
 const BG_HEX = '#0a0a0a'
-const FADE_RGBA = 'rgba(10, 10, 10, 0.08)'
+const FADE_RGBA = `rgba(${BG_RGB}, 0.1)`
 
 /**
- * Decorative canvas interstitial between the Hero and "Real people. Real
- * presence." sections: a restrained, cream-toned take on digital rain --
- * digits and `$` only, falling at a deliberately unhurried pace with
- * per-glyph opacity variance. Top/bottom gradient overlays dissolve it into
- * the surrounding --color-bg with no hard edges on either side. Purely
- * decorative (aria-hidden) and skipped entirely under
+ * Decorative canvas interstitial woven between the Hero and "Real people.
+ * Real presence." sections: a restrained, cream-toned take on digital rain
+ * -- digits and `$` only, falling at a deliberately unhurried, sparse pace.
+ *
+ * To avoid reading as a separate boxed-off section, the wrapper overlaps
+ * its neighbors with negative margins and is fully inert
+ * (`pointer-events-none`, low z-index) so it visually flows underneath the
+ * Hero's CTA row and the next section's heading rather than sitting between
+ * them as its own block. The canvas itself carries a mask-image that
+ * feathers its top and bottom to full transparency well inside its own
+ * bounds, on top of the trail fade using --color-bg exactly (not an
+ * approximation) so there's never a visible seam against the shared page
+ * background. Purely decorative (aria-hidden) and skipped entirely under
  * prefers-reduced-motion, matching this codebase's other ambient effects.
  */
 export function MatrixTransition() {
@@ -82,14 +94,16 @@ export function MatrixTransition() {
       ctx.textBaseline = 'top'
 
       for (let i = 0; i < columns; i++) {
-        const char = CHARS[Math.floor(Math.random() * CHARS.length)]
-        const x = i * FONT_SIZE
-        const y = drops[i] * FONT_SIZE
-        const alpha = 0.35 + Math.random() * 0.45
-        ctx.fillStyle = `rgba(${CREAM_RGB}, ${alpha})`
-        ctx.fillText(char, x, y)
+        if (Math.random() < DRAW_CHANCE) {
+          const char = CHARS[Math.floor(Math.random() * CHARS.length)]
+          const x = i * FONT_SIZE
+          const y = drops[i] * FONT_SIZE
+          const alpha = 0.18 + Math.random() * 0.3
+          ctx.fillStyle = `rgba(${CREAM_RGB}, ${alpha})`
+          ctx.fillText(char, x, y)
+        }
 
-        if (y > height && Math.random() > 0.975) {
+        if (drops[i] * FONT_SIZE > height && Math.random() > 0.975) {
           drops[i] = 0
         }
         drops[i] += ROWS_PER_STEP
@@ -106,17 +120,16 @@ export function MatrixTransition() {
 
   return (
     <section
-      className="matrix-transition-wrapper relative h-[50vh] min-h-[300px] max-h-[450px] overflow-hidden bg-bg"
+      className="matrix-transition-wrapper pointer-events-none relative z-0 -mt-[100px] -mb-[100px] h-[400px] overflow-hidden bg-bg bg-noise"
       aria-hidden="true"
     >
-      <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full" />
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-24 md:h-32"
-        style={{ background: `linear-gradient(to bottom, ${BG_HEX}, transparent)` }}
-      />
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 md:h-32"
-        style={{ background: `linear-gradient(to top, ${BG_HEX}, transparent)` }}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 block h-full w-full"
+        style={{
+          maskImage: 'linear-gradient(to bottom, transparent, black 35%, black 65%, transparent)',
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 35%, black 65%, transparent)',
+        }}
       />
     </section>
   )

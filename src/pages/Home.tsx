@@ -34,7 +34,7 @@ const tiles = [
 export function Home() {
   return (
     <div>
-      <section className="relative flex min-h-[80vh] flex-col items-center justify-center overflow-hidden bg-noise hairline-b">
+      <section className="relative z-10 flex min-h-[80vh] flex-col items-center justify-center overflow-hidden bg-noise">
         <div
           className="glow-gold pointer-events-none absolute left-1/2 top-1/2 h-[42rem] w-[42rem] -translate-x-1/2 -translate-y-1/2"
           aria-hidden="true"
@@ -66,7 +66,7 @@ export function Home() {
 
       <MatrixTransition />
 
-      <section className="mx-auto max-w-7xl px-6 py-20 md:py-24">
+      <section className="relative z-10 mx-auto max-w-7xl px-6 py-20 md:py-24">
         <div className="grid items-center gap-10 md:grid-cols-2">
           <CultureMedia className="md:order-2" />
           <Reveal stagger className="md:order-1">
