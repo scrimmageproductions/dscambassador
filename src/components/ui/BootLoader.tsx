@@ -1,52 +1,27 @@
-import { useEffect, useRef, useState } from 'react'
-import { CREAM_RGB, FONT_SIZE, randomChar } from './matrixRain'
+import { useEffect, useState } from 'react'
 
 const BAR_DURATION_MS = 1800
-// Cinematic exit choreography once loadingProgress hits 100% -- an
-// anticipation beat, then a slow-building zoom, then a data stream that
-// fades in partway through the zoom and outlives it slightly, then a hard
-// cut. Every duration below is deliberate: this is meant to read as
-// luxurious and Web3-architectural, not a jump-scare glitch.
-const HOLD_MS = 250 // Phase 1: hold the completed mark + bar, static.
-const PLUNGE_MS = 450 // Phase 2: full duration of the DSC scale transition.
-const PLUNGE_SCALE = 15
-// Smooth start, hard acceleration toward the end -- gives the eye time to
-// track the motion before it outruns the viewport.
-const PLUNGE_EASE = 'cubic-bezier(0.5, 0, 0.2, 1)'
-const BAR_FADE_MS = 200 // How long the bar takes to fade once the hold ends.
-// Phase 3: the data stream ignites this far into the plunge (not at its
-// start), overlapping the tail of the zoom rather than waiting for it to
-// finish -- and, unlike the mark/bar, appears with no opacity fade of its
-// own: it's at full brightness from its very first frame, cascading into
-// view via its own downward motion instead of a CSS cross-fade.
-const STREAM_DELAY_MS = 250
-// The stream keeps running this long *after* the plunge's own 450ms
-// transition has fully completed -- not just after the stream ignites --
-// so there's a deliberate beat of full-screen, fully-resolved data stream
-// once the mark has genuinely scaled past the viewport, before the cut.
-const POST_PLUNGE_STREAM_MS = 200
-// How long the stream stays mounted once ignited, derived from the above
-// so it always ends exactly POST_PLUNGE_STREAM_MS after the plunge itself.
-const STREAM_MS = PLUNGE_MS - STREAM_DELAY_MS + POST_PLUNGE_STREAM_MS
-// Pixels advanced per rendered frame (not gated by any step throttle) --
-// still brisk, but slower than a full-flood flash so it reads as code
-// streaming past rather than a wall of static.
-const STREAM_VY = 16
-// Per-frame alpha decay for each stream's trailing history -- freshly-drawn
-// glyphs are always full brightness; only older ones in the same column's
-// trail fade, which is what gives each stream its "streak" shape without
-// ever needing the whole canvas to fade in or out.
-const STREAM_TRAIL_DECAY = 0.9
-const STREAM_MIN_ALPHA = 0.02
-// ~60-70% of available column slots active, leaving negative space between
-// streams instead of a solid wall.
-const STREAM_DENSITY = 0.65
+// "Architectural Vault Split" exit choreography once loadingProgress hits
+// 100%: a lock hold, then two solid panels split apart top/bottom like a
+// museum vault shutter, revealing the live Hero underneath through the
+// widening seam, then a hard cut. Clean and mechanical -- no zoom, no
+// plunge, no rain of its own.
+const HOLD_MS = 200 // Phase 1: hold the completed mark + bar, static.
+const SPLIT_MS = 400 // Phase 2: full duration of the panel split.
+// Sharp, editorial curve: fast open, settling at the very end.
+const SPLIT_EASE = 'cubic-bezier(0.16, 1, 0.3, 1)'
+// The mark + bar fade out over only the first slice of the split, so they
+// never stretch or distort as the panels start moving.
+const CONTENT_FADE_MS = 100
+const SEAM_COLOR = 'rgba(232, 228, 217, 0.2)'
+// Matches --color-bg exactly, so the panels are indistinguishable from the
+// page's own background right up until they slide away.
+const PANEL_BG = '#0A0A0A'
 
 const BOOT_SEEN_KEY = 'dsc-boot-seen'
 
 const CREAM = '#E8DFD0'
 const CREAM_FAINT = 'rgba(232, 223, 208, 0.1)'
-const MATTE_BLACK = '#0D0D0D'
 
 function prefersReducedMotion() {
   return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -103,8 +78,8 @@ export const TOTAL_DOTS = FILLED.length
 /** The dot-matrix "DSC" mark: a matte-black-outlined pixel wordmark whose
  * interior fills in dot-by-dot (in `revealCount` order) with flat, solid
  * cream -- no gradient, no pattern, no glow, so every revealed pixel is
- * 100% sharp against the matte-black background. Unrevealed letter-pixels
- * sit at low, flat opacity until their turn comes up in the sweep. */
+ * 100% sharp against the panel background. Unrevealed letter-pixels sit at
+ * low, flat opacity until their turn comes up in the sweep. */
 function DotMatrixMark({ revealCount }: { revealCount: number }) {
   return (
     <svg
@@ -117,7 +92,7 @@ function DotMatrixMark({ revealCount }: { revealCount: number }) {
       aria-label="Digital Spenders Club"
     >
       {OUTLINE.map(({ x, y }) => (
-        <rect key={`o-${x}-${y}`} x={x * BLOCK} y={y * BLOCK} width={BLOCK} height={BLOCK} fill={MATTE_BLACK} />
+        <rect key={`o-${x}-${y}`} x={x * BLOCK} y={y * BLOCK} width={BLOCK} height={BLOCK} fill={PANEL_BG} />
       ))}
       {FILLED.map(({ x, y }) => {
         const revealed = (REVEAL_INDEX.get(`${x},${y}`) ?? 0) < revealCount
@@ -142,126 +117,31 @@ function ease(t: number) {
   return 1 - Math.pow(1 - t, 3)
 }
 
-type StreamTrailEntry = { char: string; alpha: number; row: number }
-type StreamDrop = { col: number; headRow: number; trail: StreamTrailEntry[] }
-
 /**
- * Phase 3 of the exit sequence -- "The Data Stream": mounted for the
- * `STREAM_MS` window that starts partway through the zoom and outlives it
- * by `POST_PLUNGE_STREAM_MS`. The canvas itself is at full opacity from its
- * very first frame -- no cross-fade -- because the "reveal" is the motion
- * itself: every active column's stream starts with its head at the top
- * edge of the screen and falls at `STREAM_VY` px/frame, so the whole thing
- * visibly cascades down into view rather than materializing everywhere at
- * once. Each newly-drawn glyph is full brightness; only the trailing
- * history behind each head fades (`STREAM_TRAIL_DECAY`), which is what
- * gives every stream its streak shape without the canvas ever needing to
- * fade in or out on its own. Only ~`STREAM_DENSITY` of the available
- * column slots carry a stream, so it reads as a deep data current with
- * negative space between columns instead of a solid wall of static. It
- * never outlives its effect: the parent unmounts it the instant the phase
- * ends.
- */
-function MatrixStream() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-
-  useEffect(() => {
-    const canvasRefEl = canvasRef.current
-    const ctxRef = canvasRefEl?.getContext('2d')
-    if (!canvasRefEl || !ctxRef) return
-    const canvasEl: HTMLCanvasElement = canvasRefEl
-    const ctx: CanvasRenderingContext2D = ctxRef
-
-    const dpr = Math.min(window.devicePixelRatio || 1, 2)
-    const width = window.innerWidth
-    const height = window.innerHeight
-    canvasEl.width = Math.floor(width * dpr)
-    canvasEl.height = Math.floor(height * dpr)
-    canvasEl.style.width = `${width}px`
-    canvasEl.style.height = `${height}px`
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-    ctx.font = `${FONT_SIZE}px "JetBrains Mono", ui-monospace, monospace`
-    ctx.textBaseline = 'top'
-
-    // Only ~STREAM_DENSITY of the column slots carry a stream, chosen once
-    // (not reshuffled per frame) so the gaps read as a stable current
-    // rather than per-frame flicker.
-    const totalColumnSlots = Math.ceil(width / FONT_SIZE)
-    const activeCount = Math.max(1, Math.floor(totalColumnSlots * STREAM_DENSITY))
-    const pool = Array.from({ length: totalColumnSlots }, (_, i) => i)
-    for (let i = pool.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1))
-      ;[pool[i], pool[j]] = [pool[j], pool[i]]
-    }
-    // Every stream's head starts at (or a couple of rows above) the top
-    // edge, so they cascade down from there rather than all being fully
-    // populated from frame 1 -- a slight per-column stagger reads as a
-    // cascade rather than one perfectly flat wipe.
-    const drops: StreamDrop[] = pool.slice(0, activeCount).map((col) => ({
-      col,
-      headRow: -Math.random() * 4,
-      trail: [],
-    }))
-
-    const rowsPerFrame = STREAM_VY / FONT_SIZE
-    let raf = 0
-
-    function draw() {
-      raf = requestAnimationFrame(draw)
-      ctx.clearRect(0, 0, width, height)
-      for (const drop of drops) {
-        for (const entry of drop.trail) entry.alpha *= STREAM_TRAIL_DECAY
-        drop.trail = drop.trail.filter((entry) => entry.alpha >= STREAM_MIN_ALPHA)
-        // Freshly drawn at full brightness -- the crisp entry the fade-in
-        // used to fake is now just this leading edge falling into frame.
-        drop.trail.push({ char: randomChar(), alpha: 1, row: drop.headRow })
-        drop.headRow += rowsPerFrame
-
-        const x = drop.col * FONT_SIZE
-        for (const entry of drop.trail) {
-          const y = entry.row * FONT_SIZE
-          if (y < -FONT_SIZE || y > height) continue
-          ctx.fillStyle = `rgba(${CREAM_RGB}, ${entry.alpha})`
-          ctx.fillText(entry.char, x, y)
-        }
-      }
-    }
-    raf = requestAnimationFrame(draw)
-
-    return () => cancelAnimationFrame(raf)
-  }, [])
-
-  return <canvas ref={canvasRef} aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 block" />
-}
-
-/**
- * First-visit-only boot screen. During loading (0-100%), the canvas stays
- * completely dark -- no rain, no ambient motion -- showing only a dot-matrix
- * "DSC" mark that fills in dot-by-dot, left to right, in exact lockstep
- * with a single `loadingProgress` value (0-100) driven by
+ * First-visit-only boot screen. During loading (0-100%), the two vault
+ * panels sit together covering the full viewport, showing only a
+ * dot-matrix "DSC" mark that fills in dot-by-dot, left to right, in exact
+ * lockstep with a single `loadingProgress` value (0-100) driven by
  * requestAnimationFrame over ~1.8s, plus a flat, solid-cream hairline
  * progress bar reading off that same value. No drop-shadows, glows, or
- * blur filters anywhere -- every pixel and the bar are 100% sharp cream
- * against matte black.
+ * blur filters anywhere -- every pixel and the bar are 100% sharp cream.
  *
- * Once loadingProgress reaches 100%, a deliberately paced, cinematic exit
- * plays out rather than an instant cut:
- *   1. Hold (250ms) -- the completed mark and full bar sit static, letting
- *      the eye register that loading finished.
- *   2. Plunge (450ms) -- the bar fades out over BAR_FADE_MS as the DSC mark
- *      begins scaling `1 -> 15` through its own center
- *      (`cubic-bezier(0.5, 0, 0.2, 1)`: smooth start, hard acceleration).
- *   3. Data stream -- STREAM_DELAY_MS into the plunge (not at its start), a
- *      partial-density (~STREAM_DENSITY) matrix stream ignites at full
- *      brightness (no fade of its own -- it cascades down from the top
- *      edge instead) and keeps running until POST_PLUNGE_STREAM_MS after
- *      the plunge's own 450ms has fully played out, so there's a
- *      deliberate beat of fully-resolved data stream once the mark has
- *      genuinely cleared the viewport.
- *   4. Hard cut -- the instant that run finishes, the whole overlay
- *      unmounts with no fade, straight into the live Hero underneath.
- * Skips the whole plunge/stream for prefers-reduced-motion and cuts
- * straight from 100% to unmounted instead.
+ * Once loadingProgress reaches 100%, a clean, mechanical "Architectural
+ * Vault Split" plays out:
+ *   1. Lock hold (200ms) -- the completed mark and full bar sit static, so
+ *      the 100% state registers cleanly.
+ *   2. Hairline seam & panel split (400ms) -- a 1px hairline appears along
+ *      the exact vertical center, the mark and bar fade out over the first
+ *      CONTENT_FADE_MS of this phase (so they never stretch or distort),
+ *      and the two panels slide apart -- the top one translateY(-100%),
+ *      the bottom one translateY(100%) -- on a sharp, editorial curve
+ *      (`cubic-bezier(0.16, 1, 0.3, 1)`), revealing the live Hero
+ *      underneath (whose own ambient rain has been running the entire
+ *      time behind this overlay) through the widening seam.
+ *   3. Hard cut -- the instant the panels clear the viewport bounds at the
+ *      400ms mark, the whole overlay unmounts with no fade.
+ * Skips the whole split for prefers-reduced-motion and cuts straight from
+ * 100% to unmounted instead.
  *
  * Gated on sessionStorage so it fires exactly once per browser session --
  * never on client-side route navigation (App itself only mounts once per
@@ -274,14 +154,13 @@ export function BootLoader() {
     sessionStorage.setItem(BOOT_SEEN_KEY, '1')
     return true
   })
-  const [phase, setPhase] = useState<'loading' | 'holding' | 'plunging' | 'streaming' | 'done'>('loading')
+  const [phase, setPhase] = useState<'loading' | 'holding' | 'splitting' | 'done'>('loading')
   const [loadingProgress, setLoadingProgress] = useState(0)
 
   useEffect(() => {
     if (!shouldRender) return
     let raf: number
     let holdTimer: ReturnType<typeof setTimeout> | undefined
-    let streamDelayTimer: ReturnType<typeof setTimeout> | undefined
     let doneTimer: ReturnType<typeof setTimeout> | undefined
     const start = performance.now()
 
@@ -295,11 +174,8 @@ export function BootLoader() {
       } else {
         setPhase('holding')
         holdTimer = setTimeout(() => {
-          setPhase('plunging')
-          streamDelayTimer = setTimeout(() => {
-            setPhase('streaming')
-            doneTimer = setTimeout(() => setPhase('done'), STREAM_MS)
-          }, STREAM_DELAY_MS)
+          setPhase('splitting')
+          doneTimer = setTimeout(() => setPhase('done'), SPLIT_MS)
         }, HOLD_MS)
       }
     }
@@ -308,7 +184,6 @@ export function BootLoader() {
     return () => {
       cancelAnimationFrame(raf)
       clearTimeout(holdTimer)
-      clearTimeout(streamDelayTimer)
       clearTimeout(doneTimer)
     }
   }, [shouldRender])
@@ -316,42 +191,45 @@ export function BootLoader() {
   if (!shouldRender || phase === 'done') return null
 
   const revealCount = Math.floor((loadingProgress / 100) * TOTAL_DOTS)
-  // The mark starts (and keeps) scaling from 'plunging' onward -- 'streaming'
-  // doesn't reset or reapply the transition, so the CSS transition already
-  // in flight just keeps running underneath the stream.
-  const isPlunging = phase === 'plunging' || phase === 'streaming'
+  const isSplitting = phase === 'splitting'
 
   return (
-    <div
-      className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden"
-      style={{ backgroundColor: MATTE_BLACK, transition: 'none' }}
-    >
-      {phase === 'streaming' && <MatrixStream />}
+    <div className="fixed inset-0 z-[200] overflow-hidden" style={{ transition: 'none' }}>
+      <div
+        className="absolute inset-x-0 top-0 z-10 flex items-end justify-center"
+        style={{
+          height: '50%',
+          backgroundColor: PANEL_BG,
+          borderBottom: isSplitting ? `1px solid ${SEAM_COLOR}` : 'none',
+          transform: isSplitting ? 'translateY(-100%)' : 'translateY(0)',
+          transition: isSplitting ? `transform ${SPLIT_MS}ms ${SPLIT_EASE}` : 'none',
+        }}
+      />
+      <div
+        className="absolute inset-x-0 bottom-0 z-10"
+        style={{
+          height: '50%',
+          backgroundColor: PANEL_BG,
+          transform: isSplitting ? 'translateY(100%)' : 'translateY(0)',
+          transition: isSplitting ? `transform ${SPLIT_MS}ms ${SPLIT_EASE}` : 'none',
+        }}
+      />
 
-      <div className="relative z-10 flex flex-col items-center">
-        <div
-          style={{
-            transform: isPlunging ? `scale(${PLUNGE_SCALE})` : 'scale(1)',
-            transformOrigin: 'center',
-            transition: phase === 'plunging' ? `transform ${PLUNGE_MS}ms ${PLUNGE_EASE}` : 'none',
-          }}
-        >
-          <DotMatrixMark revealCount={revealCount} />
+      <div
+        className="absolute inset-0 z-20 flex flex-col items-center justify-center"
+        style={{
+          opacity: isSplitting ? 0 : 1,
+          transition: isSplitting ? `opacity ${CONTENT_FADE_MS}ms ease-out` : 'none',
+        }}
+      >
+        <DotMatrixMark revealCount={revealCount} />
+
+        <div className="relative mt-10 h-[2px] w-40 overflow-hidden rounded-full bg-cream/10">
+          <div
+            className="absolute inset-y-0 left-0 rounded-full bg-cream"
+            style={{ width: `${loadingProgress}%`, willChange: 'width' }}
+          />
         </div>
-
-        {phase !== 'streaming' && (
-          <div className="relative mt-10 h-[2px] w-40 overflow-hidden rounded-full bg-cream/10">
-            <div
-              className="absolute inset-y-0 left-0 rounded-full bg-cream"
-              style={{
-                width: `${loadingProgress}%`,
-                opacity: phase === 'plunging' ? 0 : 1,
-                transition: phase === 'plunging' ? `opacity ${BAR_FADE_MS}ms ease-out` : 'none',
-                willChange: 'width',
-              }}
-            />
-          </div>
-        )}
       </div>
     </div>
   )
