@@ -19,11 +19,22 @@ const SCRAMBLE_TICK_MS = 40 // How often the scrambled characters re-randomize.
 const SCRAMBLE_FONT_SIZE = '44px'
 const SCRAMBLE_BAR_WIDTH = '4ch'
 const LOCK_COLOR = '#FFFFFF'
-const CASCADE_MS = 300 // Phase 2: full-viewport matrix cascade before the cut.
+const CASCADE_MS = 500 // Phase 2: full-viewport matrix cascade before the cut.
 // Both the "released" DSC columns and the ambient fill-in columns share
 // this velocity, so by hard-cut time the whole screen already matches the
 // Hero's own ambient rain speed with no visible seam.
 const CASCADE_VY = 18
+// ~85-90% of ambient column slots actually carry a stream (the released
+// trio is always active regardless) -- a rich, full-screen wall with just
+// enough negative space that it doesn't read as fully saturated static.
+const CASCADE_DENSITY = 0.88
+// Per-frame alpha decay for the released columns' trail -- slightly slower
+// than before so each one leaves a longer, more visible streak behind it.
+const CASCADE_TRAIL_DECAY = 0.92
+const CASCADE_MIN_ALPHA = 0.02
+// How often every visible glyph re-randomizes independent of its motion --
+// this is what makes the cascade visibly flicker rather than just fall.
+const CASCADE_CHAR_TICK_MS = 35
 // Outward wave ignition: each ambient column's ignite delay grows with its
 // distance from center, capped low so the whole wave still reads as one
 // fast beat rather than a visible build-up.
@@ -180,6 +191,7 @@ type CascadeColumn = {
   headRow: number
   trail: CascadeEntry[]
   released: boolean
+  active: boolean
   delayMs: number
   ignited: boolean
 }
@@ -189,14 +201,21 @@ type CascadeColumn = {
  * window. The three columns under where the scrambled DSC text just sat
  * are "released" -- their head starts at that same mid-screen row and
  * grows a falling trail downward from there, exactly like the scrambled
- * characters dropping into rain. Every other column is "ambient": each one
- * ignites (pre-fills top-to-bottom in a single frame, then keeps flowing)
- * only once its own `delayMs` has elapsed, which grows with distance from
- * center (`RADIAL_DELAY_PER_COL_MS` per column, capped at
+ * characters dropping into rain. Of the remaining column slots, only
+ * ~CASCADE_DENSITY of them are "active" (chosen once, at random, so the
+ * gaps read as stable negative space rather than per-frame flicker); every
+ * inactive slot is skipped entirely and never draws. Each active ambient
+ * column ignites (pre-fills top-to-bottom in a single frame, then keeps
+ * flowing) only once its own `delayMs` has elapsed, which grows with
+ * distance from center (`RADIAL_DELAY_PER_COL_MS` per column, capped at
  * `RADIAL_DELAY_MAX_MS`) -- an outward wave rippling from the released
  * center columns to the edges, rather than every column popping in at
- * once. Both kinds share CASCADE_VY, so the whole screen is already
- * moving at the Hero's own ambient-rain speed by the time this unmounts.
+ * once. Every visible glyph also re-randomizes on its own
+ * `CASCADE_CHAR_TICK_MS` clock, independent of its downward motion, so the
+ * whole cascade visibly flickers as it falls rather than just sliding.
+ * Both released and ambient columns share CASCADE_VY, so the whole screen
+ * is already moving at the Hero's own ambient-rain speed by the time this
+ * unmounts.
  *
  * Column x-positions (`col * FONT_SIZE`, no left/right padding, columns
  * numbered from the same `Math.floor(width / FONT_SIZE)` count) are
@@ -238,8 +257,18 @@ function MatrixCascade() {
     const centerCol = Math.round(width / 2 / FONT_SIZE)
     const centerRow = height / 2 / FONT_SIZE
     // The three columns the scrambled "DSC" text just occupied -- the wave's
-    // epicenter.
+    // epicenter. Always active, unaffected by the density roll below.
     const releasedCols = new Set([centerCol - 1, centerCol, centerCol + 1])
+
+    // ~CASCADE_DENSITY of the remaining slots are active, chosen once (not
+    // reshuffled per frame) so the negative-space gaps read as a stable
+    // part of the wall rather than flickering in and out.
+    const ambientSlots = Array.from({ length: totalColumns }, (_, col) => col).filter((col) => !releasedCols.has(col))
+    for (let i = ambientSlots.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[ambientSlots[i], ambientSlots[j]] = [ambientSlots[j], ambientSlots[i]]
+    }
+    const activeAmbientCols = new Set(ambientSlots.slice(0, Math.round(ambientSlots.length * CASCADE_DENSITY)))
 
     const columns: CascadeColumn[] = Array.from({ length: totalColumns }, (_, col) => {
       const released = releasedCols.has(col)
@@ -248,6 +277,7 @@ function MatrixCascade() {
         headRow: released ? centerRow : totalRows,
         trail: [],
         released,
+        active: released || activeAmbientCols.has(col),
         delayMs: released ? 0 : Math.min(Math.abs(col - centerCol) * RADIAL_DELAY_PER_COL_MS, RADIAL_DELAY_MAX_MS),
         ignited: released,
       }
@@ -255,16 +285,27 @@ function MatrixCascade() {
 
     const rowsPerFrame = CASCADE_VY / FONT_SIZE
     const mountedAt = performance.now()
+    let lastCharTick = 0
     let raf = 0
 
     function draw(now: number) {
       raf = requestAnimationFrame(draw)
       const elapsed = now - mountedAt
+      // Every glyph re-randomizes on this clock, independent of its own
+      // downward motion -- the flicker that reads as "cascading code"
+      // rather than a smooth, static slide.
+      const refreshChars = now - lastCharTick >= CASCADE_CHAR_TICK_MS
+      if (refreshChars) lastCharTick = now
+
       ctx.clearRect(0, 0, width, height)
       for (const column of columns) {
+        if (!column.active) continue
         if (column.released) {
-          for (const entry of column.trail) entry.alpha *= 0.9
-          column.trail = column.trail.filter((entry) => entry.alpha >= 0.02)
+          for (const entry of column.trail) {
+            entry.alpha *= CASCADE_TRAIL_DECAY
+            if (refreshChars) entry.char = randomChar()
+          }
+          column.trail = column.trail.filter((entry) => entry.alpha >= CASCADE_MIN_ALPHA)
           column.trail.push({ char: randomChar(), alpha: 1, row: column.headRow })
           column.headRow += rowsPerFrame
         } else {
@@ -286,10 +327,8 @@ function MatrixCascade() {
           // continuously full without ever needing to rebuild its trail.
           for (const entry of column.trail) {
             entry.row += rowsPerFrame
-            if (entry.row * FONT_SIZE > height) {
-              entry.row -= totalRows + 1
-              entry.char = randomChar()
-            }
+            if (entry.row * FONT_SIZE > height) entry.row -= totalRows + 1
+            if (refreshChars) entry.char = randomChar()
           }
         }
 
@@ -318,7 +357,7 @@ function MatrixCascade() {
  * that same value. No drop-shadows, glows, or blur filters anywhere.
  *
  * Once loadingProgress reaches 100%, a "Terminal Decryption Scramble &
- * Matrix Rain Cascade" exit plays out, under 600ms total:
+ * Matrix Rain Cascade" exit plays out, under 750ms total:
  *   1a. Pause (100ms) -- the completed mark and full bar sit static.
  *   1b. Scramble (120ms) -- the pixel mark swaps for three real glyphs
  *       cycling through the `$0123456789` pool every SCRAMBLE_TICK_MS,
@@ -327,18 +366,22 @@ function MatrixCascade() {
  *       font as the scramble text, so it always matches).
  *   1c. Lock (30ms, ~220-250ms) -- the cycling freezes on the literal
  *       string "[DSC]" in pure white, held static right up to the release.
- *   2.  Cascade (300ms) -- the instant the lock ends, those same three
+ *   2.  Cascade (500ms) -- the instant the lock ends, those same three
  *       columns "release" into falling rain (in standard cream again) from
- *       their own mid-screen position, while every other column ignites in
- *       an outward wave from center (each column's ignite delay grows with
- *       its distance from center, capped low) rather than all at once, all
- *       at the same CASCADE_VY as the Hero's own ambient rain running
- *       underneath (Home mounts immediately; this is just an overlay on
- *       top of it) and on the identical column grid, so there's no
+ *       their own mid-screen position, while ~CASCADE_DENSITY of every
+ *       other column slot ignites in an outward wave from center (each
+ *       column's ignite delay grows with its distance from center, capped
+ *       low) rather than all at once -- a dense, mostly-full wall with just
+ *       enough gaps to avoid reading as solid static. Every visible glyph
+ *       also re-randomizes on its own fast clock (CASCADE_CHAR_TICK_MS),
+ *       independent of its fall, so the whole thing visibly flickers. All
+ *       active columns share CASCADE_VY, matching the Hero's own ambient
+ *       rain speed underneath (Home mounts immediately; this is just an
+ *       overlay on top of it) on the identical column grid, so there's no
  *       horizontal jump at the handoff. The overlay's background stays
  *       100% solid throughout -- the Hero stays fully hidden behind the
  *       rain curtain until the hard cut, not bleeding through early.
- *   3.  Hard cut -- the instant the cascade's 300ms is up, the whole
+ *   3.  Hard cut -- the instant the cascade's 500ms is up, the whole
  *       overlay unmounts with no fade, snapping straight from the solid
  *       rain curtain to the fully revealed Hero.
  * Skips straight from 100% to unmounted for prefers-reduced-motion.
