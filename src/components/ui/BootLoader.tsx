@@ -4,15 +4,16 @@ import { CREAM_RGB, FONT_SIZE, HEAD_ALPHA_MAX, HEAD_ALPHA_MIN, randomChar } from
 const BAR_DURATION_MS = 1800
 // "Terminal Decryption Scramble & Matrix Rain Cascade" exit choreography,
 // fired the instant loadingProgress hits 100%. Every duration below is
-// deliberate -- the whole sequence stays under 600ms total so it reads as
-// fast and sharp, never a stall or a glitch.
+// deliberate -- the whole sequence runs ~950ms so the scramble has time to
+// actually read as a character transformation before the cascade takes over.
 const PAUSE_MS = 100 // Phase 1a: static pause right at 100%, before scrambling.
 // Phase 1b splits into an active scramble, then a brief frozen "lock" just
-// before release -- 100 + 120 + 30 = 250ms, exactly the "~220ms-250ms"
-// window the lock-snap flash occupies.
-const SCRAMBLE_MS = 120 // Rapid character-cycle + bar collapse.
+// before release -- 100 + 320 + 30 = 450ms. Long enough (at ~35ms/tick, each
+// glyph slot cycles through ~8-10 random characters) for the scramble to
+// actually read as a transformation, not a blink.
+const SCRAMBLE_MS = 320 // Rapid character-cycle + bar collapse.
 const LOCK_MS = 30 // Frozen "[DSC]" in pure white right before release.
-const SCRAMBLE_TICK_MS = 40 // How often the scrambled characters re-randomize.
+const SCRAMBLE_TICK_MS = 35 // How often the scrambled characters re-randomize.
 // Monospace size shared by the scramble text and the bar's `ch`-based
 // collapse width below, so the bar always ends up matching the text's
 // actual rendered width regardless of font metrics.
@@ -357,14 +358,16 @@ function MatrixCascade() {
  * that same value. No drop-shadows, glows, or blur filters anywhere.
  *
  * Once loadingProgress reaches 100%, a "Terminal Decryption Scramble &
- * Matrix Rain Cascade" exit plays out, under 750ms total:
+ * Matrix Rain Cascade" exit plays out, ~950ms total:
  *   1a. Pause (100ms) -- the completed mark and full bar sit static.
- *   1b. Scramble (120ms) -- the pixel mark swaps for three real glyphs
- *       cycling through the `$0123456789` pool every SCRAMBLE_TICK_MS,
- *       while the bar collapses inward from its full width to
- *       SCRAMBLE_BAR_WIDTH (sized in `ch` units off the same monospace
- *       font as the scramble text, so it always matches).
- *   1c. Lock (30ms, ~220-250ms) -- the cycling freezes on the literal
+ *   1b. Scramble (320ms) -- the pixel mark swaps for three real glyphs
+ *       cycling through the `$0123456789` pool every SCRAMBLE_TICK_MS
+ *       (~35ms, so each slot visibly cycles through ~8-10 characters
+ *       before locking), while the bar collapses inward from its full
+ *       width to SCRAMBLE_BAR_WIDTH over that same 320ms (sized in `ch`
+ *       units off the same monospace font as the scramble text, so it
+ *       always matches) -- both finish settling right as the lock fires.
+ *   1c. Lock (30ms, ~420-450ms) -- the cycling freezes on the literal
  *       string "[DSC]" in pure white, held static right up to the release.
  *   2.  Cascade (500ms) -- the instant the lock ends, those same three
  *       columns "release" into falling rain (in standard cream again) from
