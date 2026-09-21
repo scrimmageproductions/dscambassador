@@ -15,15 +15,29 @@ const PLUNGE_SCALE = 15
 const PLUNGE_EASE = 'cubic-bezier(0.5, 0, 0.2, 1)'
 const BAR_FADE_MS = 200 // How long the bar takes to fade once the hold ends.
 // Phase 3: the data stream ignites this far into the plunge (not at its
-// start), and keeps running for STREAM_MS after that -- overlapping the
-// tail of the zoom rather than waiting for it to finish.
+// start), overlapping the tail of the zoom rather than waiting for it to
+// finish -- and, unlike the mark/bar, appears with no opacity fade of its
+// own: it's at full brightness from its very first frame, cascading into
+// view via its own downward motion instead of a CSS cross-fade.
 const STREAM_DELAY_MS = 250
-const STREAM_FADE_MS = 200
-const STREAM_MS = 300
+// The stream keeps running this long *after* the plunge's own 450ms
+// transition has fully completed -- not just after the stream ignites --
+// so there's a deliberate beat of full-screen, fully-resolved data stream
+// once the mark has genuinely scaled past the viewport, before the cut.
+const POST_PLUNGE_STREAM_MS = 200
+// How long the stream stays mounted once ignited, derived from the above
+// so it always ends exactly POST_PLUNGE_STREAM_MS after the plunge itself.
+const STREAM_MS = PLUNGE_MS - STREAM_DELAY_MS + POST_PLUNGE_STREAM_MS
 // Pixels advanced per rendered frame (not gated by any step throttle) --
 // still brisk, but slower than a full-flood flash so it reads as code
 // streaming past rather than a wall of static.
 const STREAM_VY = 16
+// Per-frame alpha decay for each stream's trailing history -- freshly-drawn
+// glyphs are always full brightness; only older ones in the same column's
+// trail fade, which is what gives each stream its "streak" shape without
+// ever needing the whole canvas to fade in or out.
+const STREAM_TRAIL_DECAY = 0.9
+const STREAM_MIN_ALPHA = 0.02
 // ~60-70% of available column slots active, leaving negative space between
 // streams instead of a solid wall.
 const STREAM_DENSITY = 0.65
@@ -128,27 +142,28 @@ function ease(t: number) {
   return 1 - Math.pow(1 - t, 3)
 }
 
+type StreamTrailEntry = { char: string; alpha: number; row: number }
+type StreamDrop = { col: number; headRow: number; trail: StreamTrailEntry[] }
+
 /**
- * Phase 3 of the exit sequence -- "The Data Stream": mounted only for the
- * `STREAM_MS` window that starts partway through the zoom. Fades in over
- * `STREAM_FADE_MS` (a plain opacity transition, triggered by flipping
- * `visible` one frame after mount) rather than snapping to full brightness,
- * and only ~`STREAM_DENSITY` of the available column slots carry a stream,
- * so it reads as a deep data current with negative space between columns
- * instead of a solid wall of static. Each active column is redrawn every
- * frame with fresh glyphs and a bottom-heavy brightness gradient (long
- * streaks fading upward), shoved down by `STREAM_VY` px/frame -- brisk, but
- * slower than the flood-style flash this replaced. It never outlives its
- * effect: the parent unmounts it the instant the phase ends.
+ * Phase 3 of the exit sequence -- "The Data Stream": mounted for the
+ * `STREAM_MS` window that starts partway through the zoom and outlives it
+ * by `POST_PLUNGE_STREAM_MS`. The canvas itself is at full opacity from its
+ * very first frame -- no cross-fade -- because the "reveal" is the motion
+ * itself: every active column's stream starts with its head at the top
+ * edge of the screen and falls at `STREAM_VY` px/frame, so the whole thing
+ * visibly cascades down into view rather than materializing everywhere at
+ * once. Each newly-drawn glyph is full brightness; only the trailing
+ * history behind each head fades (`STREAM_TRAIL_DECAY`), which is what
+ * gives every stream its streak shape without the canvas ever needing to
+ * fade in or out on its own. Only ~`STREAM_DENSITY` of the available
+ * column slots carry a stream, so it reads as a deep data current with
+ * negative space between columns instead of a solid wall of static. It
+ * never outlives its effect: the parent unmounts it the instant the phase
+ * ends.
  */
 function MatrixStream() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const raf = requestAnimationFrame(() => setVisible(true))
-    return () => cancelAnimationFrame(raf)
-  }, [])
 
   useEffect(() => {
     const canvasRefEl = canvasRef.current
@@ -178,27 +193,36 @@ function MatrixStream() {
       const j = Math.floor(Math.random() * (i + 1))
       ;[pool[i], pool[j]] = [pool[j], pool[i]]
     }
-    const activeCols = pool.slice(0, activeCount)
+    // Every stream's head starts at (or a couple of rows above) the top
+    // edge, so they cascade down from there rather than all being fully
+    // populated from frame 1 -- a slight per-column stagger reads as a
+    // cascade rather than one perfectly flat wipe.
+    const drops: StreamDrop[] = pool.slice(0, activeCount).map((col) => ({
+      col,
+      headRow: -Math.random() * 4,
+      trail: [],
+    }))
 
-    const totalRows = Math.ceil(height / FONT_SIZE) + 2
-    let yOffset = 0
+    const rowsPerFrame = STREAM_VY / FONT_SIZE
     let raf = 0
 
     function draw() {
       raf = requestAnimationFrame(draw)
-      yOffset = (yOffset + STREAM_VY) % FONT_SIZE
       ctx.clearRect(0, 0, width, height)
-      for (const col of activeCols) {
-        const x = col * FONT_SIZE
-        for (let row = -2; row <= totalRows; row++) {
-          const y = row * FONT_SIZE + yOffset
+      for (const drop of drops) {
+        for (const entry of drop.trail) entry.alpha *= STREAM_TRAIL_DECAY
+        drop.trail = drop.trail.filter((entry) => entry.alpha >= STREAM_MIN_ALPHA)
+        // Freshly drawn at full brightness -- the crisp entry the fade-in
+        // used to fake is now just this leading edge falling into frame.
+        drop.trail.push({ char: randomChar(), alpha: 1, row: drop.headRow })
+        drop.headRow += rowsPerFrame
+
+        const x = drop.col * FONT_SIZE
+        for (const entry of drop.trail) {
+          const y = entry.row * FONT_SIZE
           if (y < -FONT_SIZE || y > height) continue
-          // Streaks stretched long: brightest at the bottom leading edge,
-          // fading toward the top of the stream.
-          const depth = (y + FONT_SIZE) / (height + FONT_SIZE * 2)
-          const alpha = 0.35 + depth * 0.65
-          ctx.fillStyle = `rgba(${CREAM_RGB}, ${alpha})`
-          ctx.fillText(randomChar(), x, y)
+          ctx.fillStyle = `rgba(${CREAM_RGB}, ${entry.alpha})`
+          ctx.fillText(entry.char, x, y)
         }
       }
     }
@@ -207,14 +231,7 @@ function MatrixStream() {
     return () => cancelAnimationFrame(raf)
   }, [])
 
-  return (
-    <canvas
-      ref={canvasRef}
-      aria-hidden="true"
-      className="pointer-events-none absolute inset-0 z-20 block"
-      style={{ opacity: visible ? 1 : 0, transition: `opacity ${STREAM_FADE_MS}ms ease-out` }}
-    />
-  )
+  return <canvas ref={canvasRef} aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 block" />
 }
 
 /**
@@ -234,10 +251,14 @@ function MatrixStream() {
  *   2. Plunge (450ms) -- the bar fades out over BAR_FADE_MS as the DSC mark
  *      begins scaling `1 -> 15` through its own center
  *      (`cubic-bezier(0.5, 0, 0.2, 1)`: smooth start, hard acceleration).
- *   3. Data stream -- STREAM_DELAY_MS into the plunge (not at its start),
- *      a partial-density (~STREAM_DENSITY) matrix stream fades in over the
- *      still-zooming mark and runs for STREAM_MS.
- *   4. Hard cut -- the instant the stream's run finishes, the whole overlay
+ *   3. Data stream -- STREAM_DELAY_MS into the plunge (not at its start), a
+ *      partial-density (~STREAM_DENSITY) matrix stream ignites at full
+ *      brightness (no fade of its own -- it cascades down from the top
+ *      edge instead) and keeps running until POST_PLUNGE_STREAM_MS after
+ *      the plunge's own 450ms has fully played out, so there's a
+ *      deliberate beat of fully-resolved data stream once the mark has
+ *      genuinely cleared the viewport.
+ *   4. Hard cut -- the instant that run finishes, the whole overlay
  *      unmounts with no fade, straight into the live Hero underneath.
  * Skips the whole plunge/stream for prefers-reduced-motion and cuts
  * straight from 100% to unmounted instead.
