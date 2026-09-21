@@ -205,9 +205,10 @@ type CascadeColumn = {
  * that same index in the Hero's canvas, guaranteeing zero horizontal jump
  * at the handoff.
  *
- * The container behind this canvas goes transparent the instant this
- * mounts, so the live Hero bleeds through the gaps between characters
- * immediately -- the "seamless handoff" the hard cut needs.
+ * The container behind this canvas stays 100% solid (never transparent) for
+ * the cascade's entire run -- the Hero underneath stays fully hidden until
+ * the hard cut, so the two stages (solid rain curtain, then the live page)
+ * read as completely distinct rather than bleeding into each other.
  */
 function MatrixCascade() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -334,9 +335,12 @@ function MatrixCascade() {
  *       at the same CASCADE_VY as the Hero's own ambient rain running
  *       underneath (Home mounts immediately; this is just an overlay on
  *       top of it) and on the identical column grid, so there's no
- *       horizontal jump at the handoff.
+ *       horizontal jump at the handoff. The overlay's background stays
+ *       100% solid throughout -- the Hero stays fully hidden behind the
+ *       rain curtain until the hard cut, not bleeding through early.
  *   3.  Hard cut -- the instant the cascade's 300ms is up, the whole
- *       overlay unmounts with no fade.
+ *       overlay unmounts with no fade, snapping straight from the solid
+ *       rain curtain to the fully revealed Hero.
  * Skips straight from 100% to unmounted for prefers-reduced-motion.
  *
  * Gated on sessionStorage so it fires exactly once per browser session --
@@ -401,10 +405,7 @@ export function BootLoader() {
   const isCascading = phase === 'cascading'
 
   return (
-    <div
-      className="fixed inset-0 z-[200] overflow-hidden"
-      style={{ backgroundColor: isCascading ? 'transparent' : PANEL_BG, transition: 'none' }}
-    >
+    <div className="fixed inset-0 z-[200] overflow-hidden" style={{ backgroundColor: PANEL_BG, transition: 'none' }}>
       {isCascading && <MatrixCascade />}
 
       {!isCascading && (
