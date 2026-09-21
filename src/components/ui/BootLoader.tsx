@@ -1,9 +1,25 @@
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
+import {
+  CREAM_RGB,
+  FONT_SIZE,
+  HEAD_ALPHA_MAX,
+  HEAD_ALPHA_MIN,
+  MAX_COLUMNS,
+  MIN_ALPHA,
+  randomChar,
+  ROWS_PER_STEP,
+  STEP_MS,
+  TRAIL_DECAY_BASE,
+} from './matrixRain'
 
 const BAR_DURATION_MS = 1800
 const HOLD_MS = 200
-const FADE_MS = 300
+// "Velocity Stretch / Motion Blur Blast": the rapid exit sequence once the
+// bar and dot-matrix mark hit 100% -- rain speed and canvas stretch both
+// snap instantly, hold for this long, then the whole overlay hard-cuts.
+const BLAST_MS = 150
+const BLAST_VELOCITY = 4
+const BLAST_SCALE_Y = 3
 
 const BOOT_SEEN_KEY = 'dsc-boot-seen'
 
@@ -113,14 +129,144 @@ function ease(t: number) {
   return 1 - Math.pow(1 - t, 3)
 }
 
+type BootTrailEntry = { char: string; alpha: number; row: number }
+type BootDrop = { col: number; headRow: number; trail: BootTrailEntry[] }
+
+/**
+ * The boot screen's own ambient digit-rain background -- continuous free
+ * fall, no scroll-linking, sharing MatrixTransition's exact constants
+ * (font, char pool, color, alpha, decay) so the look is identical to the
+ * Hero's own rain it hands off into. `blasting` is read through a ref
+ * inside the animation loop (never a dependency of the setup effect) so
+ * flipping it can't tear down and restart the falling drops: the fall
+ * speed jumps to 4x on the very next tick, and the scaleY stretch below is
+ * applied straight to the canvas's inline style, both with zero transition
+ * so the "instant" snap the velocity-stretch exit calls for is real.
+ */
+function BootRain({ blasting }: { blasting: boolean }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const blastingRef = useRef(blasting)
+
+  useEffect(() => {
+    blastingRef.current = blasting
+  }, [blasting])
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const canvasRefEl = canvasRef.current
+    const ctxRef = canvasRefEl?.getContext('2d')
+    if (!canvasRefEl || !ctxRef) return
+
+    // Re-bind as explicitly non-nullable: TS's control-flow narrowing from
+    // the guard above doesn't extend into the nested resize/draw closures.
+    const canvasEl: HTMLCanvasElement = canvasRefEl
+    const ctx: CanvasRenderingContext2D = ctxRef
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+    let width = 0
+    let height = 0
+    let drops: BootDrop[] = []
+    let raf = 0
+    let lastStep = 0
+
+    function spawnDrops() {
+      const totalColumns = Math.max(1, Math.floor(width / FONT_SIZE))
+      const activeCount = Math.min(MAX_COLUMNS, totalColumns)
+      const pool = Array.from({ length: totalColumns }, (_, i) => i)
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[pool[i], pool[j]] = [pool[j], pool[i]]
+      }
+      drops = pool.slice(0, activeCount).map((col) => ({ col, headRow: Math.random() * -30, trail: [] }))
+    }
+
+    function resize() {
+      width = window.innerWidth
+      height = window.innerHeight
+      canvasEl.width = Math.floor(width * dpr)
+      canvasEl.height = Math.floor(height * dpr)
+      canvasEl.style.width = `${width}px`
+      canvasEl.style.height = `${height}px`
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      spawnDrops()
+    }
+
+    resize()
+    window.addEventListener('resize', resize)
+
+    function draw(time: number) {
+      raf = requestAnimationFrame(draw)
+      if (time - lastStep < STEP_MS) return
+      lastStep = time
+
+      const velocityMultiplier = blastingRef.current ? BLAST_VELOCITY : 1
+
+      ctx.clearRect(0, 0, width, height)
+      ctx.font = `${FONT_SIZE}px "JetBrains Mono", ui-monospace, monospace`
+      ctx.textBaseline = 'top'
+
+      for (const drop of drops) {
+        for (const entry of drop.trail) entry.alpha *= TRAIL_DECAY_BASE
+        drop.trail = drop.trail.filter((entry) => entry.alpha >= MIN_ALPHA)
+
+        if (drop.headRow * FONT_SIZE < height) {
+          drop.trail.push({
+            char: randomChar(),
+            alpha: HEAD_ALPHA_MIN + Math.random() * (HEAD_ALPHA_MAX - HEAD_ALPHA_MIN),
+            row: drop.headRow,
+          })
+          drop.headRow += ROWS_PER_STEP * velocityMultiplier
+        } else if (drop.trail.length === 0) {
+          drop.headRow = Math.random() * -30
+        }
+
+        const x = drop.col * FONT_SIZE
+        for (const entry of drop.trail) {
+          const y = entry.row * FONT_SIZE
+          if (y < -FONT_SIZE || y > height) continue
+          ctx.fillStyle = `rgba(${CREAM_RGB}, ${entry.alpha})`
+          ctx.fillText(entry.char, x, y)
+        }
+      }
+    }
+    raf = requestAnimationFrame(draw)
+
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('resize', resize)
+    }
+  }, [])
+
+  return (
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 z-0 block"
+      style={{
+        transform: blasting ? `scaleY(${BLAST_SCALE_Y})` : 'scaleY(1)',
+        transformOrigin: 'center',
+        transition: 'none',
+        willChange: 'transform',
+      }}
+    />
+  )
+}
+
 /**
  * First-visit-only boot screen: a dot-matrix "DSC" mark that fills in
  * dot-by-dot, left to right, in exact lockstep with a single
  * `loadingProgress` value (0-100) driven by requestAnimationFrame over
- * ~1.8s. The hairline progress bar below reads off that same value, so the
- * two never drift relative to each other. At 100% the mark holds for
- * 200ms, then the whole overlay fades and scales out (`opacity 1 -> 0`,
- * `scale 1 -> 1.02`) to reveal the site underneath.
+ * ~1.8s, over an ambient digit-rain background. The hairline progress bar
+ * below reads off that same value, so the two never drift relative to each
+ * other.
+ *
+ * At 100% the mark holds for 200ms, then a "Velocity Stretch / Motion Blur
+ * Blast" exit fires: the rain's fall speed instantly jumps 4x and the
+ * canvas stretches `scaleY(3)` for 150ms, then the whole overlay hard-cuts
+ * (an unmount, no fade or shrink) straight into the live Hero underneath --
+ * whose own ambient rain (`MatrixTransition`) has been running the entire
+ * time behind this overlay, so the high-speed blast snaps directly into
+ * matching ambient rain with no visible seam.
  *
  * Gated on sessionStorage so it fires exactly once per browser session --
  * never on client-side route navigation (App itself only mounts once per
@@ -133,14 +279,14 @@ export function BootLoader() {
     sessionStorage.setItem(BOOT_SEEN_KEY, '1')
     return true
   })
-  const [phase, setPhase] = useState<'loading' | 'exiting' | 'done'>('loading')
+  const [phase, setPhase] = useState<'loading' | 'blasting' | 'done'>('loading')
   const [loadingProgress, setLoadingProgress] = useState(0)
 
   useEffect(() => {
     if (!shouldRender) return
     let raf: number
     let holdTimer: ReturnType<typeof setTimeout> | undefined
-    let fadeTimer: ReturnType<typeof setTimeout> | undefined
+    let blastTimer: ReturnType<typeof setTimeout> | undefined
     const start = performance.now()
 
     const tick = (now: number) => {
@@ -150,8 +296,10 @@ export function BootLoader() {
         raf = requestAnimationFrame(tick)
       } else {
         holdTimer = setTimeout(() => {
-          setPhase('exiting')
-          fadeTimer = setTimeout(() => setPhase('done'), FADE_MS)
+          setPhase('blasting')
+          // Hard cut: no fade, no shrink -- straight to unmount once the
+          // velocity blast has had its 150ms.
+          blastTimer = setTimeout(() => setPhase('done'), BLAST_MS)
         }, HOLD_MS)
       }
     }
@@ -160,7 +308,7 @@ export function BootLoader() {
     return () => {
       cancelAnimationFrame(raf)
       clearTimeout(holdTimer)
-      clearTimeout(fadeTimer)
+      clearTimeout(blastTimer)
     }
   }, [shouldRender])
 
@@ -169,23 +317,22 @@ export function BootLoader() {
   const revealCount = Math.floor((loadingProgress / 100) * TOTAL_DOTS)
 
   return (
-    <motion.div
-      className="fixed inset-0 z-[200] flex flex-col items-center justify-center"
-      style={{ backgroundColor: MATTE_BLACK }}
-      animate={{
-        opacity: phase === 'exiting' ? 0 : 1,
-        scale: phase === 'exiting' ? 1.02 : 1,
-      }}
-      transition={{ duration: FADE_MS / 1000, ease: 'easeOut' }}
+    <div
+      className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden"
+      style={{ backgroundColor: MATTE_BLACK, transition: 'none' }}
     >
-      <DotMatrixMark revealCount={revealCount} />
+      <BootRain blasting={phase === 'blasting'} />
 
-      <div className="relative mt-10 h-[2px] w-40 overflow-hidden rounded-full bg-cream/10">
-        <div
-          className="absolute inset-y-0 left-0 rounded-full bg-cream"
-          style={{ width: `${loadingProgress}%`, willChange: 'width' }}
-        />
+      <div className="relative z-10 flex flex-col items-center">
+        <DotMatrixMark revealCount={revealCount} />
+
+        <div className="relative mt-10 h-[2px] w-40 overflow-hidden rounded-full bg-cream/10">
+          <div
+            className="absolute inset-y-0 left-0 rounded-full bg-cream"
+            style={{ width: `${loadingProgress}%`, willChange: 'width' }}
+          />
+        </div>
       </div>
-    </motion.div>
+    </div>
   )
 }

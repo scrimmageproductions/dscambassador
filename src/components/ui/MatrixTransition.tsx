@@ -1,29 +1,22 @@
 import { useEffect, useRef, type RefObject } from 'react'
+import {
+  CREAM_RGB,
+  FONT_SIZE,
+  HEAD_ALPHA_MAX,
+  HEAD_ALPHA_MIN,
+  MAX_COLUMNS,
+  MIN_ALPHA,
+  randomChar,
+  ROWS_PER_STEP,
+  STEP_MS,
+  TRAIL_DECAY_BASE,
+} from './matrixRain'
 
-// Character pool restricted to digits + dollar sign only -- no Katakana, no
-// Latin letters, on brand for a finance-culture club rather than a generic
-// hacker aesthetic.
-const CHARS = '$0123456789'.split('')
-const FONT_SIZE = 16
-// Time between simulation ticks, decoupled from the render loop's frame
-// rate -- this is what keeps the fall "moderate" and refined instead of
-// hyperactive regardless of a 60Hz vs. 120Hz display.
-const STEP_MS = 130
-const ROWS_PER_STEP = 0.45
-// "Atmospheric background motion, not a dense wall of text": only this many
-// of the available column slots ever have an active stream at once.
-const MAX_COLUMNS = 26
-// #E8E4D9, the exact cream requested for these characters.
-const CREAM_RGB = '232, 228, 217'
-const HEAD_ALPHA_MIN = 0.32
-const HEAD_ALPHA_MAX = 0.55
 // Per-tick multiplier applied to every trailing glyph's own alpha. Ramps
-// from the base value toward TRAIL_DECAY_STAGE2 across stage 2, which is
+// from TRAIL_DECAY_BASE toward TRAIL_DECAY_STAGE2 across stage 2, which is
 // what makes the trails visually stretch into streaks during the cascade
 // wipe (a slower decay = a longer-lived tail) -- no ctx.scale() needed.
-const TRAIL_DECAY_BASE = 0.85
 const TRAIL_DECAY_STAGE2 = 0.95
-const MIN_ALPHA = 0.02
 // How much of the gap to targetScrollProgress the smoothed value closes per
 // rAF tick -- this is what turns a fast-scroll flick's instant jump to 1
 // into a graceful multi-frame decay instead of a hard cut.
@@ -46,10 +39,6 @@ const FEEDER_EASE = 0.08
 
 type TrailEntry = { char: string; alpha: number; row: number }
 type Drop = { col: number; headRow: number; trail: TrailEntry[]; isFeeder: boolean }
-
-function randomChar() {
-  return CHARS[Math.floor(Math.random() * CHARS.length)]
-}
 
 function clamp01(v: number) {
   return Math.min(1, Math.max(0, v))
