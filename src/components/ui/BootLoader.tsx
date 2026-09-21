@@ -2,18 +2,31 @@ import { useEffect, useRef, useState } from 'react'
 import { CREAM_RGB, FONT_SIZE, randomChar } from './matrixRain'
 
 const BAR_DURATION_MS = 1800
-// "Zoom-Plunge & Matrix Wall": the explosive exit once loadingProgress hits
-// 100% -- no hold, it fires the instant the bar/mark complete. Phase 1
-// scales the DSC mark through the viewport; Phase 2, as it clears the
-// bounds, ignites a full-screen flash of high-velocity rain; Phase 3 is an
-// immediate hard-cut unmount, no fade.
-const PLUNGE_MS = 100
-const FLASH_MS = 100
+// Cinematic exit choreography once loadingProgress hits 100% -- an
+// anticipation beat, then a slow-building zoom, then a data stream that
+// fades in partway through the zoom and outlives it slightly, then a hard
+// cut. Every duration below is deliberate: this is meant to read as
+// luxurious and Web3-architectural, not a jump-scare glitch.
+const HOLD_MS = 250 // Phase 1: hold the completed mark + bar, static.
+const PLUNGE_MS = 450 // Phase 2: full duration of the DSC scale transition.
 const PLUNGE_SCALE = 15
-const PLUNGE_EASE = 'cubic-bezier(0.7, 0, 0.84, 0)'
+// Smooth start, hard acceleration toward the end -- gives the eye time to
+// track the motion before it outruns the viewport.
+const PLUNGE_EASE = 'cubic-bezier(0.5, 0, 0.2, 1)'
+const BAR_FADE_MS = 200 // How long the bar takes to fade once the hold ends.
+// Phase 3: the data stream ignites this far into the plunge (not at its
+// start), and keeps running for STREAM_MS after that -- overlapping the
+// tail of the zoom rather than waiting for it to finish.
+const STREAM_DELAY_MS = 250
+const STREAM_FADE_MS = 200
+const STREAM_MS = 300
 // Pixels advanced per rendered frame (not gated by any step throttle) --
-// deliberately unthrottled so the wall reads as fast as the spec calls for.
-const FLASH_VY = 25
+// still brisk, but slower than a full-flood flash so it reads as code
+// streaming past rather than a wall of static.
+const STREAM_VY = 16
+// ~60-70% of available column slots active, leaving negative space between
+// streams instead of a solid wall.
+const STREAM_DENSITY = 0.65
 
 const BOOT_SEEN_KEY = 'dsc-boot-seen'
 
@@ -116,18 +129,26 @@ function ease(t: number) {
 }
 
 /**
- * Phase 2 of the exit sequence -- "Matrix Wall Flash": mounted only for the
- * ~100ms `FLASH_MS` window right as the zoomed-through DSC mark clears the
- * viewport. Every column across the full width is redrawn solid, every
- * frame, with fresh random glyphs and a bottom-heavy brightness gradient
- * (long streaks fading upward), then the whole wall is shoved down by
- * `FLASH_VY` px each frame -- unthrottled, at full render rate, since this
- * is meant to read as a raw, high-velocity data flash rather than the
- * measured ambient rain elsewhere on the site. It never outlives its
+ * Phase 3 of the exit sequence -- "The Data Stream": mounted only for the
+ * `STREAM_MS` window that starts partway through the zoom. Fades in over
+ * `STREAM_FADE_MS` (a plain opacity transition, triggered by flipping
+ * `visible` one frame after mount) rather than snapping to full brightness,
+ * and only ~`STREAM_DENSITY` of the available column slots carry a stream,
+ * so it reads as a deep data current with negative space between columns
+ * instead of a solid wall of static. Each active column is redrawn every
+ * frame with fresh glyphs and a bottom-heavy brightness gradient (long
+ * streaks fading upward), shoved down by `STREAM_VY` px/frame -- brisk, but
+ * slower than the flood-style flash this replaced. It never outlives its
  * effect: the parent unmounts it the instant the phase ends.
  */
-function MatrixFlash() {
+function MatrixStream() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setVisible(true))
+    return () => cancelAnimationFrame(raf)
+  }, [])
 
   useEffect(() => {
     const canvasRefEl = canvasRef.current
@@ -147,24 +168,33 @@ function MatrixFlash() {
     ctx.font = `${FONT_SIZE}px "JetBrains Mono", ui-monospace, monospace`
     ctx.textBaseline = 'top'
 
-    // Every column slot active -- "flood 100% of the canvas," not the
-    // sparser, capped density of the site's ambient rain.
-    const totalColumns = Math.ceil(width / FONT_SIZE)
+    // Only ~STREAM_DENSITY of the column slots carry a stream, chosen once
+    // (not reshuffled per frame) so the gaps read as a stable current
+    // rather than per-frame flicker.
+    const totalColumnSlots = Math.ceil(width / FONT_SIZE)
+    const activeCount = Math.max(1, Math.floor(totalColumnSlots * STREAM_DENSITY))
+    const pool = Array.from({ length: totalColumnSlots }, (_, i) => i)
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[pool[i], pool[j]] = [pool[j], pool[i]]
+    }
+    const activeCols = pool.slice(0, activeCount)
+
     const totalRows = Math.ceil(height / FONT_SIZE) + 2
     let yOffset = 0
     let raf = 0
 
     function draw() {
       raf = requestAnimationFrame(draw)
-      yOffset = (yOffset + FLASH_VY) % FONT_SIZE
+      yOffset = (yOffset + STREAM_VY) % FONT_SIZE
       ctx.clearRect(0, 0, width, height)
-      for (let col = 0; col < totalColumns; col++) {
+      for (const col of activeCols) {
         const x = col * FONT_SIZE
         for (let row = -2; row <= totalRows; row++) {
           const y = row * FONT_SIZE + yOffset
           if (y < -FONT_SIZE || y > height) continue
           // Streaks stretched long: brightest at the bottom leading edge,
-          // fading toward the top of the wall.
+          // fading toward the top of the stream.
           const depth = (y + FONT_SIZE) / (height + FONT_SIZE * 2)
           const alpha = 0.35 + depth * 0.65
           ctx.fillStyle = `rgba(${CREAM_RGB}, ${alpha})`
@@ -177,7 +207,14 @@ function MatrixFlash() {
     return () => cancelAnimationFrame(raf)
   }, [])
 
-  return <canvas ref={canvasRef} aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 block" />
+  return (
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 z-20 block"
+      style={{ opacity: visible ? 1 : 0, transition: `opacity ${STREAM_FADE_MS}ms ease-out` }}
+    />
+  )
 }
 
 /**
@@ -190,14 +227,20 @@ function MatrixFlash() {
  * blur filters anywhere -- every pixel and the bar are 100% sharp cream
  * against matte black.
  *
- * The instant loadingProgress reaches 100%, an explosive "Zoom-Plunge &
- * Matrix Wall" exit fires, no hold: the DSC mark scales `1 -> 15` through
- * its own center over 100ms (`cubic-bezier(0.7, 0, 0.84, 0)`, an
- * accelerating plunge-through-the-screen curve); as it clears the viewport,
- * a 100ms full-screen flash of ultra-dense, high-velocity rain ignites;
- * then the whole overlay hard-cuts -- an unmount, no fade -- straight into
- * the live Hero underneath. Skips the plunge/flash for
- * prefers-reduced-motion and cuts straight from 100% to unmounted instead.
+ * Once loadingProgress reaches 100%, a deliberately paced, cinematic exit
+ * plays out rather than an instant cut:
+ *   1. Hold (250ms) -- the completed mark and full bar sit static, letting
+ *      the eye register that loading finished.
+ *   2. Plunge (450ms) -- the bar fades out over BAR_FADE_MS as the DSC mark
+ *      begins scaling `1 -> 15` through its own center
+ *      (`cubic-bezier(0.5, 0, 0.2, 1)`: smooth start, hard acceleration).
+ *   3. Data stream -- STREAM_DELAY_MS into the plunge (not at its start),
+ *      a partial-density (~STREAM_DENSITY) matrix stream fades in over the
+ *      still-zooming mark and runs for STREAM_MS.
+ *   4. Hard cut -- the instant the stream's run finishes, the whole overlay
+ *      unmounts with no fade, straight into the live Hero underneath.
+ * Skips the whole plunge/stream for prefers-reduced-motion and cuts
+ * straight from 100% to unmounted instead.
  *
  * Gated on sessionStorage so it fires exactly once per browser session --
  * never on client-side route navigation (App itself only mounts once per
@@ -210,14 +253,15 @@ export function BootLoader() {
     sessionStorage.setItem(BOOT_SEEN_KEY, '1')
     return true
   })
-  const [phase, setPhase] = useState<'loading' | 'plunging' | 'flashing' | 'done'>('loading')
+  const [phase, setPhase] = useState<'loading' | 'holding' | 'plunging' | 'streaming' | 'done'>('loading')
   const [loadingProgress, setLoadingProgress] = useState(0)
 
   useEffect(() => {
     if (!shouldRender) return
     let raf: number
-    let plungeTimer: ReturnType<typeof setTimeout> | undefined
-    let flashTimer: ReturnType<typeof setTimeout> | undefined
+    let holdTimer: ReturnType<typeof setTimeout> | undefined
+    let streamDelayTimer: ReturnType<typeof setTimeout> | undefined
+    let doneTimer: ReturnType<typeof setTimeout> | undefined
     const start = performance.now()
 
     const tick = (now: number) => {
@@ -228,55 +272,66 @@ export function BootLoader() {
       } else if (prefersReducedMotion()) {
         setPhase('done')
       } else {
-        setPhase('plunging')
-        plungeTimer = setTimeout(() => {
-          setPhase('flashing')
-          flashTimer = setTimeout(() => setPhase('done'), FLASH_MS)
-        }, PLUNGE_MS)
+        setPhase('holding')
+        holdTimer = setTimeout(() => {
+          setPhase('plunging')
+          streamDelayTimer = setTimeout(() => {
+            setPhase('streaming')
+            doneTimer = setTimeout(() => setPhase('done'), STREAM_MS)
+          }, STREAM_DELAY_MS)
+        }, HOLD_MS)
       }
     }
     raf = requestAnimationFrame(tick)
 
     return () => {
       cancelAnimationFrame(raf)
-      clearTimeout(plungeTimer)
-      clearTimeout(flashTimer)
+      clearTimeout(holdTimer)
+      clearTimeout(streamDelayTimer)
+      clearTimeout(doneTimer)
     }
   }, [shouldRender])
 
   if (!shouldRender || phase === 'done') return null
 
   const revealCount = Math.floor((loadingProgress / 100) * TOTAL_DOTS)
+  // The mark starts (and keeps) scaling from 'plunging' onward -- 'streaming'
+  // doesn't reset or reapply the transition, so the CSS transition already
+  // in flight just keeps running underneath the stream.
+  const isPlunging = phase === 'plunging' || phase === 'streaming'
 
   return (
     <div
       className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden"
       style={{ backgroundColor: MATTE_BLACK, transition: 'none' }}
     >
-      {phase === 'flashing' && <MatrixFlash />}
+      {phase === 'streaming' && <MatrixStream />}
 
-      {phase !== 'flashing' && (
-        <div className="relative z-10 flex flex-col items-center">
-          <div
-            style={{
-              transform: phase === 'plunging' ? `scale(${PLUNGE_SCALE})` : 'scale(1)',
-              transformOrigin: 'center',
-              transition: phase === 'plunging' ? `transform ${PLUNGE_MS}ms ${PLUNGE_EASE}` : 'none',
-            }}
-          >
-            <DotMatrixMark revealCount={revealCount} />
-          </div>
-
-          {phase === 'loading' && (
-            <div className="relative mt-10 h-[2px] w-40 overflow-hidden rounded-full bg-cream/10">
-              <div
-                className="absolute inset-y-0 left-0 rounded-full bg-cream"
-                style={{ width: `${loadingProgress}%`, willChange: 'width' }}
-              />
-            </div>
-          )}
+      <div className="relative z-10 flex flex-col items-center">
+        <div
+          style={{
+            transform: isPlunging ? `scale(${PLUNGE_SCALE})` : 'scale(1)',
+            transformOrigin: 'center',
+            transition: phase === 'plunging' ? `transform ${PLUNGE_MS}ms ${PLUNGE_EASE}` : 'none',
+          }}
+        >
+          <DotMatrixMark revealCount={revealCount} />
         </div>
-      )}
+
+        {phase !== 'streaming' && (
+          <div className="relative mt-10 h-[2px] w-40 overflow-hidden rounded-full bg-cream/10">
+            <div
+              className="absolute inset-y-0 left-0 rounded-full bg-cream"
+              style={{
+                width: `${loadingProgress}%`,
+                opacity: phase === 'plunging' ? 0 : 1,
+                transition: phase === 'plunging' ? `opacity ${BAR_FADE_MS}ms ease-out` : 'none',
+                willChange: 'width',
+              }}
+            />
+          </div>
+        )}
+      </div>
     </div>
   )
 }
