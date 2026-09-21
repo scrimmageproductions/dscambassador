@@ -7,18 +7,28 @@ const BAR_DURATION_MS = 1800
 // deliberate -- the whole sequence stays under 600ms total so it reads as
 // fast and sharp, never a stall or a glitch.
 const PAUSE_MS = 100 // Phase 1a: static pause right at 100%, before scrambling.
-const SCRAMBLE_MS = 150 // Phase 1b: rapid character-cycle + bar collapse.
+// Phase 1b splits into an active scramble, then a brief frozen "lock" just
+// before release -- 100 + 120 + 30 = 250ms, exactly the "~220ms-250ms"
+// window the lock-snap flash occupies.
+const SCRAMBLE_MS = 120 // Rapid character-cycle + bar collapse.
+const LOCK_MS = 30 // Frozen "[DSC]" in pure white right before release.
 const SCRAMBLE_TICK_MS = 40 // How often the scrambled characters re-randomize.
 // Monospace size shared by the scramble text and the bar's `ch`-based
 // collapse width below, so the bar always ends up matching the text's
 // actual rendered width regardless of font metrics.
 const SCRAMBLE_FONT_SIZE = '44px'
 const SCRAMBLE_BAR_WIDTH = '4ch'
+const LOCK_COLOR = '#FFFFFF'
 const CASCADE_MS = 300 // Phase 2: full-viewport matrix cascade before the cut.
 // Both the "released" DSC columns and the ambient fill-in columns share
 // this velocity, so by hard-cut time the whole screen already matches the
 // Hero's own ambient rain speed with no visible seam.
 const CASCADE_VY = 18
+// Outward wave ignition: each ambient column's ignite delay grows with its
+// distance from center, capped low so the whole wave still reads as one
+// fast beat rather than a visible build-up.
+const RADIAL_DELAY_PER_COL_MS = 15
+const RADIAL_DELAY_MAX_MS = 60
 
 const BOOT_SEEN_KEY = 'dsc-boot-seen'
 
@@ -126,17 +136,31 @@ function ease(t: number) {
  * `$0123456789` pool (same `randomChar` pool the site's own matrix rain
  * uses) every SCRAMBLE_TICK_MS -- a cryptographic-decryption cycle rather
  * than the dot-matrix reveal. Flat solid cream, no glow, same shade the
- * cascade rain draws in, so there's no color shift into Phase 2.
+ * cascade rain draws in, so there's no color shift into Phase 2 once it
+ * unlocks.
+ *
+ * When `locked`, the cycling stops dead and the mark instead reads the
+ * literal decrypted string "[DSC]" in pure white -- the "lock snap" beat
+ * right before Phase 2 releases it into the rain.
  */
-function ScrambleText() {
+function ScrambleText({ locked }: { locked: boolean }) {
   const [chars, setChars] = useState(() => [randomChar(), randomChar(), randomChar()])
 
   useEffect(() => {
+    if (locked) return
     const interval = setInterval(() => {
       setChars([randomChar(), randomChar(), randomChar()])
     }, SCRAMBLE_TICK_MS)
     return () => clearInterval(interval)
-  }, [])
+  }, [locked])
+
+  if (locked) {
+    return (
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: SCRAMBLE_FONT_SIZE, lineHeight: 1, color: LOCK_COLOR }}>
+        [DSC]
+      </div>
+    )
+  }
 
   return (
     <div
@@ -151,21 +175,39 @@ function ScrambleText() {
 }
 
 type CascadeEntry = { char: string; alpha: number; row: number }
-type CascadeColumn = { col: number; headRow: number; trail: CascadeEntry[]; released: boolean }
+type CascadeColumn = {
+  col: number
+  headRow: number
+  trail: CascadeEntry[]
+  released: boolean
+  delayMs: number
+  ignited: boolean
+}
 
 /**
  * Phase 2 -- "Matrix Cascade Ignition": mounted only for the CASCADE_MS
  * window. The three columns under where the scrambled DSC text just sat
  * are "released" -- their head starts at that same mid-screen row and
  * grows a falling trail downward from there, exactly like the scrambled
- * characters dropping into rain. Every other column is "ambient": it
- * starts pre-filled top-to-bottom (so the viewport reads as fully
- * cascading from the very first frame, not building up over time) and
- * just keeps flowing. Both kinds share CASCADE_VY, so the whole screen is
- * already moving at the Hero's own ambient-rain speed by the time this
- * unmounts. The container behind this canvas goes transparent the instant
- * this mounts, so the live Hero bleeds through the gaps between
- * characters immediately -- the "seamless handoff" the hard cut needs.
+ * characters dropping into rain. Every other column is "ambient": each one
+ * ignites (pre-fills top-to-bottom in a single frame, then keeps flowing)
+ * only once its own `delayMs` has elapsed, which grows with distance from
+ * center (`RADIAL_DELAY_PER_COL_MS` per column, capped at
+ * `RADIAL_DELAY_MAX_MS`) -- an outward wave rippling from the released
+ * center columns to the edges, rather than every column popping in at
+ * once. Both kinds share CASCADE_VY, so the whole screen is already
+ * moving at the Hero's own ambient-rain speed by the time this unmounts.
+ *
+ * Column x-positions (`col * FONT_SIZE`, no left/right padding, columns
+ * numbered from the same `Math.floor(width / FONT_SIZE)` count) are
+ * identical to MatrixTransition's own grid math -- same shared FONT_SIZE,
+ * same origin, so a column index here lands on the exact same pixel as
+ * that same index in the Hero's canvas, guaranteeing zero horizontal jump
+ * at the handoff.
+ *
+ * The container behind this canvas goes transparent the instant this
+ * mounts, so the live Hero bleeds through the gaps between characters
+ * immediately -- the "seamless handoff" the hard cut needs.
  */
 function MatrixCascade() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -188,32 +230,35 @@ function MatrixCascade() {
     ctx.font = `${FONT_SIZE}px "JetBrains Mono", ui-monospace, monospace`
     ctx.textBaseline = 'top'
 
-    const totalColumns = Math.max(1, Math.ceil(width / FONT_SIZE))
+    // Matches MatrixTransition's own `Math.floor(width / FONT_SIZE)` column
+    // count exactly, so this canvas's grid and the Hero's are identical.
+    const totalColumns = Math.max(1, Math.floor(width / FONT_SIZE))
     const totalRows = Math.ceil(height / FONT_SIZE) + 2
     const centerCol = Math.round(width / 2 / FONT_SIZE)
     const centerRow = height / 2 / FONT_SIZE
-    // The three columns the scrambled "DSC" text just occupied.
+    // The three columns the scrambled "DSC" text just occupied -- the wave's
+    // epicenter.
     const releasedCols = new Set([centerCol - 1, centerCol, centerCol + 1])
 
     const columns: CascadeColumn[] = Array.from({ length: totalColumns }, (_, col) => {
-      if (releasedCols.has(col)) {
-        return { col, headRow: centerRow, trail: [], released: true }
+      const released = releasedCols.has(col)
+      return {
+        col,
+        headRow: released ? centerRow : totalRows,
+        trail: [],
+        released,
+        delayMs: released ? 0 : Math.min(Math.abs(col - centerCol) * RADIAL_DELAY_PER_COL_MS, RADIAL_DELAY_MAX_MS),
+        ignited: released,
       }
-      // Ambient columns start fully populated top-to-bottom -- the rest of
-      // the canvas width fills instantly rather than growing in, since the
-      // whole window has to read as "cascading" within CASCADE_MS.
-      const trail: CascadeEntry[] = []
-      for (let row = 0; row <= totalRows; row++) {
-        trail.push({ char: randomChar(), alpha: HEAD_ALPHA_MIN + Math.random() * (HEAD_ALPHA_MAX - HEAD_ALPHA_MIN), row })
-      }
-      return { col, headRow: totalRows, trail, released: false }
     })
 
     const rowsPerFrame = CASCADE_VY / FONT_SIZE
+    const mountedAt = performance.now()
     let raf = 0
 
-    function draw() {
+    function draw(now: number) {
       raf = requestAnimationFrame(draw)
+      const elapsed = now - mountedAt
       ctx.clearRect(0, 0, width, height)
       for (const column of columns) {
         if (column.released) {
@@ -222,6 +267,19 @@ function MatrixCascade() {
           column.trail.push({ char: randomChar(), alpha: 1, row: column.headRow })
           column.headRow += rowsPerFrame
         } else {
+          if (!column.ignited) {
+            if (elapsed < column.delayMs) continue
+            // Ignite now: pre-fill top-to-bottom in this single frame, same
+            // as the old simultaneous flood, just staggered by delayMs.
+            for (let row = 0; row <= totalRows; row++) {
+              column.trail.push({
+                char: randomChar(),
+                alpha: HEAD_ALPHA_MIN + Math.random() * (HEAD_ALPHA_MAX - HEAD_ALPHA_MIN),
+                row,
+              })
+            }
+            column.ignited = true
+          }
           // Keep every ambient row flowing downward, wrapping back above
           // the top the instant it exits the bottom -- the column stays
           // continuously full without ever needing to rebuild its trail.
@@ -261,16 +319,22 @@ function MatrixCascade() {
  * Once loadingProgress reaches 100%, a "Terminal Decryption Scramble &
  * Matrix Rain Cascade" exit plays out, under 600ms total:
  *   1a. Pause (100ms) -- the completed mark and full bar sit static.
- *   1b. Scramble (150ms) -- the pixel mark swaps for three real glyphs
+ *   1b. Scramble (120ms) -- the pixel mark swaps for three real glyphs
  *       cycling through the `$0123456789` pool every SCRAMBLE_TICK_MS,
  *       while the bar collapses inward from its full width to
  *       SCRAMBLE_BAR_WIDTH (sized in `ch` units off the same monospace
  *       font as the scramble text, so it always matches).
- *   2.  Cascade (300ms) -- the three scrambled columns "release" into
- *       falling rain from their own mid-screen position while every other
- *       column ignites at once across the rest of the width, all at the
- *       same CASCADE_VY as the Hero's own ambient rain running underneath
- *       (Home mounts immediately; this is just an overlay on top of it).
+ *   1c. Lock (30ms, ~220-250ms) -- the cycling freezes on the literal
+ *       string "[DSC]" in pure white, held static right up to the release.
+ *   2.  Cascade (300ms) -- the instant the lock ends, those same three
+ *       columns "release" into falling rain (in standard cream again) from
+ *       their own mid-screen position, while every other column ignites in
+ *       an outward wave from center (each column's ignite delay grows with
+ *       its distance from center, capped low) rather than all at once, all
+ *       at the same CASCADE_VY as the Hero's own ambient rain running
+ *       underneath (Home mounts immediately; this is just an overlay on
+ *       top of it) and on the identical column grid, so there's no
+ *       horizontal jump at the handoff.
  *   3.  Hard cut -- the instant the cascade's 300ms is up, the whole
  *       overlay unmounts with no fade.
  * Skips straight from 100% to unmounted for prefers-reduced-motion.
@@ -286,7 +350,7 @@ export function BootLoader() {
     sessionStorage.setItem(BOOT_SEEN_KEY, '1')
     return true
   })
-  const [phase, setPhase] = useState<'loading' | 'paused' | 'scrambling' | 'cascading' | 'done'>('loading')
+  const [phase, setPhase] = useState<'loading' | 'paused' | 'scrambling' | 'locked' | 'cascading' | 'done'>('loading')
   const [loadingProgress, setLoadingProgress] = useState(0)
 
   useEffect(() => {
@@ -294,6 +358,7 @@ export function BootLoader() {
     let raf: number
     let pauseTimer: ReturnType<typeof setTimeout> | undefined
     let scrambleTimer: ReturnType<typeof setTimeout> | undefined
+    let lockTimer: ReturnType<typeof setTimeout> | undefined
     let cascadeTimer: ReturnType<typeof setTimeout> | undefined
     const start = performance.now()
 
@@ -309,8 +374,11 @@ export function BootLoader() {
         pauseTimer = setTimeout(() => {
           setPhase('scrambling')
           scrambleTimer = setTimeout(() => {
-            setPhase('cascading')
-            cascadeTimer = setTimeout(() => setPhase('done'), CASCADE_MS)
+            setPhase('locked')
+            lockTimer = setTimeout(() => {
+              setPhase('cascading')
+              cascadeTimer = setTimeout(() => setPhase('done'), CASCADE_MS)
+            }, LOCK_MS)
           }, SCRAMBLE_MS)
         }, PAUSE_MS)
       }
@@ -321,6 +389,7 @@ export function BootLoader() {
       cancelAnimationFrame(raf)
       clearTimeout(pauseTimer)
       clearTimeout(scrambleTimer)
+      clearTimeout(lockTimer)
       clearTimeout(cascadeTimer)
     }
   }, [shouldRender])
@@ -328,7 +397,7 @@ export function BootLoader() {
   if (!shouldRender || phase === 'done') return null
 
   const revealCount = Math.floor((loadingProgress / 100) * TOTAL_DOTS)
-  const isScrambling = phase === 'scrambling'
+  const isScrambleText = phase === 'scrambling' || phase === 'locked'
   const isCascading = phase === 'cascading'
 
   return (
@@ -340,17 +409,17 @@ export function BootLoader() {
 
       {!isCascading && (
         <div className="relative z-10 flex h-full flex-col items-center justify-center">
-          {isScrambling ? <ScrambleText /> : <DotMatrixMark revealCount={revealCount} />}
+          {isScrambleText ? <ScrambleText locked={phase === 'locked'} /> : <DotMatrixMark revealCount={revealCount} />}
 
           <div
             className="relative mt-10 h-[2px] overflow-hidden rounded-full bg-cream/10"
             style={{
-              width: isScrambling ? SCRAMBLE_BAR_WIDTH : '10rem',
+              width: isScrambleText ? SCRAMBLE_BAR_WIDTH : '10rem',
               // `ch` only needs to resolve correctly while it's actually the
               // active unit (during the collapse); harmless to set otherwise.
-              fontFamily: isScrambling ? 'var(--font-mono)' : undefined,
-              fontSize: isScrambling ? SCRAMBLE_FONT_SIZE : undefined,
-              transition: isScrambling ? `width ${SCRAMBLE_MS}ms ease-in` : 'none',
+              fontFamily: isScrambleText ? 'var(--font-mono)' : undefined,
+              fontSize: isScrambleText ? SCRAMBLE_FONT_SIZE : undefined,
+              transition: phase === 'scrambling' ? `width ${SCRAMBLE_MS}ms ease-in` : 'none',
             }}
           >
             <div
