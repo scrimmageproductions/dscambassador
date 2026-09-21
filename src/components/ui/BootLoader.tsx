@@ -3,13 +3,12 @@ import { motion } from 'framer-motion'
 
 const BAR_DURATION_MS = 1800
 const HOLD_MS = 200
-const FADE_MS = 150
-
-export type BootLoaderExitStyle = 'cut' | 'fade'
+const FADE_MS = 300
 
 const BOOT_SEEN_KEY = 'dsc-boot-seen'
 
 const CREAM = '#E8DFD0'
+const CREAM_FAINT = 'rgba(232, 223, 208, 0.1)'
 const MATTE_BLACK = '#0D0D0D'
 
 // Classic 5x7 blocky pixel-font glyphs, laid out with a 1-unit gap between
@@ -58,10 +57,19 @@ const OUTLINE = FILLED.flatMap(({ x, y }) => {
 const GRID_W = PAD * 2 + WORD.reduce((sum, l) => sum + l[0].length, 0) + LETTER_GAP * (WORD.length - 1)
 const GRID_H = PAD * 2 + WORD[0].length
 
+// Reveal order sweeps strictly left-to-right across the letterforms (column
+// by column, top-to-bottom within a column) so the mark resolves the same
+// way a scanning dot-matrix display would, in lockstep with loadingProgress.
+const REVEAL_ORDER = [...FILLED].sort((a, b) => a.x - b.x || a.y - b.y)
+const REVEAL_INDEX = new Map(REVEAL_ORDER.map(({ x, y }, i) => [`${x},${y}`, i]))
+export const TOTAL_DOTS = FILLED.length
+
 /** The dot-matrix "DSC" mark: a matte-black-outlined pixel wordmark whose
- * interior is filled with the same cream/black dot-matrix texture as the
- * custom cursor, via a tiled SVG `<pattern>`. */
-function DotMatrixMark() {
+ * interior fills in dot-by-dot (in `revealCount` order) with the same
+ * cream/black dot-matrix texture as the custom cursor, via a tiled SVG
+ * `<pattern>`. Unrevealed letter-pixels sit at low opacity until their turn
+ * comes up in the sweep. */
+function DotMatrixMark({ revealCount }: { revealCount: number }) {
   return (
     <svg
       width={GRID_W * BLOCK}
@@ -81,26 +89,44 @@ function DotMatrixMark() {
       {OUTLINE.map(({ x, y }) => (
         <rect key={`o-${x}-${y}`} x={x * BLOCK} y={y * BLOCK} width={BLOCK} height={BLOCK} fill={MATTE_BLACK} />
       ))}
-      {FILLED.map(({ x, y }) => (
-        <rect key={`f-${x}-${y}`} x={x * BLOCK} y={y * BLOCK} width={BLOCK} height={BLOCK} fill="url(#boot-dot-matrix)" />
-      ))}
+      {FILLED.map(({ x, y }) => {
+        const revealed = (REVEAL_INDEX.get(`${x},${y}`) ?? 0) < revealCount
+        return (
+          <rect
+            key={`f-${x}-${y}`}
+            x={x * BLOCK}
+            y={y * BLOCK}
+            width={BLOCK}
+            height={BLOCK}
+            fill={revealed ? 'url(#boot-dot-matrix)' : CREAM_FAINT}
+            style={revealed ? { filter: 'drop-shadow(0 0 2.5px rgba(232, 223, 208, 0.55))' } : undefined}
+          />
+        )
+      })}
     </svg>
   )
 }
 
+// circOut-ish ease, applied once to loadingProgress so the pixel sweep and
+// the bar -- both driven off the same number -- share an identical curve.
+function ease(t: number) {
+  return 1 - Math.pow(1 - t, 3)
+}
+
 /**
- * First-visit-only boot screen: a centered dot-matrix "DSC" mark fades in
- * while a hairline cream progress bar fills over ~1.8s. Once it hits 100%
- * and holds briefly, the overlay exits and unmounts -- no slide, sweep, or
- * translation, ever: either an instant hard cut (`exitStyle="cut"`, the
- * default -- zero fade, the frame just cuts straight to the site) or a
- * swift linear opacity fade (`exitStyle="fade"`, 150ms).
+ * First-visit-only boot screen: a dot-matrix "DSC" mark that fills in
+ * dot-by-dot, left to right, in exact lockstep with a single
+ * `loadingProgress` value (0-100) driven by requestAnimationFrame over
+ * ~1.8s. The hairline progress bar below reads off that same value, so the
+ * two never drift relative to each other. At 100% the mark holds for
+ * 200ms, then the whole overlay fades and scales out (`opacity 1 -> 0`,
+ * `scale 1 -> 1.02`) to reveal the site underneath.
  *
  * Gated on sessionStorage so it fires exactly once per browser session --
  * never on client-side route navigation (App itself only mounts once per
  * page load anyway) and never again on a reload within the same session.
  */
-export function BootLoader({ exitStyle = 'cut' }: { exitStyle?: BootLoaderExitStyle } = {}) {
+export function BootLoader() {
   const [shouldRender] = useState(() => {
     if (typeof window === 'undefined') return false
     if (sessionStorage.getItem(BOOT_SEEN_KEY)) return false
@@ -108,46 +134,56 @@ export function BootLoader({ exitStyle = 'cut' }: { exitStyle?: BootLoaderExitSt
     return true
   })
   const [phase, setPhase] = useState<'loading' | 'exiting' | 'done'>('loading')
+  const [loadingProgress, setLoadingProgress] = useState(0)
 
   useEffect(() => {
     if (!shouldRender) return
+    let raf: number
+    let holdTimer: ReturnType<typeof setTimeout> | undefined
     let fadeTimer: ReturnType<typeof setTimeout> | undefined
-    const fillTimer = setTimeout(() => {
-      if (exitStyle === 'cut') {
-        // Zero fade, zero delay: unmount on the very next frame.
-        setPhase('done')
+    const start = performance.now()
+
+    const tick = (now: number) => {
+      const t = Math.min((now - start) / BAR_DURATION_MS, 1)
+      setLoadingProgress(Math.round(ease(t) * 100))
+      if (t < 1) {
+        raf = requestAnimationFrame(tick)
       } else {
-        setPhase('exiting')
-        fadeTimer = setTimeout(() => setPhase('done'), FADE_MS)
+        holdTimer = setTimeout(() => {
+          setPhase('exiting')
+          fadeTimer = setTimeout(() => setPhase('done'), FADE_MS)
+        }, HOLD_MS)
       }
-    }, BAR_DURATION_MS + HOLD_MS)
+    }
+    raf = requestAnimationFrame(tick)
+
     return () => {
-      clearTimeout(fillTimer)
+      cancelAnimationFrame(raf)
+      clearTimeout(holdTimer)
       clearTimeout(fadeTimer)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [shouldRender])
 
   if (!shouldRender || phase === 'done') return null
+
+  const revealCount = Math.floor((loadingProgress / 100) * TOTAL_DOTS)
 
   return (
     <motion.div
       className="fixed inset-0 z-[200] flex flex-col items-center justify-center"
       style={{ backgroundColor: MATTE_BLACK }}
-      animate={{ opacity: phase === 'exiting' ? 0 : 1 }}
-      transition={{ duration: FADE_MS / 1000, ease: 'linear' }}
+      animate={{
+        opacity: phase === 'exiting' ? 0 : 1,
+        scale: phase === 'exiting' ? 1.02 : 1,
+      }}
+      transition={{ duration: FADE_MS / 1000, ease: 'easeOut' }}
     >
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.5, ease: 'easeOut' }}>
-        <DotMatrixMark />
-      </motion.div>
+      <DotMatrixMark revealCount={revealCount} />
 
       <div className="relative mt-10 h-[2px] w-40 overflow-hidden rounded-full bg-cream/10">
-        <motion.div
+        <div
           className="absolute inset-y-0 left-0 rounded-full bg-cream"
-          initial={{ width: '0%' }}
-          animate={{ width: '100%' }}
-          transition={{ duration: BAR_DURATION_MS / 1000, ease: 'circOut' }}
-          style={{ willChange: 'width' }}
+          style={{ width: `${loadingProgress}%`, willChange: 'width' }}
         />
       </div>
     </motion.div>
