@@ -60,24 +60,6 @@ export function Events() {
         </div>
       </section>
 
-      <section className="hairline-t bg-surface/20">
-        <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
-          <Reveal stagger>
-            <SectionLabel>The circuit feed</SectionLabel>
-            <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
-              What&rsquo;s next, by category.
-            </h2>
-          </Reveal>
-          <div className="mt-10">
-            <EventFeed
-              active={activeFilter}
-              onActiveChange={handleFilterChange}
-              highlightIds={highlightIds}
-            />
-          </div>
-        </div>
-      </section>
-
       <section className="hairline-t">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-20 md:grid-cols-2 md:py-24">
           <Reveal stagger>
@@ -86,8 +68,8 @@ export function Events() {
               This is what an activation looks like.
             </h2>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-cream-3">
-              A folding table, a rack of kit, and people who showed up. No side-event vendor
-              energy, just the club, in a room, moving.
+              A folding table, a rack of kit, and people who showed up. Just the club, in a room,
+              moving.
             </p>
           </Reveal>
           <CultureMedia
@@ -98,7 +80,7 @@ export function Events() {
         </div>
       </section>
 
-      <section className="hairline-t hairline-b bg-surface/20">
+      <section className="hairline-t bg-surface/20">
         <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
           <Reveal stagger>
             <SectionLabel>Where ambassadors show up</SectionLabel>
@@ -129,6 +111,24 @@ export function Events() {
             </a>
             , the ecosystem calendar.
           </p>
+        </div>
+      </section>
+
+      <section className="hairline-t hairline-b bg-surface/20">
+        <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
+          <Reveal stagger>
+            <SectionLabel>The circuit feed</SectionLabel>
+            <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
+              What&rsquo;s next, by category.
+            </h2>
+          </Reveal>
+          <div className="mt-10">
+            <EventFeed
+              active={activeFilter}
+              onActiveChange={handleFilterChange}
+              highlightIds={highlightIds}
+            />
+          </div>
         </div>
       </section>
 
