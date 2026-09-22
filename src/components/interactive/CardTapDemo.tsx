@@ -3,10 +3,34 @@ import { MembershipCardIllustration } from '../illustrations/Garments'
 import { LinkButton } from '../ui/Button'
 import { TiltCard } from '../motion/TiltCard'
 
-type Stage = 'idle' | 'tapping' | 'verified' | 'app'
+type StepKey = 'init' | 'authorize' | 'execute' | 'settle'
+
+const STEPS: {
+  key: StepKey
+  dot: string
+  eyebrow: string
+  heading: string
+  log: string
+}[] = [
+  { key: 'init', dot: '01 INIT', eyebrow: 'Membership card', heading: 'Tap in to open Burner.', log: '> awaiting nfc.tap()' },
+  { key: 'authorize', dot: '02 AUTHORIZE', eyebrow: 'Reading card…', heading: 'Verifying', log: '> auth.verify(signature) …' },
+  {
+    key: 'execute',
+    dot: '03 EXECUTE',
+    eyebrow: 'Card verified',
+    heading: 'Welcome to Digital Spenders Club',
+    log: '> membership.grant(card_id) OK',
+  },
+  { key: 'settle', dot: '04 SETTLE', eyebrow: 'Burner unlocked', heading: 'You’re in.', log: '> session.settled — access: member' },
+]
+
+// Auto-run pacing, 2x the original 650ms/750ms beats, so the terminal log
+// and each step's status actually has time to read before advancing.
+const AUTHORIZE_MS = 1300
+const EXECUTE_MS = 1500
 
 export function CardTapDemo() {
-  const [stage, setStage] = useState<Stage>('idle')
+  const [stepIndex, setStepIndex] = useState(0)
   const timers = useRef<ReturnType<typeof setTimeout>[]>([])
 
   useEffect(() => {
@@ -15,19 +39,37 @@ export function CardTapDemo() {
     }
   }, [])
 
+  function clearTimers() {
+    timers.current.forEach(clearTimeout)
+    timers.current = []
+  }
+
   function runTap() {
-    if (stage !== 'idle') return
-    setStage('tapping')
-    timers.current.push(setTimeout(() => setStage('verified'), 650))
-    timers.current.push(setTimeout(() => setStage('app'), 1400))
+    if (stepIndex !== 0) return
+    clearTimers()
+    setStepIndex(1)
+    timers.current.push(
+      setTimeout(() => {
+        setStepIndex(2)
+        timers.current.push(setTimeout(() => setStepIndex(3), EXECUTE_MS))
+      }, AUTHORIZE_MS),
+    )
+  }
+
+  // Manual step dots: jump straight to any step, at the viewer's own pace,
+  // cancelling whatever auto-run timers were still pending.
+  function goToStep(index: number) {
+    clearTimers()
+    setStepIndex(index)
   }
 
   function reset() {
-    timers.current.forEach(clearTimeout)
-    setStage('idle')
+    clearTimers()
+    setStepIndex(0)
   }
 
-  const unlocked = stage === 'verified' || stage === 'app'
+  const step = STEPS[stepIndex].key
+  const unlocked = step === 'execute' || step === 'settle'
 
   return (
     <div className="hairline glass-card p-6 md:p-10">
@@ -35,8 +77,8 @@ export function CardTapDemo() {
         <div className="relative flex items-center justify-center py-6">
           <div
             className={`relative z-10 w-44 transition-transform duration-500 ease-out ${
-              stage === 'idle' ? '-translate-x-8 translate-y-4' : '-translate-y-14 translate-x-6'
-            } ${stage === 'tapping' ? 'scale-95' : ''}`}
+              step === 'init' ? '-translate-x-8 translate-y-4' : '-translate-y-14 translate-x-6'
+            } ${step === 'authorize' ? 'scale-95' : ''}`}
           >
             <TiltCard maxTilt={10} className="rounded-2xl">
               <MembershipCardIllustration className="w-full drop-shadow-[0_0_30px_rgba(196,165,116,0.08)]" />
@@ -56,7 +98,7 @@ export function CardTapDemo() {
               aria-hidden="true"
             />
 
-            {stage === 'tapping' && (
+            {step === 'authorize' && (
               <>
                 <span
                   className="pointer-events-none absolute left-1/2 top-9 h-3 w-3 -translate-x-1/2 -translate-y-1/2 animate-ping rounded-full bg-cream [animation-duration:0.6s]"
@@ -69,7 +111,7 @@ export function CardTapDemo() {
               </>
             )}
 
-            {stage === 'app' ? (
+            {step === 'settle' ? (
               <div className="w-full animate-tick text-center">
                 <p className="label-mono text-[0.55rem] text-cream-wash">DSC</p>
                 <p className="font-display text-sm text-cream">Burner</p>
@@ -93,62 +135,78 @@ export function CardTapDemo() {
         </div>
 
         <div>
-          {stage === 'idle' && (
-            <>
-              <p className="label-mono text-[0.68rem] text-cream-wash">Membership card</p>
-              <h3 className="mt-3 font-display text-2xl text-cream">Tap in to open Burner.</h3>
+          <div key={step} className="animate-tick">
+            <p className={`label-mono text-[0.68rem] ${step === 'init' ? 'text-cream-wash' : 'text-gold'}`}>
+              {STEPS[stepIndex].eyebrow}
+            </p>
+            <h3 className="mt-3 font-display text-2xl text-cream">{STEPS[stepIndex].heading}</h3>
+
+            {step === 'init' && (
               <p className="mt-3 text-sm leading-relaxed text-cream-3">
                 Every member taps their DSC Membership Card to their phone to unlock the Burner
                 app. That&rsquo;s the access model, no separate login. Ambassadors trigger the
                 same moment for someone new at an event.
               </p>
-              <button
-                type="button"
-                onClick={runTap}
-                className="label-mono mt-6 border border-cream/35 px-6 py-3 text-[0.7rem] text-cream transition-colors hover:border-cream hover:bg-cream/5"
-              >
-                Simulate a tap
-              </button>
-            </>
-          )}
+            )}
 
-          {stage === 'tapping' && (
-            <div className="animate-tick">
-              <p className="label-mono text-[0.68rem] text-gold">Reading card…</p>
-              <p className="mt-3 font-display text-2xl text-cream">Verifying</p>
-            </div>
-          )}
-
-          {stage === 'verified' && (
-            <div className="animate-tick">
-              <p className="label-mono text-[0.68rem] text-gold">Card verified</p>
-              <p className="mt-3 font-display text-2xl text-cream">Welcome to Digital Spenders Club</p>
-            </div>
-          )}
-
-          {stage === 'app' && (
-            <div className="animate-tick space-y-4">
-              <p className="label-mono text-[0.68rem] text-gold">Burner unlocked</p>
-              <p className="font-display text-2xl text-cream">You&rsquo;re in.</p>
-              <p className="text-sm leading-relaxed text-cream-3">
+            {step === 'settle' && (
+              <p className="mt-3 text-sm leading-relaxed text-cream-3">
                 This is what opens every time, for a member checking the SYNC agenda, or someone
                 tapping in for the first time at a conference booth.
               </p>
-              <div className="flex flex-wrap gap-3 pt-2">
-                <LinkButton to="https://spenders.club" variant="ghost" className="!px-5 !py-2.5">
-                  spenders.club
-                </LinkButton>
+            )}
+
+            {/* Terminal-style transaction log: one running line per step, so
+                the underlying status is legible, not just the headline. */}
+            <p className="label-mono mt-4 text-[0.62rem] text-cream-wash/80">{STEPS[stepIndex].log}</p>
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              {step === 'init' && (
                 <button
                   type="button"
-                  onClick={reset}
-                  className="label-mono text-[0.68rem] text-cream-wash underline underline-offset-4 hover:text-cream"
+                  onClick={runTap}
+                  className="label-mono border border-cream/35 px-6 py-3 text-[0.7rem] text-cream transition-colors hover:border-cream hover:bg-cream/5"
                 >
-                  Run again
+                  Simulate a tap
                 </button>
-              </div>
+              )}
+              {step === 'settle' && (
+                <>
+                  <LinkButton to="https://spenders.club" variant="ghost" className="!px-5 !py-2.5">
+                    spenders.club
+                  </LinkButton>
+                  <button
+                    type="button"
+                    onClick={reset}
+                    className="label-mono text-[0.68rem] text-cream-wash underline underline-offset-4 hover:text-cream"
+                  >
+                    Run again
+                  </button>
+                </>
+              )}
             </div>
-          )}
+          </div>
         </div>
+      </div>
+
+      {/* Step dots: click any step, or step through them one at a time, at
+          your own pace -- independent of the auto-run timers above. */}
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-2 border-t border-cream/10 pt-6">
+        {STEPS.map((s, i) => (
+          <button
+            key={s.key}
+            type="button"
+            onClick={() => goToStep(i)}
+            aria-current={i === stepIndex ? 'step' : undefined}
+            className={`label-mono rounded-full border px-3 py-1.5 text-[0.6rem] transition-colors ${
+              i === stepIndex
+                ? 'border-gold bg-gold/10 text-gold'
+                : 'border-cream/20 text-cream-wash hover:border-cream/40 hover:text-cream'
+            }`}
+          >
+            {s.dot}
+          </button>
+        ))}
       </div>
     </div>
   )

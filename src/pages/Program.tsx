@@ -38,8 +38,7 @@ export function Program() {
       <section className="hairline-t hairline-b bg-surface/20">
         <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
           <Reveal stagger>
-            <SectionLabel>What you&rsquo;ll do: minimum commitment</SectionLabel>
-            <h2 className="mt-6 max-w-2xl font-display text-3xl text-cream md:text-4xl">
+            <h2 className="max-w-2xl font-display text-3xl text-cream md:text-4xl">
               Three expectations. Clear standards.
             </h2>
           </Reveal>

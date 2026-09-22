@@ -1,6 +1,5 @@
 import { lazy, Suspense, useState } from 'react'
 import { PageHero } from '../components/ui/PageHero'
-import { SectionLabel } from '../components/ui/SectionLabel'
 import { HairlineCard } from '../components/ui/HairlineCard'
 import { Button, LinkButton } from '../components/ui/Button'
 import { SyncAgendaAccordion } from '../components/interactive/SyncAgendaAccordion'
@@ -78,8 +77,7 @@ export function HQ() {
       <section className="hairline-t hairline-b bg-surface/20">
         <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
           <Reveal stagger>
-            <SectionLabel>Monthly SYNC agenda</SectionLabel>
-            <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
+            <h2 className="max-w-xl font-display text-3xl text-cream md:text-4xl">
               What actually gets discussed.
             </h2>
           </Reveal>
@@ -91,8 +89,7 @@ export function HQ() {
 
       <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
         <Reveal stagger>
-          <SectionLabel>Your dashboard, previewed</SectionLabel>
-          <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
+          <h2 className="max-w-xl font-display text-3xl text-cream md:text-4xl">
             Tracking, once you&rsquo;re in.
           </h2>
         </Reveal>

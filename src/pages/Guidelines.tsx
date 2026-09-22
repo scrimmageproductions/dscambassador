@@ -2,6 +2,7 @@ import { Button, LinkButton } from '../components/ui/Button'
 import { Tagline } from '../components/ui/Tagline'
 import { eligibility, commitments, contentRules, successMetrics } from '../content/guidelines'
 import { Reveal } from '../components/motion/Reveal'
+import { TextDecode } from '../components/motion/TextDecode'
 
 export function Guidelines() {
   return (
@@ -11,7 +12,7 @@ export function Guidelines() {
           <Reveal stagger>
             <p className="label-mono text-[0.7rem] text-cream-wash">Official Guidelines</p>
             <h1 className="mt-4 font-display text-4xl text-cream md:text-5xl">
-              Digital Spenders Club Ambassador Program
+              <TextDecode>Digital Spenders Club Ambassador Program</TextDecode>
             </h1>
             <div className="no-print mt-8 flex flex-wrap gap-3">
               <Button variant="ghost" onClick={() => window.print()}>

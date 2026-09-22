@@ -10,6 +10,7 @@ import { MatrixTransition } from '../components/ui/MatrixTransition'
 import { ScrambleHeader } from '../components/ui/ScrambleHeader'
 import { Reveal } from '../components/motion/Reveal'
 import { ParallaxImage } from '../components/motion/ParallaxImage'
+import { TextDecode } from '../components/motion/TextDecode'
 import { Link } from 'react-router-dom'
 
 const tiles = [
@@ -46,13 +47,17 @@ const events = [
 export function Home() {
   const ctaRef = useRef<HTMLDivElement>(null)
   const scrambleRef = useRef<HTMLHeadingElement>(null)
+  const heroRef = useRef<HTMLElement>(null)
 
   return (
     <div>
       <div className="relative">
-        <MatrixTransition ctaRef={ctaRef} targetRef={scrambleRef} />
+        <MatrixTransition ctaRef={ctaRef} targetRef={scrambleRef} heroRef={heroRef} />
 
-        <section className="relative z-10 flex min-h-[80vh] flex-col items-center justify-center overflow-hidden bg-noise hairline-b">
+        <section
+          ref={heroRef}
+          className="relative z-10 flex min-h-[80vh] flex-col items-center justify-center overflow-hidden bg-noise hairline-b"
+        >
           <div
             className="glow-gold pointer-events-none absolute left-1/2 top-1/2 h-[42rem] w-[42rem] -translate-x-1/2 -translate-y-1/2"
             aria-hidden="true"
@@ -61,7 +66,7 @@ export function Home() {
             <Reveal stagger>
               <SectionLabel className="justify-center">Digital Spenders Club</SectionLabel>
               <h1 className="mx-auto mt-8 max-w-3xl font-display text-5xl text-cream sm:text-6xl md:text-8xl">
-                Ambassador Program
+                <TextDecode>Ambassador Program</TextDecode>
               </h1>
               <div className="mt-8">
                 <Tagline className="text-sm md:text-base" />
@@ -89,8 +94,7 @@ export function Home() {
           <div className="grid items-center gap-10 md:grid-cols-2">
             <CultureMedia className="md:order-2" />
             <Reveal stagger className="md:order-1">
-              <SectionLabel>IRL motion</SectionLabel>
-              <h3 className="mt-6 max-w-md font-display text-3xl text-cream md:text-4xl">
+              <h3 className="max-w-md font-display text-3xl text-cream md:text-4xl">
                 Real people. Real presence.
               </h3>
               <p className="mt-4 max-w-md text-sm leading-relaxed text-cream-3">
@@ -148,8 +152,7 @@ export function Home() {
       <section className="hairline-t">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-6 py-20 md:grid-cols-2 md:py-24">
           <Reveal stagger>
-            <SectionLabel>The shop</SectionLabel>
-            <h2 className="mt-6 max-w-md font-display text-3xl text-cream md:text-4xl">
+            <h2 className="max-w-md font-display text-3xl text-cream md:text-4xl">
               The kit is one piece of a much bigger line.
             </h2>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-cream-3">
@@ -186,8 +189,7 @@ export function Home() {
 
       <section className="mx-auto max-w-3xl px-6 py-20 md:py-28">
         <Reveal stagger>
-          <SectionLabel>Check yourself</SectionLabel>
-          <h2 className="mt-6 font-display text-3xl text-cream md:text-4xl">
+          <h2 className="font-display text-3xl text-cream md:text-4xl">
             See where you stand before you apply.
           </h2>
         </Reveal>

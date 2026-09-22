@@ -74,8 +74,7 @@ export function Kit() {
             <BurnerVideoEmbed />
           </div>
           <Reveal stagger>
-            <SectionLabel>Featured object</SectionLabel>
-            <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
+            <h2 className="max-w-xl font-display text-3xl text-cream md:text-4xl">
               The DSC Membership Card.
             </h2>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-cream-3">
@@ -124,8 +123,7 @@ export function Kit() {
       <section className="hairline-t mx-auto max-w-6xl px-6 py-20 md:py-24">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <Reveal stagger>
-            <SectionLabel>From the shop floor</SectionLabel>
-            <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
+            <h2 className="max-w-xl font-display text-3xl text-cream md:text-4xl">
               What the club actually wears.
             </h2>
             <p className="mt-4 max-w-xl text-sm leading-relaxed text-cream-3">

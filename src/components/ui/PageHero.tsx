@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { SectionLabel } from './SectionLabel'
 import { Reveal } from '../motion/Reveal'
+import { TextDecode } from '../motion/TextDecode'
 
 export function PageHero({
   eyebrow,
@@ -9,7 +10,7 @@ export function PageHero({
   children,
 }: {
   eyebrow: string
-  title: ReactNode
+  title: string
   lede?: ReactNode
   children?: ReactNode
 }) {
@@ -19,7 +20,7 @@ export function PageHero({
         <Reveal stagger>
           <SectionLabel>{eyebrow}</SectionLabel>
           <h1 className="mt-6 max-w-3xl text-4xl leading-[1.05] text-cream md:text-6xl">
-            {title}
+            <TextDecode>{title}</TextDecode>
           </h1>
           {lede ? (
             <p className="mt-6 max-w-xl text-base leading-relaxed text-cream-3 md:text-lg">

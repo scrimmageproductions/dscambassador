@@ -25,6 +25,10 @@ const SCROLL_SMOOTHING = 0.08
 // loop actually stops scheduling itself -- LERP asymptotically approaches
 // but never exactly reaches its target.
 const FADE_EPSILON = 0.005
+// Below this fraction of the Hero section's own height visible in the
+// viewport, the draw loop pauses outright -- no off-screen GPU work once
+// the user has scrolled well past it.
+const VISIBILITY_THRESHOLD = 0.05
 
 // -- Two-stage scroll choreography, keyed off a single scrollProgress in
 // [0, 1] that tracks how far the gap between the Hero's CTA row and the
@@ -79,13 +83,23 @@ function clamp01(v: number) {
  * own background/noise texture is always visible through the gaps between
  * characters. Purely decorative (aria-hidden) and skipped entirely under
  * prefers-reduced-motion.
+ *
+ * An IntersectionObserver on `heroRef` pauses the draw loop outright the
+ * moment the Hero section's visible fraction drops below
+ * VISIBILITY_THRESHOLD (i.e. the user has scrolled well past it) -- no
+ * off-screen GPU work, no fading artifacts from a loop still running
+ * against a canvas nobody can see. It resumes seamlessly, picking the LERP
+ * chase back up from wherever it left off, the moment the Hero scrolls
+ * back into view.
  */
 export function MatrixTransition({
   ctaRef,
   targetRef,
+  heroRef,
 }: {
   ctaRef: RefObject<HTMLElement | null>
   targetRef: RefObject<HTMLElement | null>
+  heroRef: RefObject<HTMLElement | null>
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -95,7 +109,8 @@ export function MatrixTransition({
     const canvasRefEl = canvasRef.current
     const containerRefEl = canvasRefEl?.parentElement
     const ctxRef = canvasRefEl?.getContext('2d')
-    if (!canvasRefEl || !containerRefEl || !ctxRef) return
+    const heroEl = heroRef.current
+    if (!canvasRefEl || !containerRefEl || !ctxRef || !heroEl) return
 
     // Re-bind as explicitly non-nullable: TS's control-flow narrowing from
     // the guard above doesn't extend into the nested resize/draw closures.
@@ -121,6 +136,9 @@ export function MatrixTransition({
     let targetScrollProgress = 0
     let smoothProgress = 0
     let scrollRaf = 0
+    // Assume visible until the observer's first callback corrects it --
+    // avoids a one-frame flash of "paused" while the observer spins up.
+    let isIntersecting = true
 
     // Landing point is the horizontal center of the viewport/canvas, at the
     // target's own top edge -- the streams converge exactly where the real
@@ -212,7 +230,29 @@ export function MatrixTransition({
     updateScrollProgress()
     window.addEventListener('scroll', handleScroll, { passive: true })
 
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        isIntersecting = entry.intersectionRatio >= VISIBILITY_THRESHOLD
+        // Resume exactly like a scroll update would: only kick the loop
+        // back on if it isn't already running and there's still something
+        // to animate.
+        if (isIntersecting && raf === 0 && !isFullyFadedOut()) {
+          raf = requestAnimationFrame(draw)
+        }
+      },
+      { threshold: [0, VISIBILITY_THRESHOLD] },
+    )
+    visibilityObserver.observe(heroEl)
+
     function draw(time: number) {
+      // Paused: the Hero has scrolled (near enough) out of view. Don't
+      // reschedule -- the observer callback above is what restarts this
+      // loop once it scrolls back into range.
+      if (!isIntersecting) {
+        raf = 0
+        return
+      }
+
       // Chase the (possibly discontinuous, e.g. after a fast scroll flick)
       // target every rAF tick, independent of the STEP_MS throttle below --
       // this is what makes the whole transition decay gracefully instead of
@@ -293,8 +333,9 @@ export function MatrixTransition({
       cancelAnimationFrame(scrollRaf)
       window.removeEventListener('resize', resize)
       window.removeEventListener('scroll', handleScroll)
+      visibilityObserver.disconnect()
     }
-  }, [ctaRef, targetRef])
+  }, [ctaRef, targetRef, heroRef])
 
   return (
     <canvas

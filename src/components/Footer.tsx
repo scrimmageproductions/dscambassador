@@ -1,5 +1,13 @@
 import { Link } from 'react-router-dom'
+import { AtSign, Calendar, Camera, Globe } from 'lucide-react'
 import { Tagline } from './ui/Tagline'
+
+const elsewhere = [
+  { href: 'https://spenders.club', label: 'spenders.club', Icon: Globe },
+  { href: 'https://instagram.com/spenders_club', label: '@spenders_club', Icon: Camera },
+  { href: 'https://twitter.com/spenders_club', label: '@spenders_club', Icon: AtSign },
+  { href: 'https://sheeets.xyz', label: 'Ecosystem calendar', Icon: Calendar },
+]
 
 export function Footer() {
   return (
@@ -43,26 +51,22 @@ export function Footer() {
           <div>
             <p className="label-mono text-[0.68rem] text-cream-wash">Elsewhere</p>
             <ul className="mt-4 space-y-3 text-sm text-cream-3">
-              <li>
-                <a href="https://spenders.club" target="_blank" rel="noreferrer" className="hover:text-cream">
-                  spenders.club
-                </a>
-              </li>
-              <li>
-                <a href="https://instagram.com/spenders_club" target="_blank" rel="noreferrer" className="hover:text-cream">
-                  @spenders_club
-                </a>
-              </li>
-              <li>
-                <a href="https://twitter.com/spenders_club" target="_blank" rel="noreferrer" className="hover:text-cream">
-                  @spenders_club
-                </a>
-              </li>
-              <li>
-                <a href="https://sheeets.xyz" target="_blank" rel="noreferrer" className="hover:text-cream">
-                  Ecosystem calendar
-                </a>
-              </li>
+              {elsewhere.map(({ href, label, Icon }) => (
+                <li key={href}>
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group flex items-center gap-2.5 text-cream-wash transition-colors duration-200 hover:text-cream"
+                  >
+                    <Icon
+                      className="h-4 w-4 shrink-0 text-cream-wash transition-colors duration-200 group-hover:text-cream"
+                      aria-hidden="true"
+                    />
+                    {label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

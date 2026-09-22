@@ -89,8 +89,7 @@ export function Campus() {
       <section className="hairline-t bg-surface/20">
         <div className="mx-auto max-w-3xl px-6 py-20 md:py-24">
           <Reveal stagger>
-            <SectionLabel>Start a chapter</SectionLabel>
-            <h2 className="mt-6 font-display text-3xl text-cream md:text-4xl">
+            <h2 className="font-display text-3xl text-cream md:text-4xl">
               Tell us about your club.
             </h2>
           </Reveal>

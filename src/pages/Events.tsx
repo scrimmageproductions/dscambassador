@@ -1,6 +1,5 @@
 import { lazy, Suspense, useState } from 'react'
 import { PageHero } from '../components/ui/PageHero'
-import { SectionLabel } from '../components/ui/SectionLabel'
 import { HairlineCard } from '../components/ui/HairlineCard'
 import { LinkButton } from '../components/ui/Button'
 import { EventMaterialsRequest } from '../components/interactive/EventMaterialsRequest'
@@ -63,8 +62,7 @@ export function Events() {
       <section className="hairline-t">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-20 md:grid-cols-2 md:py-24">
           <Reveal stagger>
-            <SectionLabel>IRL motion</SectionLabel>
-            <h2 className="mt-6 max-w-md font-display text-3xl text-cream md:text-4xl">
+            <h2 className="max-w-md font-display text-3xl text-cream md:text-4xl">
               This is what an activation looks like.
             </h2>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-cream-3">
@@ -83,8 +81,7 @@ export function Events() {
       <section className="hairline-t bg-surface/20">
         <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
           <Reveal stagger>
-            <SectionLabel>Where ambassadors show up</SectionLabel>
-            <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
+            <h2 className="max-w-xl font-display text-3xl text-cream md:text-4xl">
               The circuit, mapped.
             </h2>
           </Reveal>
@@ -117,8 +114,7 @@ export function Events() {
       <section className="hairline-t hairline-b bg-surface/20">
         <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
           <Reveal stagger>
-            <SectionLabel>The circuit feed</SectionLabel>
-            <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
+            <h2 className="max-w-xl font-display text-3xl text-cream md:text-4xl">
               What&rsquo;s next, by category.
             </h2>
           </Reveal>
@@ -134,8 +130,7 @@ export function Events() {
 
       <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
         <Reveal stagger>
-          <SectionLabel>Onboard with the card</SectionLabel>
-          <h2 className="mt-6 max-w-xl font-display text-3xl text-cream md:text-4xl">
+          <h2 className="max-w-xl font-display text-3xl text-cream md:text-4xl">
             Every activation ends in a tap.
           </h2>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-cream-3">
@@ -152,8 +147,7 @@ export function Events() {
       <section className="hairline-t bg-surface/20">
         <div className="mx-auto max-w-3xl px-6 py-20 md:py-24">
           <Reveal stagger>
-            <SectionLabel>Materials</SectionLabel>
-            <h2 className="mt-6 font-display text-3xl text-cream md:text-4xl">
+            <h2 className="font-display text-3xl text-cream md:text-4xl">
               Requesting event assets.
             </h2>
           </Reveal>
