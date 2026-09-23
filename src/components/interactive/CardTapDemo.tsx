@@ -151,8 +151,9 @@ export function CardTapDemo() {
 
             {step === 'settle' && (
               <p className="mt-3 text-sm leading-relaxed text-cream-3">
-                This is what opens every time, for a member checking the SYNC agenda, or someone
-                tapping in for the first time at a conference booth.
+                This is what opens every time&mdash;from tapping in via NFC at an event booth to
+                managing your .brnr.eth handle, checking your crypto balance, or launching the DSC
+                app.
               </p>
             )}
 
