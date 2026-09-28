@@ -39,7 +39,7 @@ export function PendingApprovalsTab() {
       region: '—',
       requestedBy: roleTransfer.fromName,
       submittedAt: roleTransfer.submittedAt,
-      summary: `Handover to ${roleTransfer.toName} — ${roleTransfer.reason}`,
+      summary: `Handover to ${roleTransfer.toName} — ${roleTransfer.reason} (inventory receipt confirmed: ${roleTransfer.unactivatedInventoryAtTransfer} cards)`,
       onApprove: () => approveTransfer(),
       onReject: (reason: string) => rejectTransfer(reason),
     })

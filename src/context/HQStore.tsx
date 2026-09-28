@@ -9,6 +9,7 @@ import {
   type RoleTransfer,
 } from './HQStoreContext'
 import { regionalCardInventory } from '../data/dashboard'
+import { sendAdminAlert } from '../services/adminAlertService'
 
 export const NODE_REGION = 'New York, NY'
 
@@ -68,6 +69,7 @@ export function HQStoreProvider({ children }: { children: ReactNode }) {
       ...prev,
     ])
     appendAudit(`Card reorder requested — ${batchSize} cards, ${NODE_REGION}`)
+    sendAdminAlert({ nodeRegion: NODE_REGION, requestType: APPROVAL_TYPE_LABEL['card-reorder'] })
   }
 
   function claimPrimaryAmbassadorName(name: string) {
@@ -87,6 +89,7 @@ export function HQStoreProvider({ children }: { children: ReactNode }) {
       ...prev,
     ])
     appendAudit(`${APPROVAL_TYPE_LABEL[type]} submitted — ${details.requestedBy}, ${details.region}`)
+    sendAdminAlert({ nodeRegion: details.region, requestType: APPROVAL_TYPE_LABEL[type] })
   }
 
   function approveRequest(id: string) {
@@ -115,7 +118,7 @@ export function HQStoreProvider({ children }: { children: ReactNode }) {
     })
   }
 
-  function initiateTransfer(fromName: string, toName: string, reason: string) {
+  function initiateTransfer(fromName: string, toName: string, reason: string, unactivatedInventory: number) {
     setRoleTransfer({
       id: nextId('transfer'),
       fromName,
@@ -123,19 +126,29 @@ export function HQStoreProvider({ children }: { children: ReactNode }) {
       reason,
       stage: 'pending-co-ambassador',
       submittedAt: Date.now(),
+      unactivatedInventoryAtTransfer: unactivatedInventory,
+      receiverConfirmedReceipt: false,
     })
-    appendAudit(`Role transfer initiated — ${fromName} proposed handover to ${toName}`)
+    appendAudit(
+      `Role transfer initiated — ${fromName} proposed handover to ${toName} (${unactivatedInventory} unactivated cards pending transfer)`,
+    )
   }
 
-  function simulateCoAmbassadorDecision(accept: boolean) {
+  function simulateCoAmbassadorDecision(accept: boolean, receiptConfirmed: boolean) {
     setRoleTransfer((prev) => {
       if (!prev) return prev
       if (!accept) {
         appendAudit(`Role transfer declined by ${prev.toName}`)
         return { ...prev, stage: 'declined' }
       }
-      appendAudit(`${prev.toName} accepted the handover — routed to admin approval`)
-      return { ...prev, stage: 'pending-admin' }
+      // Logic gate: acceptance cannot advance the transfer to admin approval
+      // until the co-ambassador has confirmed physical inventory receipt.
+      if (!receiptConfirmed) return prev
+      appendAudit(
+        `${prev.toName} confirmed receipt of ${prev.unactivatedInventoryAtTransfer} unactivated cards — routed to admin approval`,
+      )
+      sendAdminAlert({ nodeRegion: NODE_REGION, requestType: 'Role Transfer & Inventory Handoff' })
+      return { ...prev, stage: 'pending-admin', receiverConfirmedReceipt: true }
     })
   }
 

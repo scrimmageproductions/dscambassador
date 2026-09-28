@@ -5,13 +5,16 @@ import { useHQStore } from '../../context/useHQStore'
 
 export function RoleTransferModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { session } = useAmbassadorSession()
-  const { coAmbassador, initiateTransfer } = useHQStore()
+  const { coAmbassador, cardInventory, initiateTransfer } = useHQStore()
   const [reason, setReason] = useState('')
+  const [inventoryConfirmed, setInventoryConfirmed] = useState(false)
+  const unactivated = cardInventory.batchSize - cardInventory.activations
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    initiateTransfer(session?.name ?? 'Ambassador', coAmbassador, reason)
+    initiateTransfer(session?.name ?? 'Ambassador', coAmbassador, reason, unactivated)
     setReason('')
+    setInventoryConfirmed(false)
     onClose()
   }
 
@@ -31,6 +34,10 @@ export function RoleTransferModal({ open, onClose }: { open: boolean; onClose: (
         <p className="label-mono text-[0.68rem] text-cream-wash">Designated co-ambassador</p>
         <p className="mt-2 font-display text-xl text-cream">{coAmbassador}</p>
 
+        <p className="label-mono mt-4 text-[0.65rem] text-[#E8E4D9]">
+          Unactivated inventory: {unactivated} cards
+        </p>
+
         <div className="mt-5">
           <label htmlFor="transfer-reason" className="label-mono text-[0.68rem] text-cream-wash">
             Transition reason / notes to HQ
@@ -45,6 +52,18 @@ export function RoleTransferModal({ open, onClose }: { open: boolean; onClose: (
             className="hairline mt-2 w-full resize-none bg-ink px-4 py-3 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
           />
         </div>
+
+        <label className="label-mono mt-5 flex items-start gap-2.5 text-[0.65rem] text-cream-2">
+          <input
+            type="checkbox"
+            required
+            checked={inventoryConfirmed}
+            onChange={(e) => setInventoryConfirmed(e.target.checked)}
+            className="mt-0.5 h-4 w-4 shrink-0 rounded-none accent-[#E8E4D9]"
+          />
+          I confirm that the remaining physical card inventory will be transferred to the
+          Co-Ambassador.
+        </label>
 
         <button
           type="submit"

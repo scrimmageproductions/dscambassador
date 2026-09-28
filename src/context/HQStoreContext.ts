@@ -33,6 +33,9 @@ export type RoleTransfer = {
   stage: TransferStage
   submittedAt: number
   rejectionReason?: string
+  /** Unactivated card count snapshotted at initiation, for the physical handoff checkpoint. */
+  unactivatedInventoryAtTransfer: number
+  receiverConfirmedReceipt: boolean
 }
 
 export type AuditLogEntry = {
@@ -67,8 +70,8 @@ export type HQStoreValue = {
   resetCardReorderStatus: () => void
 
   roleTransfer: RoleTransfer | null
-  initiateTransfer: (fromName: string, toName: string, reason: string) => void
-  simulateCoAmbassadorDecision: (accept: boolean) => void
+  initiateTransfer: (fromName: string, toName: string, reason: string, unactivatedInventory: number) => void
+  simulateCoAmbassadorDecision: (accept: boolean, receiptConfirmed: boolean) => void
   approveTransfer: () => void
   rejectTransfer: (reason: string) => void
 
