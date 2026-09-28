@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import { AmbassadorSessionProvider } from './context/AmbassadorSession'
+import { HQStoreProvider } from './context/HQStore'
 import { BootLoader } from './components/ui/BootLoader'
 import { Layout } from './components/Layout'
 import { Home } from './pages/Home'
@@ -10,25 +11,29 @@ import { Events } from './pages/Events'
 import { Apply } from './pages/Apply'
 import { Guidelines } from './pages/Guidelines'
 import { HQ } from './pages/HQ'
+import { Admin } from './pages/Admin'
 import { NotFound } from './pages/NotFound'
 
 function App() {
   return (
     <AmbassadorSessionProvider>
-      <BootLoader />
-      <Routes>
-        <Route element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="program" element={<Program />} />
-          <Route path="kit" element={<Kit />} />
-          <Route path="campus" element={<Campus />} />
-          <Route path="events" element={<Events />} />
-          <Route path="apply" element={<Apply />} />
-          <Route path="guidelines" element={<Guidelines />} />
-          <Route path="hq" element={<HQ />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
+      <HQStoreProvider>
+        <BootLoader />
+        <Routes>
+          <Route element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="program" element={<Program />} />
+            <Route path="kit" element={<Kit />} />
+            <Route path="campus" element={<Campus />} />
+            <Route path="events" element={<Events />} />
+            <Route path="apply" element={<Apply />} />
+            <Route path="guidelines" element={<Guidelines />} />
+            <Route path="hq" element={<HQ />} />
+            <Route path="admin" element={<Admin />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </HQStoreProvider>
     </AmbassadorSessionProvider>
   )
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DashboardHeader } from './DashboardHeader'
 import { DashboardSidebar } from './DashboardSidebar'
 import { TakeActionView } from './views/TakeActionView'
@@ -18,6 +18,8 @@ import { SettingsView } from './views/SettingsView'
 import { MailingAddressView } from './views/MailingAddressView'
 import { viewLabels, type DashboardViewKey } from '../../data/dashboard'
 import { Reveal } from '../motion/Reveal'
+import { useAmbassadorSession } from '../../context/useAmbassadorSession'
+import { useHQStore } from '../../context/useHQStore'
 
 function renderView(key: DashboardViewKey, name: string) {
   switch (key) {
@@ -58,10 +60,18 @@ function renderView(key: DashboardViewKey, name: string) {
 
 export function AmbassadorDashboard({ name, onSignOut }: { name: string; onSignOut: () => void }) {
   const [active, setActive] = useState<DashboardViewKey>('take-action')
+  const { session } = useAmbassadorSession()
+  const { ambassadorRole, claimPrimaryAmbassadorName } = useHQStore()
+
+  useEffect(() => {
+    // Only a genuine ambassador demo persona "claims" the node's primary-ambassador
+    // identity -- an admin persona previewing /hq must never overwrite it.
+    if (session && !session.isAdmin) claimPrimaryAmbassadorName(session.name)
+  }, [session, claimPrimaryAmbassadorName])
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-12 md:py-16">
-      <DashboardHeader name={name} onSignOut={onSignOut} />
+      <DashboardHeader name={name} role={ambassadorRole} isAdmin={!!session?.isAdmin} onSignOut={onSignOut} />
 
       <div className="mt-10 grid gap-6 md:grid-cols-[240px_1fr] md:items-start">
         <DashboardSidebar active={active} onSelect={setActive} />

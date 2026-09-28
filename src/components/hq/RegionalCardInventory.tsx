@@ -1,13 +1,14 @@
 import { useState } from 'react'
-import { regionalCardInventory } from '../../data/dashboard'
+import { useHQStore } from '../../context/useHQStore'
+import { useAmbassadorSession } from '../../context/useAmbassadorSession'
 import { CardReorderModal } from './CardReorderModal'
 
-const { batchSize, activations, reorderThresholdPct } = regionalCardInventory
-
 export function RegionalCardInventory() {
+  const { session } = useAmbassadorSession()
+  const { cardInventory, submitCardReorder, resetCardReorderStatus } = useHQStore()
   const [modalOpen, setModalOpen] = useState(false)
-  const [requestStatus, setRequestStatus] = useState<'idle' | 'pending'>('idle')
 
+  const { batchSize, activations, reorderThresholdPct, reorderStatus, reorderRejectionReason } = cardInventory
   const activationRate = (activations / batchSize) * 100
   const unlocked = activationRate >= reorderThresholdPct
 
@@ -64,8 +65,23 @@ export function RegionalCardInventory() {
       </div>
 
       <div className="mt-8 border-t border-white/10 pt-6">
-        {requestStatus === 'pending' ? (
+        {reorderStatus === 'pending' ? (
           <p className="label-mono text-[0.65rem] text-gold">[ Pending admin approval ]</p>
+        ) : reorderStatus === 'approved' ? (
+          <p className="label-mono text-[0.65rem] text-[#E8E4D9]">[ Approved &mdash; shipment confirmed ]</p>
+        ) : reorderStatus === 'rejected' ? (
+          <div>
+            <p className="label-mono text-[0.65rem] text-gold">
+              [ Rejected{reorderRejectionReason ? `: ${reorderRejectionReason}` : ''} ]
+            </p>
+            <button
+              type="button"
+              onClick={resetCardReorderStatus}
+              className="label-mono mt-3 text-[0.62rem] text-white/50 underline underline-offset-4 hover:text-white"
+            >
+              Request again
+            </button>
+          </div>
         ) : unlocked ? (
           <button
             type="button"
@@ -94,7 +110,9 @@ export function RegionalCardInventory() {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         batchDefault={batchSize}
-        onSubmitted={() => setRequestStatus('pending')}
+        onSubmitted={({ batchSize: submittedBatch, address }) =>
+          submitCardReorder({ batchSize: submittedBatch, address, requestedBy: session?.name ?? 'Ambassador' })
+        }
       />
     </div>
   )

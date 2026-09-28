@@ -1,5 +1,7 @@
 import { useRef, useState, type ChangeEvent, type DragEvent, type FormEvent } from 'react'
 import { Button } from '../ui/Button'
+import { useAmbassadorSession } from '../../context/useAmbassadorSession'
+import { useHQStore } from '../../context/useHQStore'
 
 type UploadStatus = 'uploading' | 'done'
 type UploadedFile = { id: string; name: string; size: number; status: UploadStatus }
@@ -51,6 +53,8 @@ function QtyStepper({ value, onChange }: { value: number; onChange: (v: number) 
 }
 
 export function EventRequestModule() {
+  const { session } = useAmbassadorSession()
+  const { region, submitRequest } = useHQStore()
   const [submitted, setSubmitted] = useState(false)
   const [files, setFiles] = useState<UploadedFile[]>([])
   const [dragActive, setDragActive] = useState(false)
@@ -107,6 +111,14 @@ export function EventRequestModule() {
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setSubmitted(true)
+    const data = new FormData(e.currentTarget)
+    const eventName = String(data.get('eventName') ?? 'Event')
+    const budget = String(data.get('budget') ?? '0')
+    submitRequest('event-funding', {
+      region,
+      requestedBy: session?.name ?? 'Ambassador',
+      summary: `${eventName} — requested budget $${budget}`,
+    })
   }
 
   function reset() {
@@ -147,6 +159,7 @@ export function EventRequestModule() {
             </label>
             <input
               id="req-event-name"
+              name="eventName"
               required
               placeholder="e.g. ETHDenver Side Event"
               className="hairline mt-2 w-full rounded-lg bg-surface px-4 py-3 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
@@ -184,6 +197,7 @@ export function EventRequestModule() {
               <span className="text-sm text-cream-wash">$</span>
               <input
                 id="req-budget"
+                name="budget"
                 type="number"
                 min={0}
                 step="0.01"

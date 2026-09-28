@@ -27,10 +27,11 @@ export function SignInModal({ open, onClose }: { open: boolean; onClose: () => v
   const { signIn } = useAmbassadorSession()
   const [method, setMethod] = useState<Method>('card')
   const [name, setName] = useState('')
+  const [asAdmin, setAsAdmin] = useState(false)
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    signIn(name)
+    signIn(name, asAdmin)
     onClose()
   }
 
@@ -88,6 +89,16 @@ export function SignInModal({ open, onClose }: { open: boolean; onClose: () => v
           maxLength={40}
           className="hairline mt-2 w-full bg-ink px-4 py-3 text-sm text-cream placeholder:text-cream-wash/40 focus-visible:outline-cream"
         />
+
+        <label className="mt-5 flex items-center gap-2.5 text-sm text-cream-2">
+          <input
+            type="checkbox"
+            checked={asAdmin}
+            onChange={(e) => setAsAdmin(e.target.checked)}
+            className="h-3.5 w-3.5 accent-[#E8E4D9]"
+          />
+          Sign in as Admin <span className="text-cream-wash/60">(preview the registry panel)</span>
+        </label>
 
         <Button type="submit" variant="solid" className="mt-6 w-full">
           Preview / Demo Sign-In

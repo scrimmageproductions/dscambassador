@@ -1,4 +1,16 @@
-export function DashboardHeader({ name, onSignOut }: { name: string; onSignOut: () => void }) {
+import { Link } from 'react-router-dom'
+
+export function DashboardHeader({
+  name,
+  role,
+  isAdmin,
+  onSignOut,
+}: {
+  name: string
+  role: 'primary' | 'emeritus'
+  isAdmin: boolean
+  onSignOut: () => void
+}) {
   return (
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div>
@@ -8,8 +20,16 @@ export function DashboardHeader({ name, onSignOut }: { name: string; onSignOut: 
         </p>
       </div>
       <div className="flex items-center gap-3">
+        {isAdmin ? (
+          <Link
+            to="/admin"
+            className="label-mono rounded-full border border-white/15 px-4 py-1.5 text-[0.65rem] text-cream-wash transition-colors hover:border-white/30 hover:text-cream"
+          >
+            Admin panel &rarr;
+          </Link>
+        ) : null}
         <span className="label-mono rounded-full border border-gold/40 bg-gold/10 px-4 py-1.5 text-[0.65rem] text-gold">
-          Ambassador
+          {role === 'emeritus' ? 'Emeritus member' : 'Ambassador'}
         </span>
         <button
           type="button"

@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Button } from '../ui/Button'
 import { myEvents } from '../../data/dashboard'
+import { useHQStore } from '../../context/useHQStore'
 
 function referralCode(name: string) {
   const base = name.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 6) || 'DSC'
@@ -86,7 +87,8 @@ function EventReportForm() {
 
 const merchOptions = ['Membership cards', 'Flyers', 'Banners', 'Signage']
 
-function MerchDropForm() {
+function MerchDropForm({ name }: { name: string }) {
+  const { region, submitRequest } = useHQStore()
   const [submitted, setSubmitted] = useState(false)
   const [selected, setSelected] = useState<string[]>([])
 
@@ -98,6 +100,7 @@ function MerchDropForm() {
     e.preventDefault()
     if (selected.length === 0) return
     setSubmitted(true)
+    submitRequest('merch-allocation', { region, requestedBy: name, summary: `Restock: ${selected.join(', ')}` })
   }
 
   if (submitted) {
@@ -237,7 +240,7 @@ export function ActionModule({ name }: { name: string }) {
 
       <div className="hairline glass-card mt-5 rounded-2xl p-8 md:p-10">
         {tab === 'event-report' && <EventReportForm />}
-        {tab === 'merch' && <MerchDropForm />}
+        {tab === 'merch' && <MerchDropForm name={name} />}
         {tab === 'community' && <CommunityLinks name={name} />}
       </div>
     </div>

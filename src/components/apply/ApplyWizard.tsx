@@ -6,6 +6,7 @@ import { StepPresence } from './StepPresence'
 import { StepFit } from './StepFit'
 import { StepAgreement } from './StepAgreement'
 import { Button } from '../ui/Button'
+import { useHQStore } from '../../context/useHQStore'
 
 function validateStep(step: number, draft: ReturnType<typeof useDraft>['draft']): string | null {
   if (step === 0) {
@@ -36,6 +37,7 @@ function validateStep(step: number, draft: ReturnType<typeof useDraft>['draft'])
 
 export function ApplyWizard() {
   const { draft, update, clear } = useDraft()
+  const { submitRequest } = useHQStore()
   const [step, setStep] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [submittedAt, setSubmittedAt] = useState<string | null>(null)
@@ -49,6 +51,11 @@ export function ApplyWizard() {
     setError(null)
     if (step === 3) {
       setSubmittedAt(new Date().toLocaleString())
+      submitRequest('ambassador-application', {
+        region: draft.city.trim() || 'Unspecified',
+        requestedBy: draft.name.trim() || 'Applicant',
+        summary: `New ambassador application — ${draft.name.trim() || 'Applicant'}`,
+      })
       clear()
       return
     }

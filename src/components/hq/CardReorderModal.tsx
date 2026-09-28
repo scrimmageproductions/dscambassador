@@ -10,7 +10,7 @@ export function CardReorderModal({
   open: boolean
   onClose: () => void
   batchDefault: number
-  onSubmitted: () => void
+  onSubmitted: (details: { batchSize: number; address: string }) => void
 }) {
   const [batchSize, setBatchSize] = useState(batchDefault)
   const [address, setAddress] = useState('')
@@ -20,7 +20,7 @@ export function CardReorderModal({
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setSubmitted(true)
-    onSubmitted()
+    onSubmitted({ batchSize, address })
   }
 
   function handleClose() {
