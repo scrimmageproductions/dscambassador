@@ -10,6 +10,7 @@ export type DashboardViewKey =
   | 'gallery'
   | 'merch'
   | 'growth'
+  | 'regional-logistics'
   | 'brand-assets'
   | 'settings'
   | 'mailing-address'
@@ -39,6 +40,7 @@ export const navGroups: NavGroup[] = [
       { key: 'gallery', label: 'Photo Gallery' },
       { key: 'merch', label: 'Order Merch' },
       { key: 'growth', label: 'Community Growth' },
+      { key: 'regional-logistics', label: 'Regional Logistics & Node Status' },
     ],
   },
   {
@@ -125,6 +127,13 @@ export const galleryItems = [
   { src: '/dsceventgif.gif', caption: 'Local SWC meetup' },
   { src: '/apparelgif.gif', caption: 'Ambassador summit' },
 ]
+
+/** Demo-only regional node stats for the Regional Logistics view's card-inventory tracker. */
+export const regionalCardInventory = {
+  batchSize: 150,
+  activations: 112,
+  reorderThresholdPct: 70,
+}
 
 export const brandAssets = [
   { name: 'Logo pack (white / black)', type: 'ZIP · PNG + SVG' },

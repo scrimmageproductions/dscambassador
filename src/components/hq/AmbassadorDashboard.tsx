@@ -12,6 +12,7 @@ import { MyExpensesView } from './views/MyExpensesView'
 import { GalleryView } from './views/GalleryView'
 import { MerchView } from './views/MerchView'
 import { GrowthView } from './views/GrowthView'
+import { RegionalLogisticsView } from './views/RegionalLogisticsView'
 import { BrandAssetsView } from './views/BrandAssetsView'
 import { SettingsView } from './views/SettingsView'
 import { MailingAddressView } from './views/MailingAddressView'
@@ -42,6 +43,8 @@ function renderView(key: DashboardViewKey, name: string) {
       return <MerchView />
     case 'growth':
       return <GrowthView />
+    case 'regional-logistics':
+      return <RegionalLogisticsView />
     case 'brand-assets':
       return <BrandAssetsView />
     case 'settings':
